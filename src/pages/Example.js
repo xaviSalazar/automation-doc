@@ -5,7 +5,9 @@ import PizZipUtils from "pizzip/utils/index.js";
 import { saveAs } from "file-saver";
 
 // URL to saved file 
-const filePath = "https://docxtemplater.com/tag-example.docx"
+// const filePath = "https://docxtemplater.com/tag-example.docx"
+const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/TemplateTest.docx'
+// const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/AUTORIZACION_example.docx'
 
 // Values defined to change inside a file (pdf, word, etc)
 // const valuesToChange =  {
@@ -76,14 +78,14 @@ function readSource(url, valuesToChange) {
 //     saveAs(blob, "output.docx");
 // }
 
-export default function Example() {
+export default function Example(valuesToChange) {
 
-    const valuesToChange =  {
-    first_name: "John",
-    last_name: "Doe",
-    phone: "0652455478",
-    description: "New Website",
-    }
+    // const valuesToChange =  {
+    // first_name: "John",
+    // last_name: "Doe",
+    // phone: "0652455478",
+    // description: "New Website",
+    // }
 
         // generate document should be called in a map
         // const generateDocument = () => {

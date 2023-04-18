@@ -93,6 +93,12 @@ function useApiRef() {
 //
 
 export default function DataGridView() {
+  // const valuesToChange =  {
+  //   first_name: "John",
+  //   last_name: "Doe",
+  //   phone: "0652455478",
+  //   description: "New Website",
+  //   }
 
   const { apiRef, columns } = useApiRef();
 
@@ -103,8 +109,7 @@ export default function DataGridView() {
     
     console.log(obj.get(1))
 
-    Example();
-
+    Example(obj.get(1));
   }
 
   return (
@@ -128,5 +133,4 @@ export default function DataGridView() {
       </Button>
     </Box>
   );
-  
 }

@@ -19,8 +19,7 @@ function App() {
         >
           Learn React
         </a>
-        <Example />
-        
+      <Example />
       </header>
       <DataGridView />
     </div>
