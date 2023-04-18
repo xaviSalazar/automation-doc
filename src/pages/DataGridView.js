@@ -3,6 +3,7 @@ import { useRef, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import { Button } from '@mui/material';
+import Example from './Example';
 
 /*========================================================================*/
 /** Initial column Values for first render */
@@ -94,8 +95,16 @@ function useApiRef() {
 export default function DataGridView() {
 
   const { apiRef, columns } = useApiRef();
+
   const handleClickButton = () => {
+
+    const obj = apiRef.current.getRowModels();
     console.log(apiRef.current.getRowModels());
+    
+    console.log(obj.get(1))
+
+    Example();
+
   }
 
   return (
