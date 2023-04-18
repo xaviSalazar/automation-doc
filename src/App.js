@@ -1,7 +1,6 @@
-import logo from './logo.svg';
 import './App.css';
-import Example from './pages/Example';
 import DataGridView from './pages/DataGridView';
+import Study from './pages/Study';
 
 function App() {
   return (
@@ -19,7 +18,8 @@ function App() {
           Learn React
         </a> */}
       {/* <Example /> */}
-     
+
+     <Study />
       <DataGridView />
     </div>
   );

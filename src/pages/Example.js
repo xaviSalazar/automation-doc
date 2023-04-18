@@ -1,27 +1,15 @@
-import React from "react";
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
 import PizZipUtils from "pizzip/utils/index.js";
 import { saveAs } from "file-saver";
+
+import copy from "copy-to-clipboard";  
 
 // URL to saved file 
 // const filePath = "https://docxtemplater.com/tag-example.docx"
 const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/TemplateT.docx'
 // const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/AUTORIZACION_example.docx'
 
-// Values defined to change inside a file (pdf, word, etc)
-// const valuesToChange =  {
-//     first_name: "John",
-//     last_name: "Doe",
-//     phone: "0652455478",
-//     description: "New Website",
-// }
-
-
-// Loads file from url only and gets content
-// function loadFile(url, callback) {
-//     PizZipUtils.getBinaryContent(url, callback);
-// }
 
 function readSource(url, valuesToChange) {
 
@@ -49,6 +37,10 @@ function readSource(url, valuesToChange) {
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             }); //Output the document using Data-URI
             saveAs(blob, "output.docx");
+            var text = doc.getFullText();
+            console.log(text)
+            copy(text);
+            alert(`You have copied: "${text}"`);
         });
         
     })
