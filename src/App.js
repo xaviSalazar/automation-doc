@@ -1,5 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
+import Example from './pages/Example';
+import DataGridView from './pages/DataGridView';
 
 function App() {
   return (
@@ -17,7 +19,10 @@ function App() {
         >
           Learn React
         </a>
+        <Example />
+        
       </header>
+      <DataGridView />
     </div>
   );
 }
