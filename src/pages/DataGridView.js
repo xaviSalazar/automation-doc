@@ -10,17 +10,27 @@ import Example from './Example';
 const columns = [
   { field: 'id', headerName: 'ID', width: 90 },
   {
-    field: 'firstName',
-    headerName: 'Nombres',
-    width: 150,
+    field: 'fullName',
+    headerName: 'Nombre Completo',
+    description: 'This column has a value getter and is not sortable.',
+    sortable: false,
+    width: 160,
     editable: true,
+    // valueGetter: (params) =>
+    //   `${params.row.firstName || ''} ${params.row.lastName || ''}`,
   },
-  {
-    field: 'lastName',
-    headerName: 'Apellidos',
-    width: 150,
-    editable: true,
-  },
+  // {
+  //   field: 'firstName',
+  //   headerName: 'Nombres',
+  //   width: 150,
+  //   editable: true,
+  // },
+  // {
+  //   field: 'lastName',
+  //   headerName: 'Apellidos',
+  //   width: 150,
+  //   editable: true,
+  // },
   {
     field: 'email',
     headerName: 'Correo',
@@ -36,6 +46,12 @@ const columns = [
     editable: true,
   },
   {
+    field: 'time',
+    headerName: 'Hora',
+    width: 70,
+    editable: true,
+  },
+  {
     field: 'providencia',
     headerName: 'Providencia',
     width: 350,
@@ -47,21 +63,14 @@ const columns = [
     width: 350,
     editable: true,
   },
-  {
-    field: 'fullName',
-    headerName: 'Nombre Completo',
-    description: 'This column has a value getter and is not sortable.',
-    sortable: false,
-    width: 160,
-    valueGetter: (params) =>
-      `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-  },
+  
 ];
 
 /** Initial row Values for first render */
 const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', email: 'example1@gmail.com', date: '14 de Abril de 2023', providencia: 'GADDMQ-AMC-DMITZEA-2023-0312-P', dictamen: 'GADMQ-AMC-DMITZEA-2023-105' },
-  // { id: 2, lastName: 'Lannister', firstName: 'Cersei', email: 'example2@gmail.com' },
+  { id: 1, fullName: null, email: null, date: null, time: null, providencia: null, dictamen: null },
+
+  // { id: 1, lastName: null, firstName: null, fullName: null, email: null, date: null, time: null, providencia: null, dictamen: null },
   // { id: 3, lastName: 'Lannister', firstName: 'Jaime', email: 'example3@gmail.com' },
   // { id: 4, lastName: 'Stark', firstName: 'Arya', email: 'example4@gmail.com' },
   // { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', email: null },
