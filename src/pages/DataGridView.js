@@ -97,6 +97,7 @@ function useApiRef(columns) {
   console.log(_columns)
 
   return { apiRef, columns: _columns };
+
 }
 /*========================================================================*/
 
@@ -129,23 +130,23 @@ export default function DataGridView({columnLister, content}) {
     setRows(newRows)
   }, [columnLister])
 
-    /* UseEffect for blob visualization content after word replacement*/
-    React.useEffect(() => {
-      docx.
-          renderAsync(blob, document.getElementById("container"))
-          .then((x) => console.log("docx: finished"))
-    }, [blob])
+  /* UseEffect for blob visualization content after word replacement*/
+  React.useEffect(() => {
+    docx.
+        renderAsync(blob, document.getElementById("container"))
+        .then((x) => console.log("docx: finished"))
+  }, [blob])
 
-/* useMemo to update the content of the cells */
-const _columns = useMemo(() => columns.concat({ 
-                                                field: "__HIDDEN__",
-                                                width: 0,
-                                                renderCell: (params) => {                         
-                                                  apiRef.current = params.api;
-                                                  return null;
-                                                }
-                                              }),
-                                              [columns]);
+  /* useMemo to update the content of the cells */
+  const _columns = useMemo(() => columns.concat({ 
+                                                  field: "__HIDDEN__",
+                                                  width: 0,
+                                                  renderCell: (params) => {                         
+                                                    apiRef.current = params.api;
+                                                    return null;
+                                                  }
+                                                }),
+                                                [columns]);
   
   const handleClickButton = () => {
     const obj = apiRef.current.getRowModels();
