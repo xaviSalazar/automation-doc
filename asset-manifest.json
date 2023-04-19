@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/automation-doc/static/css/main.073c9b0a.css",
-    "main.js": "/automation-doc/static/js/main.741cf675.js",
+    "main.js": "/automation-doc/static/js/main.e0081b76.js",
     "static/js/787.ba6888ff.chunk.js": "/automation-doc/static/js/787.ba6888ff.chunk.js",
     "index.html": "/automation-doc/index.html",
     "main.073c9b0a.css.map": "/automation-doc/static/css/main.073c9b0a.css.map",
-    "main.741cf675.js.map": "/automation-doc/static/js/main.741cf675.js.map",
+    "main.e0081b76.js.map": "/automation-doc/static/js/main.e0081b76.js.map",
     "787.ba6888ff.chunk.js.map": "/automation-doc/static/js/787.ba6888ff.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.073c9b0a.css",
-    "static/js/main.741cf675.js"
+    "static/js/main.e0081b76.js"
   ]
 }
