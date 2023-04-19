@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import { Button } from '@mui/material';
 import Example from './Example';
+import * as docx from "docx-preview";
 
 /*========================================================================*/
 /** Initial column Values for first render */
@@ -103,16 +104,25 @@ function useApiRef() {
 
 export default function DataGridView() {
 
+  const [blob, setBlob] = React.useState();
   const { apiRef, columns } = useApiRef();
 
-  const handleClickButton = () => {
+  React.useEffect(() => {
 
+    console.log('useEffect for blob')
+
+    docx.renderAsync(blob, document.getElementById("container"))
+          .then((x) => console.log("docx: finished"))
+
+  }, [blob])
+
+  const handleClickButton = () => {
     const obj = apiRef.current.getRowModels();
     console.log(apiRef.current.getRowModels());
     
     console.log(obj.get(1))
 
-    Example(obj.get(1));
+    Example(obj.get(1), setBlob);
   }
 
   return (
@@ -134,6 +144,7 @@ export default function DataGridView() {
       <Button variant="contained" color="primary" onClick={handleClickButton}>
         Show me grid data
       </Button>
+      <div id="container" style={{ height: "600px", overflowY: "auto" }} />
     </Box>
   );
 }

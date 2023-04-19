@@ -6,15 +6,13 @@ import { saveAs } from "file-saver";
 import copy from "copy-to-clipboard";  
 
 // URL to saved file 
-// const filePath = "https://docxtemplater.com/tag-example.docx"
 const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/TemplateT.docx'
 // const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/AUTORIZACION_example.docx'
 
-
-function readSource(url, valuesToChange) {
+function readSource(url, valuesToChange, setBlob) {
 
     return new Promise((resolve, reject) => {
-
+        
         PizZipUtils.getBinaryContent(url, function (error, content) {
             // error checker
             if (error) {
@@ -36,62 +34,19 @@ function readSource(url, valuesToChange) {
                 mimeType:
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             }); //Output the document using Data-URI
+            setBlob(blob);
             saveAs(blob, "output.docx");
-            var text = doc.getFullText();
-            console.log(text)
-            copy(text);
-            alert(`You have copied: "${text}"`);
         });
-        
     })
 }
 
-// modifies values in file and then saves it in docx format
-// const renderAndSave = (error, content) => {
-//     // error checker
-//     if (error) {
-//         throw error;
-//     }
-//     // return zip 
-//     const zip = new PizZip(content);
-    
-//     const doc = new Docxtemplater(zip, {
-//         paragraphLoop: true,
-//         linebreaks: true,
-//     });
 
-//     // render the document (replace all occurences of {first_name} by John, {last_name} by Doe, ...)
-//     doc.render(valuesToChange);
-//     const blob = doc.getZip().generate({
-//         type: "blob",
-//         mimeType:
-//             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-//     }); //Output the document using Data-URI
-//     saveAs(blob, "output.docx");
-// }
+export default function Example(valuesToChange, setBlob) {
 
-export default function Example(valuesToChange) {
-
-    // const valuesToChange =  {
-    // first_name: "John",
-    // last_name: "Doe",
-    // phone: "0652455478",
-    // description: "New Website",
-    // }
-
-        // generate document should be called in a map
-        // const generateDocument = () => {
             readSource(
                 filePath,
-                valuesToChange
+                valuesToChange,
+                setBlob
             );
-        // };
 
-        // return (
-        //     <div className="p-2">
-        //         <button onClick={generateDocument}>
-        //             Generate document
-        //         </button>
-        //     </div>
-        // );
 };
