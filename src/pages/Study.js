@@ -2,7 +2,7 @@ import React from "react";
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
 
-export default function Study({setColumnLister}) {
+export default function Study({setColumnLister, setContent}) {
 
   const showFile = async (e) => {
     // console.log('showfile', e)
@@ -10,6 +10,7 @@ export default function Study({setColumnLister}) {
     const reader = new FileReader();
     reader.onload = async (e) => {
       const content = e.target.result;
+      setContent(content);
       // random delimiter to not generate a template ?? found it like that 
       var doc = new Docxtemplater(new PizZip(content), {delimiters: {start: '12op1j2po1j2poj1po', end: 'op21j4po21jp4oj1op24j'}});
       // gets full text of document but ignores format and breaklines and paragraphs

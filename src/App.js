@@ -5,6 +5,7 @@ import React from 'react';
 
 function App() {
   const [columnLister, setColumnLister] = React.useState()
+  const [content, setContent] = React.useState(null);
 
   return (
     <div className="App">
@@ -22,8 +23,8 @@ function App() {
         </a> */}
       {/* <Example /> */}
 
-     <Study setColumnLister={setColumnLister} />
-      <DataGridView columnLister={columnLister} />
+     <Study setColumnLister={setColumnLister} setContent={setContent} />
+      <DataGridView columnLister={columnLister} content={content} />
     </div>
   );
 }

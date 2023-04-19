@@ -5,7 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Button } from '@mui/material';
 import Example from './Example';
 import * as docx from "docx-preview";
-
+import ReplaceWords from './ReplaceWords';
 /*========================================================================*/
 /** Initial column Values for first render */
 const InitColumns = [
@@ -102,7 +102,7 @@ function useApiRef(columns) {
   // return { apiRef, columns_ :_columns};
 }
 
-export default function DataGridView({columnLister}) {
+export default function DataGridView({columnLister, content}) {
 
   const [blob, setBlob] = 
                         React.useState();
@@ -151,8 +151,10 @@ const _columns = useMemo(() => columns.concat({
   const handleClickButton = () => {
     const obj = apiRef.current.getRowModels();
     console.log(apiRef.current.getRowModels());
+    // gets correctly created
     console.log(obj.get(1))
-    Example(obj.get(1), setBlob);
+    ReplaceWords(content, obj.get(1), obj.get(1).identificacion, setBlob);
+    // Example(obj.get(1), setBlob);
   }
 
   const handleAddRowClickButton = () => {
@@ -180,13 +182,14 @@ const _columns = useMemo(() => columns.concat({
         checkboxSelection
         disableRowSelectionOnClick
       />
-      <Button variant="contained" color="primary" onClick={handleClickButton}>
-        Generar Documento
-      </Button>
 
-      <Button variant="contained" color="primary" onClick={handleAddRowClickButton}>
+        <Button variant="contained" color="primary" onClick={handleClickButton}>
+        Generar Documento
+        </Button>
+
+      {/* <Button variant="contained" color="primary" onClick={handleAddRowClickButton}>
         Agregar una fila
-      </Button>
+      </Button> */}
 
       <div id="container" style={{ height: "600px", overflowY: "auto" }} />
     </Box>
