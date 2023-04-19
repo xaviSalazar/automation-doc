@@ -1,6 +1,6 @@
 import './App.css';
 import DataGridView from './pages/DataGridView';
-import Study from './pages/Study';
+import LoadFile from './pages/LoadFile';
 import React from 'react';
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
         </a> */}
       {/* <Example /> */}
 
-     <Study setColumnLister={setColumnLister} setContent={setContent} />
+     <LoadFile setColumnLister={setColumnLister} setContent={setContent} />
       <DataGridView columnLister={columnLister} content={content} />
     </div>
   );

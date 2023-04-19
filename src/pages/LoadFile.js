@@ -2,7 +2,7 @@ import React from "react";
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
 
-export default function Study({setColumnLister, setContent}) {
+export default function LoadFile({setColumnLister, setContent}) {
 
   const showFile = async (e) => {
     // console.log('showfile', e)
@@ -25,6 +25,7 @@ export default function Study({setColumnLister, setContent}) {
       setColumnLister(matches);
     };
     reader.readAsBinaryString(e.target.files[0]);
+    
   };
 
   return (
