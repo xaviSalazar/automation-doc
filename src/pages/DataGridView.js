@@ -153,7 +153,7 @@ const _columns = useMemo(() => columns.concat({
     console.log(apiRef.current.getRowModels());
     // gets correctly created
     console.log(obj.get(1))
-    ReplaceWords(content, obj.get(1), obj.get(1).identificacion, setBlob);
+    ReplaceWords(content, obj.get(1), "nombre_apellido", setBlob);
     // Example(obj.get(1), setBlob);
   }
 
