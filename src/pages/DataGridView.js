@@ -57,32 +57,30 @@ const InitColumns = [
 function columnsParser(columnList) {
 
   const initColumns = [{ field: 'id', headerName: 'ID', width: 50 }]
-  // let arrayT = []
+ 
+  // creates array of objects with the keys found from uploaded document
   const colum = columnList.map( col => {
     return {field: col, headerName: col, width: 350, editable: true}
  } );
 
   return initColumns.concat(colum)
-  // columnList.map
 }
 
 function rowsParser(columnList) {
 
   const initRows = { id: 1}
-  //const initColumns = [{ field: 'id', headerName: 'ID', width: 50 }]
-  // let arrayT = []
- let dictionary = Object.assign({}, ...columnList.map((x) => ({[x]: null})));
 
- // console.log(dictionary)
+  // array dictionary creation with the keys needed to replace (rows)
+  let dictionary = Object.assign({}, ...columnList.map((x) => ({[x]: null})));
+  const rowss = Object.assign(initRows, dictionary)
 
- const rowss = Object.assign(initRows, dictionary)
-  //return initColumns.concat(colum)
   return [rowss]
 }
 
 /*========================================================================*/
 /**Function to by pass usage of ApiRef */
 function useApiRef(columns) {
+
   const apiRef = useRef(null);
   const _columns = useMemo(
     () =>
@@ -99,19 +97,20 @@ function useApiRef(columns) {
   console.log(_columns)
 
   return { apiRef, columns: _columns };
-  // return { apiRef, columns_ :_columns};
 }
+/*========================================================================*/
 
 export default function DataGridView({columnLister, content}) {
 
+  // blob that contains binary word file
   const [blob, setBlob] = 
                         React.useState();
-
+  // columns initialization
   const [columns, setColumns] = 
                               React.useState(InitColumns)
-         
+  // call apiRef bypass method
   const { apiRef } = useApiRef(columns);
-
+  // rows initialization
   const [rows, setRows] = 
                         React.useState(
                              [{ id: 1, fullName: null, email: null, date: null, time: null, providencia: null, dictamen: null }]
@@ -130,6 +129,14 @@ export default function DataGridView({columnLister, content}) {
     setRows(newRows)
   }, [columnLister])
 
+    /* UseEffect for blob visualization content after word replacement*/
+    React.useEffect(() => {
+      docx.
+          renderAsync(blob, document.getElementById("container"))
+          .then((x) => console.log("docx: finished"))
+    }, [blob])
+
+/* useMemo to update the content of the cells */
 const _columns = useMemo(() => columns.concat({ 
                                                 field: "__HIDDEN__",
                                                 width: 0,
@@ -138,16 +145,8 @@ const _columns = useMemo(() => columns.concat({
                                                   return null;
                                                 }
                                               }),
-                                              [columns]
-                       );
-    
-  /* UseEffect for blob*/
-  React.useEffect(() => {
-    docx.
-        renderAsync(blob, document.getElementById("container"))
-        .then((x) => console.log("docx: finished"))
-  }, [blob])
-
+                                              [columns]);
+  
   const handleClickButton = () => {
     const obj = apiRef.current.getRowModels();
     console.log(apiRef.current.getRowModels());
