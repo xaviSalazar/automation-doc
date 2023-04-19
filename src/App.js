@@ -23,7 +23,7 @@ function App() {
       {/* <Example /> */}
 
      <Study setColumnLister={setColumnLister} />
-      <DataGridView />
+      <DataGridView columnLister={columnLister} />
     </div>
   );
 }

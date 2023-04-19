@@ -1,14 +1,14 @@
 import * as React from 'react';
 import { useRef, useMemo } from 'react';
 import Box from '@mui/material/Box';
-import { DataGrid, gridColumnGroupsLookupSelector } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
 import { Button } from '@mui/material';
 import Example from './Example';
 import * as docx from "docx-preview";
 
 /*========================================================================*/
 /** Initial column Values for first render */
-const columns = [
+const InitColumns = [
   { field: 'id', headerName: 'ID', width: 50 },
   {
     field: 'fullName',
@@ -54,10 +54,35 @@ const columns = [
   },
 ];
 
+function columnsParser(columnList) {
+
+  const initColumns = [{ field: 'id', headerName: 'ID', width: 50 }]
+  // let arrayT = []
+  const colum = columnList.map( col => {
+    return {field: col, headerName: col, width: 350, editable: true}
+ } );
+
+  return initColumns.concat(colum)
+  // columnList.map
+}
+
+function rowsParser(columnList) {
+
+  const initRows = { id: 1}
+  //const initColumns = [{ field: 'id', headerName: 'ID', width: 50 }]
+  // let arrayT = []
+ let dictionary = Object.assign({}, ...columnList.map((x) => ({[x]: null})));
+
+ // console.log(dictionary)
+
+ const rowss = Object.assign(initRows, dictionary)
+  //return initColumns.concat(colum)
+  return [rowss]
+}
+
 /*========================================================================*/
 /**Function to by pass usage of ApiRef */
-function useApiRef() {
-
+function useApiRef(columns) {
   const apiRef = useRef(null);
   const _columns = useMemo(
     () =>
@@ -71,28 +96,52 @@ function useApiRef() {
       }),
     [columns]
   );
+  console.log(_columns)
 
   return { apiRef, columns: _columns };
+  // return { apiRef, columns_ :_columns};
 }
-//
 
-export default function DataGridView() {
+export default function DataGridView({columnLister}) {
 
   const [blob, setBlob] = 
                         React.useState();
 
-                        
-  const { apiRef, columns } = useApiRef();
+  const [columns, setColumns] = 
+                              React.useState(InitColumns)
+         
+  const { apiRef } = useApiRef(columns);
 
   const [rows, setRows] = 
                         React.useState(
                              [{ id: 1, fullName: null, email: null, date: null, time: null, providencia: null, dictamen: null }]
                              )
 
+  /* UseEffect to process columns and rows from parsed document */
   React.useEffect(() => {
+    // check undefined when webapp starts
+    if(typeof columnLister === 'undefined')
+      return
 
-    }, [rows])
+    const newColumns = columnsParser(columnLister)
+    const newRows = rowsParser(columnLister)
+    // sets columns and rows parsed from uploaded file
+    setColumns(newColumns)
+    setRows(newRows)
+  }, [columnLister])
 
+const _columns = useMemo(() => columns.concat({ 
+                                                field: "__HIDDEN__",
+                                                width: 0,
+                                                renderCell: (params) => {                         
+                                                  apiRef.current = params.api;
+                                                  return null;
+                                                }
+                                              }),
+                                              [columns]
+                       );
+    
+  /* UseEffect for blob*/
   React.useEffect(() => {
     docx.
         renderAsync(blob, document.getElementById("container"))
@@ -119,7 +168,7 @@ export default function DataGridView() {
     <Box sx={{ height: 400, width: '100%' }}>
       <DataGrid
         rows={rows}
-        columns={columns}
+        columns={_columns}
         initialState={{
           pagination: {
             paginationModel: {
