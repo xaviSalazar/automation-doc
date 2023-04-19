@@ -3,7 +3,7 @@ import PizZip from "pizzip";
 import PizZipUtils from "pizzip/utils/index.js";
 import { saveAs } from "file-saver";
 
-import copy from "copy-to-clipboard";  
+// import copy from "copy-to-clipboard";  
 
 // URL to saved file 
 const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/TemplateT.docx'
@@ -12,7 +12,7 @@ const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/TemplateT.docx'
 function readSource(url, valuesToChange, setBlob) {
 
     return new Promise((resolve, reject) => {
-        
+
         PizZipUtils.getBinaryContent(url, function (error, content) {
             // error checker
             if (error) {
