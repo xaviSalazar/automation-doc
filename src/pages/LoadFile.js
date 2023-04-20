@@ -1,11 +1,9 @@
-import React from "react";
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
 
-export default function LoadFile({setColumnLister, setContent}) {
+const LoadFile = async (e, setColumnLister, setContent) => {
 
-  const showFile = async (e) => {
-    // console.log('showfile', e)
+    console.log('showfile', e)
     e.preventDefault();
     const reader = new FileReader();
     reader.onload = async (e) => {
@@ -30,12 +28,6 @@ export default function LoadFile({setColumnLister, setContent}) {
 
   };
 
-  return (
-    <div className="App">
-      <div style={{ flex: 1 }}>
-          <input type="file" onChange={(e) => showFile(e)} />
-      </div> 
-    </div>
-  );
+  export default LoadFile;
+
   
-}

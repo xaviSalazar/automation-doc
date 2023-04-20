@@ -2,10 +2,10 @@ import * as React from 'react';
 import { useRef, useMemo } from 'react';
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
-import { Button } from '@mui/material';
-import Example from './Example';
+import { Button, Container, Typography, Stack} from '@mui/material';
 import * as docx from "docx-preview";
 import ReplaceWords from './ReplaceWords';
+import LoadFile from './LoadFile';
 /*========================================================================*/
 
 /** Initial column Values for first render */
@@ -55,6 +55,7 @@ const InitColumns = [
   },
 ];
 
+/** Initial row values for first render */
 const initRows = 
       [{ id: 1, 
          fullName: null, 
@@ -112,7 +113,10 @@ function useApiRef(columns) {
 
 }
 /*========================================================================*/
-export default function DataGridView({columnLister, content}) {
+export default function DataGridView() {
+
+  const [columnLister, setColumnLister] = React.useState()
+  const [content, setContent] = React.useState(null);
 
   // holds ids of selected rows
   const [rowSelectionModel, setRowSelectionModel] = React.useState([]);
@@ -145,8 +149,7 @@ export default function DataGridView({columnLister, content}) {
 
   /* UseEffect for blob visualization content after word replacement*/
   React.useEffect(() => {
-    docx.
-        renderAsync(blob, document.getElementById("container"))
+    docx.renderAsync(blob, document.getElementById("container"))
         .then((x) => console.log("docx: finished"))
   }, [blob])
 
@@ -180,7 +183,41 @@ export default function DataGridView({columnLister, content}) {
   }
 
   return (
-    <Box sx={{ height: 400, width: '100%' }}>
+    <Container>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
+
+         {content ? <Typography variant="h4" gutterBottom>
+                    Datos 
+                    </Typography> 
+                  : <Typography variant="h4" gutterBottom> 
+                    Primero subir un documento
+                    </Typography>
+          }
+
+          {/* <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}> */}
+
+          <Button 
+            variant="contained" 
+            component="label"
+          > 
+             Subir Archivo
+              <input
+                type="file"
+                hidden
+                onChange={(e) => LoadFile(e, setColumnLister, setContent)}
+              />
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={handleAddRowClickButton}
+          > 
+            Crear nueva fila
+          </Button>
+        </Stack>
+
+      {/* <Card> */}
+  
+      <Box sx={{ height: 400, width: '100%' }}>
       <DataGrid
         rows={rows}
         columns={_columns}
@@ -201,15 +238,12 @@ export default function DataGridView({columnLister, content}) {
         // 
       />
 
-        <Button variant="contained" color="primary" onClick={handleClickButton}>
-        Generar Documento
-        </Button>
-
-      <Button variant="contained" color="primary" onClick={handleAddRowClickButton}>
-        Agregar una fila
-      </Button>
-
+      { content && <Button variant="contained" color="primary" onClick={handleClickButton}>
+          Generar Documento
+          </Button> 
+      }
+      </Box>
       <div id="container" style={{ height: "600px", overflowY: "auto" }} />
-    </Box>
+      </Container>
   );
 }
