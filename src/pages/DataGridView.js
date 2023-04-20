@@ -7,6 +7,7 @@ import Example from './Example';
 import * as docx from "docx-preview";
 import ReplaceWords from './ReplaceWords';
 /*========================================================================*/
+
 /** Initial column Values for first render */
 const InitColumns = [
   { field: 'id', headerName: 'ID', width: 50 },
@@ -54,6 +55,17 @@ const InitColumns = [
   },
 ];
 
+const initRows = 
+      [{ id: 1, 
+         fullName: null, 
+         email: null, 
+         date: null, 
+         time: null, 
+         providencia: null, 
+         dictamen: null
+        }
+      ]
+
 function columnsParser(columnList) {
 
   const initColumns = [{ field: 'id', headerName: 'ID', width: 50 }]
@@ -68,11 +80,11 @@ function columnsParser(columnList) {
 
 function rowsParser(columnList) {
 
-  const initRows = { id: 1}
+  const headRows = { id: 1}
 
   // array dictionary creation with the keys needed to replace (rows)
   let dictionary = Object.assign({}, ...columnList.map((x) => ({[x]: null})));
-  const rowss = Object.assign(initRows, dictionary)
+  const rowss = Object.assign(headRows, dictionary)
 
   return [rowss]
 }
@@ -94,15 +106,16 @@ function useApiRef(columns) {
       }),
     [columns]
   );
-  console.log(_columns)
+  // console.log(_columns)
 
   return { apiRef, columns: _columns };
 
 }
 /*========================================================================*/
-
 export default function DataGridView({columnLister, content}) {
 
+  // holds ids of selected rows
+  const [rowSelectionModel, setRowSelectionModel] = React.useState([]);
   // blob that contains binary word file
   const [blob, setBlob] = 
                         React.useState();
@@ -113,12 +126,11 @@ export default function DataGridView({columnLister, content}) {
   const { apiRef } = useApiRef(columns);
   // rows initialization
   const [rows, setRows] = 
-                        React.useState(
-                             [{ id: 1, fullName: null, email: null, date: null, time: null, providencia: null, dictamen: null }]
-                             )
+                        React.useState(initRows)
 
   /* UseEffect to process columns and rows from parsed document */
   React.useEffect(() => {
+
     // check undefined when webapp starts
     if(typeof columnLister === 'undefined')
       return
@@ -128,6 +140,7 @@ export default function DataGridView({columnLister, content}) {
     // sets columns and rows parsed from uploaded file
     setColumns(newColumns)
     setRows(newRows)
+
   }, [columnLister])
 
   /* UseEffect for blob visualization content after word replacement*/
@@ -181,15 +194,20 @@ export default function DataGridView({columnLister, content}) {
         pageSizeOptions={[5]}
         checkboxSelection
         disableRowSelectionOnClick
+        onRowSelectionModelChange={(newRowSelectionModel) => {
+          console.log(newRowSelectionModel);
+          setRowSelectionModel(newRowSelectionModel)
+        }}
+        // 
       />
 
         <Button variant="contained" color="primary" onClick={handleClickButton}>
         Generar Documento
         </Button>
 
-      {/* <Button variant="contained" color="primary" onClick={handleAddRowClickButton}>
+      <Button variant="contained" color="primary" onClick={handleAddRowClickButton}>
         Agregar una fila
-      </Button> */}
+      </Button>
 
       <div id="container" style={{ height: "600px", overflowY: "auto" }} />
     </Box>
