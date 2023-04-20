@@ -8,7 +8,7 @@ import { saveAs } from "file-saver";
 const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/TemplateT.docx'
 // const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/AUTORIZACION_example.docx'
 
-function readSource(content, valuesToChange, fileName, setBlob) {
+function readSource(content, valuesToChange, fileName, setBlob, download) {
             // return zip 
             const zip = new PizZip(content);
             
@@ -25,17 +25,19 @@ function readSource(content, valuesToChange, fileName, setBlob) {
                     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
             }); //Output the document using Data-URI
             setBlob(blob);
-            saveAs(blob, `${fileName}.docx`);
+            if(download === true)
+                saveAs(blob, `${fileName}.docx`);
 }
 
 
-export default function ReplaceWords(content, valuesToChange, fileName, setBlob) {
+export default function ReplaceWords(content, valuesToChange, fileName, setBlob, download) {
 
             readSource(
                 content,
                 valuesToChange,
                 fileName,
-                setBlob
+                setBlob,
+                download
             );
 
 };
