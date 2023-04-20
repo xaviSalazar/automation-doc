@@ -34,21 +34,110 @@ import { FlashOnRounded } from '@mui/icons-material';
 // ===========================================================================
 export default function DataGridView() {
 
-  function RenderButtonPick(props) {
+    /** Initial column Values for first render */
+    const InitColumns = [
+      { field: 'id', headerName: 'ID', width: 50, renderCell: RenderButtonPick,},
+      // { field: 'id', headerName: 'ID', width: 50},
+      {
+        field: 'fullName',
+        headerName: 'Nombre Completo',
+        description: 'This column has a value getter and is not sortable.',
+        sortable: false,
+        width: 160,
+        editable: true,
+        // valueGetter: (params) =>
+        //   `${params.row.firstName || ''} ${params.row.lastName || ''}`,
+      },
+      {
+        field: 'email',
+        headerName: 'Correo',
+        sortable: false,
+        // type: 'number',
+        width: 200,
+        editable: true,
+      },
+      {
+        field: 'date',
+        headerName: 'Fecha',
+        width: 200,
+        editable: true,
+      },
+      {
+        field: 'time',
+        headerName: 'Hora',
+        width: 70,
+        editable: true,
+      },
+      {
+        field: 'providencia',
+        headerName: 'Providencia',
+        width: 350,
+        editable: true,
+      },
+      {
+        field: 'dictamen',
+        headerName: 'Dictamen',
+        width: 350,
+        editable: true,
+      },
+    ];
+    
+    /** Initial row values for first render */
+    const initRows = 
+          [{ id: 1, 
+             fullName: null, 
+             email: null, 
+             date: null, 
+             time: null, 
+             providencia: null, 
+             dictamen: null
+            }
+          ]
+    
 
+  const [columnLister, setColumnLister] = React.useState()
+  const [content, setContent] = React.useState(null);
+  const [open, setOpen] = React.useState(false);
+  const [singleElement, setSingleElement] = React.useState(null);
+  // rows initialization
+  const [rows, setRows] = 
+                        React.useState(initRows)
+
+  // holds ids of selected rows
+  // blob that contains binary word file
+  const [blob, setBlob] = 
+                        React.useState();
+  // columns initialization
+  const [columns, setColumns] = 
+                              React.useState(InitColumns)
+  // call apiRef bypass method
+  const { apiRef, _columns } = useApiRef(columns);
+
+    /* UseEffect to process columns and rows from parsed document */
+    React.useEffect(() => {
+
+      console.log("useEffect -> columnLister")
+      // check undefined when webapp starts
+        const newColumns = columnsParser(columnLister)
+        const newRows = rowsParser(columnLister)
+        // sets columns and rows parsed from uploaded file
+        setColumns(newColumns)
+        setRows(newRows)
+    }, [columnLister])
+
+      /* UseEffect for blob visualization content after word replacement*/
+   React.useEffect(() => {
+     if(typeof blob === "undefined")
+       return 
+     docx.renderAsync(blob, document.getElementById("viewer_docx"))
+         .then((x) => console.log("docx: finished"))
+   }, [blob])
+
+
+  function RenderButtonPick(props) {
     const { hasFocus, value } = props;
-    const buttonElement = React.useRef(null);
-    const rippleRef = React.useRef(null);
-  
-    React.useLayoutEffect(() => {
-      if (hasFocus) {
-        const input = buttonElement.current?.querySelector('input');
-        input?.focus();
-      } else if (rippleRef.current) {
-        // Only available in @mui/material v5.4.1 or later
-        rippleRef.current.stop({});
-      }
-    }, [hasFocus]);
+    // const buttonElement = React.useRef(null);
+    // const rippleRef = React.useRef(null);
   
     return (
       <strong>
@@ -63,72 +152,16 @@ export default function DataGridView() {
         </IconButton>
       </strong>
     );
-
   }
+
+  
   /*========================================================================*/
-  
-  /** Initial column Values for first render */
-  const InitColumns = [
-    { field: 'id', headerName: 'ID', width: 50, renderCell: RenderButtonPick,},
-    {
-      field: 'fullName',
-      headerName: 'Nombre Completo',
-      description: 'This column has a value getter and is not sortable.',
-      sortable: false,
-      width: 160,
-      editable: true,
-      // valueGetter: (params) =>
-      //   `${params.row.firstName || ''} ${params.row.lastName || ''}`,
-    },
-    {
-      field: 'email',
-      headerName: 'Correo',
-      sortable: false,
-      // type: 'number',
-      width: 200,
-      editable: true,
-    },
-    {
-      field: 'date',
-      headerName: 'Fecha',
-      width: 200,
-      editable: true,
-    },
-    {
-      field: 'time',
-      headerName: 'Hora',
-      width: 70,
-      editable: true,
-    },
-    {
-      field: 'providencia',
-      headerName: 'Providencia',
-      width: 350,
-      editable: true,
-    },
-    {
-      field: 'dictamen',
-      headerName: 'Dictamen',
-      width: 350,
-      editable: true,
-    },
-  ];
-  
-  /** Initial row values for first render */
-  const initRows = 
-        [{ id: 1, 
-           fullName: null, 
-           email: null, 
-           date: null, 
-           time: null, 
-           providencia: null, 
-           dictamen: null
-          }
-        ]
-  
   function columnsParser(columnList) {
+
+    if (typeof columnList === "undefined") return []
   
     const initColumns = [{ field: 'id', headerName: 'ID', width: 50, renderCell: RenderButtonPick, }]
+    // const initColumns = [{ field: 'id', headerName: 'ID', width: 50 }]
    
     // creates array of objects with the keys found from uploaded document
     const colum = columnList.map( col => {
@@ -139,7 +172,9 @@ export default function DataGridView() {
   }
   
   function rowsParser(columnList) {
-  
+
+    if (typeof columnList === "undefined") return []
+
     const headRows = { id: 1}
   
     // array dictionary creation with the keys needed to replace (rows)
@@ -148,65 +183,6 @@ export default function DataGridView() {
   
     return [rowss]
   }
-  
-
-  
-  const [columnLister, setColumnLister] = React.useState()
-  const [content, setContent] = React.useState(null);
-
-  const [open, setOpen] = React.useState(false);
-
-  const [singleElement, setSingleElement] = React.useState(null);
-
-  // holds ids of selected rows
-  const [rowSelectionModel, setRowSelectionModel] = React.useState([]);
-  // blob that contains binary word file
-  const [blob, setBlob] = 
-                        React.useState();
-  // columns initialization
-  const [columns, setColumns] = 
-                              React.useState(InitColumns)
-  // call apiRef bypass method
-  const { apiRef, _columns } = useApiRef(columns);
-  // rows initialization
-  const [rows, setRows] = 
-                        React.useState(initRows)
-
-  /* UseEffect to process columns and rows from parsed document */
-  React.useEffect(() => {
-
-    console.log("useEffect -> columnLister")
-    // check undefined when webapp starts
-    if(typeof columnLister === 'undefined')
-      console.log("useEffect return -> columnLister")
-      return
-
-    const newColumns = columnsParser(columnLister)
-    const newRows = rowsParser(columnLister)
-    // sets columns and rows parsed from uploaded file
-    setColumns(newColumns)
-    setRows(newRows)
-  }, [columnLister])
-
-
-  /* UseEffect for blob visualization content after word replacement*/
-  React.useEffect(() => {
-    if(typeof blob === "undefined")
-      return 
-    docx.renderAsync(blob, document.getElementById("viewer_docx"))
-        .then((x) => console.log("docx: finished"))
-  }, [blob])
-
-  /* useMemo to update the content of the cells */
-  // const _columns = useMemo(() => columns.concat({ 
-  //                                                 field: "__HIDDEN__",
-  //                                                 width: 0,
-  //                                                 renderCell: (params) => {                         
-  //                                                   apiRef.current = params.api;
-  //                                                   return null;
-  //                                                 }
-  //                                               }),
-  //                                               [columns]);
   
   const handleClickButton = () => {
     const obj = apiRef.current.getRowModels();
@@ -223,6 +199,7 @@ export default function DataGridView() {
     // new element to add
     const newElement =  { id: arrSize + 1, fullName: null, email: null, date: null, time: null, providencia: null, dictamen: null } 
     // useState to add element
+    console.log(rows)
     setRows( prevState => [...prevState, newElement] )
   }
 
@@ -237,18 +214,16 @@ export default function DataGridView() {
   };
 
   const handleSeeDoc = () => {
-    console.log("ver doc")
     const obj = apiRef.current.getRowModels();
-    console.log(obj.get(singleElement))
-    ReplaceWords(content, obj.get(singleElement), "nombre_apellido", setBlob, false);
+    ReplaceWords(content, obj.get(singleElement), `id_${singleElement}`, setBlob, false);
     setOpen(false);
   }
 
   const handleDownload = () => {
-    console.log("download doc")
+    const obj = apiRef.current.getRowModels();
+    ReplaceWords(content, obj.get(singleElement), `id_${singleElement}`, setBlob, true);
     setOpen(false);
   }
-
 
 // ====== RETURN ()
   return (
@@ -279,7 +254,7 @@ export default function DataGridView() {
           </Button>
           <Button 
             variant="contained" 
-            // onClick={handleAddRowClickButton}
+            onClick={handleAddRowClickButton}
           > 
             Crear nueva fila
           </Button>
@@ -309,6 +284,7 @@ export default function DataGridView() {
 
       </Box>
 
+      {/** ASYNC VIEWER FOR BLOB DOCX */}
       <Box id='viewer_docx'/>
       {/* <div id="container" style={{ height: "600px", overflowY: "auto" }} /> */}
 
