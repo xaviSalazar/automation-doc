@@ -90,7 +90,6 @@ function rowsParser(columnList) {
   return [rowss]
 }
 
-/*========================================================================*/
 /**Function to by pass usage of ApiRef */
 function useApiRef(columns) {
 
@@ -112,7 +111,8 @@ function useApiRef(columns) {
   return { apiRef, columns: _columns };
 
 }
-/*========================================================================*/
+
+// ===========================================================================
 export default function DataGridView() {
 
   const [columnLister, setColumnLister] = React.useState()
@@ -149,7 +149,7 @@ export default function DataGridView() {
 
   /* UseEffect for blob visualization content after word replacement*/
   React.useEffect(() => {
-    docx.renderAsync(blob, document.getElementById("container"))
+    docx.renderAsync(blob, document.getElementById("viewer_docx"))
         .then((x) => console.log("docx: finished"))
   }, [blob])
 
@@ -182,8 +182,11 @@ export default function DataGridView() {
     setRows( prevState => [...prevState, newElement] )
   }
 
+
+// ====== RETURN ()
   return (
     <Container>
+
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
 
          {content ? <Typography variant="h4" gutterBottom>
@@ -214,10 +217,9 @@ export default function DataGridView() {
             Crear nueva fila
           </Button>
         </Stack>
-
-      {/* <Card> */}
   
       <Box sx={{ height: 400, width: '100%' }}>
+
       <DataGrid
         rows={rows}
         columns={_columns}
@@ -238,12 +240,16 @@ export default function DataGridView() {
         // 
       />
 
-      { content && <Button variant="contained" color="primary" onClick={handleClickButton}>
-          Generar Documento
-          </Button> 
+      { content && 
+              <Button variant="contained" color="primary" onClick={handleClickButton}>
+               Generar Documento
+              </Button> 
       }
+
       </Box>
-      <div id="container" style={{ height: "600px", overflowY: "auto" }} />
+
+      <Box id='viewer_docx'/>
+      {/* <div id="container" style={{ height: "600px", overflowY: "auto" }} /> */}
       </Container>
   );
 }
