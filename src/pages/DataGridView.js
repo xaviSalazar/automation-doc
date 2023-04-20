@@ -180,8 +180,10 @@ export default function DataGridView() {
     // array dictionary creation with the keys needed to replace (rows)
     let dictionary = Object.assign({}, ...columnList.map((x) => ({[x]: null})));
     const rowss = Object.assign(headRows, dictionary)
+    
+    const debug = Object.assign({id:2}, dictionary)
   
-    return [rowss]
+    return [rowss, debug]
   }
   
   const handleClickButton = () => {
@@ -194,13 +196,18 @@ export default function DataGridView() {
   }
 
   const handleAddRowClickButton = () => {
-    // actual len of rows
-    const arrSize = Object.keys(rows).length;
-    // new element to add
-    const newElement =  { id: arrSize + 1, fullName: null, email: null, date: null, time: null, providencia: null, dictamen: null } 
-    // useState to add element
-    console.log(rows)
-    setRows( prevState => [...prevState, newElement] )
+    // // actual len of rows
+    // const arrSize = Object.keys(rows).length;
+    // // new element to add
+    // const newElement =  { id: arrSize + 1, fullName: null, email: null, date: null, time: null, providencia: null, dictamen: null } 
+    // // useState to add element
+    // console.log(apiRef.current.getRowModels())
+    // setRows( prevState => [...prevState, newElement] )
+    const obj_it = apiRef.current.getRowModels().entries()
+    //const obj_temp = [...apiRef.current.getRowModels().keys()]
+    console.log(obj_it.next().value)
+    console.log(obj_it.next().value)
+    
   }
 
   const handleOpenMenu = (event, value) => {
