@@ -8,7 +8,7 @@ import { saveAs } from "file-saver";
 // const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/TemplateT.docx'
 // const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/AUTORIZACION_example.docx'
 
-function readSource(content, valuesToChange, fileName, setBlob, download) {
+function saveSetWords(content, valuesToChange, fileName, setBlob, download) {
             // return zip 
             const zip = new PizZip(content);
             
@@ -32,7 +32,7 @@ function readSource(content, valuesToChange, fileName, setBlob, download) {
 
 export default function ReplaceWords(content, valuesToChange, fileName, setBlob, download) {
 
-            readSource(
+            saveSetWords(
                 content,
                 valuesToChange,
                 fileName,
