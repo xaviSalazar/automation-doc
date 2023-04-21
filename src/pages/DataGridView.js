@@ -7,7 +7,7 @@ import * as docx from "docx-preview";
 import ReplaceWords from './ReplaceWords';
 import LoadFile from './LoadFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import { FlashOnRounded } from '@mui/icons-material';
+// import { FlashOnRounded } from '@mui/icons-material';
 
   /**Function to by pass usage of ApiRef */
   function useApiRef(columns) {
@@ -135,7 +135,7 @@ export default function DataGridView() {
 
 
   function RenderButtonPick(props) {
-    const { hasFocus, value } = props;
+    const { value } = props;
     // const buttonElement = React.useRef(null);
     // const rippleRef = React.useRef(null);
   
@@ -181,33 +181,44 @@ export default function DataGridView() {
     let dictionary = Object.assign({}, ...columnList.map((x) => ({[x]: null})));
     const rowss = Object.assign(headRows, dictionary)
     
-    const debug = Object.assign({id:2}, dictionary)
+    // const debug = Object.assign({id:2}, dictionary)
   
-    return [rowss, debug]
+    // return [rowss, debug]
+     return [rowss]
   }
   
-  const handleClickButton = () => {
-    const obj = apiRef.current.getRowModels();
-    console.log(apiRef.current.getRowModels());
-    // gets correctly created
-    console.log(obj.get(1))
-    ReplaceWords(content, obj.get(1), "nombre_apellido", setBlob);
-    // Example(obj.get(1), setBlob);
-  }
+  // const handleClickButton = () => {
+  //   const obj = apiRef.current.getRowModels();
+  //   console.log(apiRef.current.getRowModels());
+  //   // gets correctly created
+  //   console.log(obj.get(1))
+  //   ReplaceWords(content, obj.get(1), "nombre_apellido", setBlob);
+  //   // Example(obj.get(1), setBlob);
+  // }
 
   const handleAddRowClickButton = () => {
-    // // actual len of rows
-    // const arrSize = Object.keys(rows).length;
-    // // new element to add
-    // const newElement =  { id: arrSize + 1, fullName: null, email: null, date: null, time: null, providencia: null, dictamen: null } 
-    // // useState to add element
-    // console.log(apiRef.current.getRowModels())
-    // setRows( prevState => [...prevState, newElement] )
-    const obj_it = apiRef.current.getRowModels().entries()
-    //const obj_temp = [...apiRef.current.getRowModels().keys()]
-    console.log(obj_it.next().value)
-    console.log(obj_it.next().value)
-    
+
+    const obj_it = apiRef.current.getRowModels()
+    // array of rows 
+    const valuesArray = Array.from(obj_it.values())
+
+    valuesArray.push(JSON.parse(JSON.stringify(valuesArray.slice(-1)[0])))
+
+    // gets last value from array
+    const lastItem = valuesArray.slice(-1)
+    lastItem.
+            forEach(item => {
+                              for (const [key, value] of Object.entries(item))
+                              {
+                                if (key === "id")
+                                  item[key] = value + 1
+                                else 
+                                  item[key] = null
+                              }
+                            })
+
+    console.log(valuesArray)
+    setRows(valuesArray)
   }
 
   const handleOpenMenu = (event, value) => {
@@ -259,12 +270,16 @@ export default function DataGridView() {
                 onChange={(e) => LoadFile(e, setColumnLister, setContent)}
               />
           </Button>
+      
+        { content &&
           <Button 
             variant="contained" 
             onClick={handleAddRowClickButton}
           > 
             Crear nueva fila
           </Button>
+        }
+          
         </Stack>
   
       <Box sx={{ height: 400, width: '100%' }}>
@@ -283,11 +298,11 @@ export default function DataGridView() {
         checkboxSelection
         disableRowSelectionOnClick
       />
-      { content && 
+      {/* { content && 
               <Button variant="contained" color="primary" onClick={handleClickButton}>
                Generar Documento
               </Button> 
-      }
+      } */}
 
       </Box>
 
