@@ -2,7 +2,6 @@ import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
 
 const LoadFile = async (e, setColumnLister, setContent) => {
-
     console.log('showfile', e)
     e.preventDefault();
     const reader = new FileReader();

@@ -6,7 +6,7 @@ import { saveAs } from "file-saver";
 // import copy from "copy-to-clipboard";  
 
 // URL to saved file 
-const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/TemplateT.docx'
+// const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/TemplateT.docx'
 // const filePath = 'https://d1d5i0xjsb5dtw.cloudfront.net/AUTORIZACION_example.docx'
 
 function readSource(url, valuesToChange, setBlob) {

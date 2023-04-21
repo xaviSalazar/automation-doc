@@ -278,7 +278,7 @@ export default function DataGridView() {
           > 
             Crear nueva fila
           </Button>
-        }
+      }
           
         </Stack>
   
