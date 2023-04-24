@@ -99,6 +99,8 @@ export default function DataGridView() {
   const [content, setContent] = React.useState(null);
   const [open, setOpen] = React.useState(false);
   const [singleElement, setSingleElement] = React.useState(null);
+  const [checkedRowData, SetCheckedRowData] = React.useState([])
+
   // rows initialization
   const [rows, setRows] = 
                         React.useState(initRows)
@@ -243,6 +245,16 @@ export default function DataGridView() {
     setOpen(false);
   }
 
+  const handleCheckBox = (ids) => {
+
+    const selectedIDs = new Set(ids);
+    const selectedRowData = rows.filter((row) => 
+    selectedIDs.has(row.id));
+    console.log(selectedRowData)
+    SetCheckedRowData(selectedRowData)
+
+  }
+
 // ====== RETURN ()
   return (
     <Container>
@@ -257,7 +269,15 @@ export default function DataGridView() {
                     </Typography>
           }
 
-          {/* <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}> */}
+          { (checkedRowData.length !== 0 ) &&
+
+                  <Button 
+                  variant="contained" 
+                  component="label"
+                  > 
+                  Generar DOC
+                  </Button>
+          }
 
           <Button 
             variant="contained" 
@@ -278,7 +298,7 @@ export default function DataGridView() {
           > 
             Crear nueva fila
           </Button>
-      }
+        }
           
         </Stack>
   
@@ -297,6 +317,7 @@ export default function DataGridView() {
         pageSizeOptions={[5]}
         checkboxSelection
         disableRowSelectionOnClick
+        onRowSelectionModelChange = { (ids) => handleCheckBox(ids) }
       />
       {/* { content && 
               <Button variant="contained" color="primary" onClick={handleClickButton}>

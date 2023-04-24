@@ -22,7 +22,7 @@ function saveSetWords(content, valuesToChange, fileName, setBlob, download) {
             setBlob(blob);
             console.log('blobv', typeof blob)
             console.log('content ', typeof content)
-            const docTest = new DocxMerger({}, [blob, blob])
+            const docTest = new DocxMerger({}, [blob, blob, blob, blob, blob, blob, blob, blob, blob, blob, blob])
 
             docTest.save('blob',function (data) {
                 saveAs(data,"merged_react.docx");
