@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useRef, useMemo } from 'react';
-import { ReactReduxContext, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import { Button, IconButton, MenuItem, Popover, Container, Typography, Stack} from '@mui/material';
@@ -148,7 +148,7 @@ export default function DataGridView() {
 
     React.useEffect(() => {
       console.log("useEffect for reducer load workspace")
-      console.log(reducerVar)
+      // console.log(reducerVar)
       if(typeof reducerVar === "undefined")
         return
       setColumns(reducerVar.columns)
@@ -284,7 +284,7 @@ export default function DataGridView() {
     // filter only selected ids
     const selectedRowData = valuesArray.filter((row) => 
     selectedIDs.has(row.id));
-    // console.log(selectedRowData)
+    console.log(selectedRowData)
     SetCheckedRowData(selectedRowData)
   }
 

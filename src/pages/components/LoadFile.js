@@ -18,7 +18,7 @@ const LoadFile = async (e, setColumnLister, setContent) => {
       // all matches passed to an array
       const matches = text.match(regex).map(match => match.slice(1, -1));
       // debug matches
-      console.log(matches)
+      // console.log(matches)
       const uniqueWords = [...new Set(matches)]
       // console.log(uniqueWords);
       setColumnLister(uniqueWords);

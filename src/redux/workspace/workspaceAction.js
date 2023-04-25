@@ -18,11 +18,11 @@ export const loadWorkspace = () => async(dispatch) => {
     try 
     {
         const loadData = JSON.parse(localStorage.getItem("workspace"))
-        console.log(loadData)
+        // console.log(loadData)
         dispatch(loadSuccess(loadData))
     } 
     catch(error)
     {
     }
-    
+
 }
