@@ -1,15 +1,11 @@
-import { createSlice, current } from "@reduxjs/toolkit"
 
-const initialState = {
-    rows: [],
-    columns: [],
-    content: null
-}
 
-const loadInit = createSlice({
-    name: 'init-loading',
-    initialState,
-    reducers: {
+export const saveAll = (data) => async (dispatch) => {
 
+    try {
+        localStorage.setItem('workspace', JSON.stringify(data));
+    } catch ( error ) {
+        console.log(error.message);
     }
-})
+
+}

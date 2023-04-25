@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useRef, useMemo } from 'react';
+import { useDispatch } from 'react-redux';
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import { Button, IconButton, MenuItem, Popover, Container, Typography, Stack} from '@mui/material';
@@ -7,7 +8,8 @@ import * as docx from "docx-preview";
 import ReplaceWords from './components/ReplaceWords';
 import LoadFile from './components/LoadFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-// import MergeDocuments from './components/MergeDocuments';
+import {saveAll} from '../redux/workspace/workspaceAction';
+import MergeDocuments from './components/MergeDocuments';
 // import { FlashOnRounded } from '@mui/icons-material';
 
   /**Function to by pass usage of ApiRef */
@@ -105,6 +107,8 @@ export default function DataGridView() {
   const [open, setOpen] = React.useState(false);
   // popup menu sets id row number
   const [singleElement, setSingleElement] = React.useState(null);
+
+  const dispatch = useDispatch();
   
   // rows initialization
   const [rows, setRows] = 
@@ -142,7 +146,6 @@ export default function DataGridView() {
      docx.renderAsync(blob, document.getElementById("viewer_docx"))
          .then((x) => console.log("docx: finished"))
    }, [blob])
-
 
   function RenderButtonPick(props) {
     const { value } = props;
@@ -219,6 +222,15 @@ export default function DataGridView() {
 
     // console.log(valuesArray)
     setRows(valuesArray)
+
+   
+
+  }
+
+  // Method to save all current changes made with the project.
+  window.onbeforeunload = function() {
+    console.log('fire window close ')
+    dispatch(saveAll({column: columns, row: rows, contenu: content}));
   }
 
   const handleOpenMenu = (event, value) => {
@@ -244,17 +256,16 @@ export default function DataGridView() {
   }
 
   const handleCheckBox = (ids) => {
-
     const selectedIDs = new Set(ids);
     const selectedRowData = rows.filter((row) => 
     selectedIDs.has(row.id));
     // console.log(selectedRowData)
     SetCheckedRowData(selectedRowData)
-
   }
 
   const handleGenerateDoc = () => {
-    // MergeDocuments(content, checkedRowData);
+    console.log(checkedRowData)
+    MergeDocuments(content, checkedRowData);
   }
 
 // ====== RETURN ()
