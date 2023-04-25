@@ -138,12 +138,14 @@ export default function DataGridView() {
       // check undefined when webapp starts
       if(typeof columnLister === "undefined")
         return
+      
       const newColumns = columnsParser(columnLister)
       const newRows = rowsParser(columnLister)
       // sets columns and rows parsed from uploaded file
       setColumns(newColumns)
       setRows(newRows)
-
+    // added comment below because warning is weird
+    // eslint-disable-next-line
     }, [columnLister])
 
     React.useEffect(() => {
