@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useRef, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
+import { ReactReduxContext, useDispatch, useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import { Button, IconButton, MenuItem, Popover, Container, Typography, Stack} from '@mui/material';
@@ -8,7 +8,7 @@ import * as docx from "docx-preview";
 import ReplaceWords from './components/ReplaceWords';
 import LoadFile from './components/LoadFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import {saveAll} from '../redux/workspace/workspaceAction';
+import {saveAll, loadWorkspace} from '../redux/workspace/workspaceAction';
 import MergeDocuments from './components/MergeDocuments';
 // import { FlashOnRounded } from '@mui/icons-material';
 
@@ -109,10 +109,14 @@ export default function DataGridView() {
   const [singleElement, setSingleElement] = React.useState(null);
 
   const dispatch = useDispatch();
+
+  // reducers load variables workspace
+  const reducerVar = useSelector(state => state.workspace)
   
   // rows initialization
   const [rows, setRows] = 
                         React.useState(initRows)
+                        // React.useState([])
 
   // holds ids of selected rows
   const [checkedRowData, SetCheckedRowData] = React.useState([])
@@ -123,6 +127,7 @@ export default function DataGridView() {
   // columns initialization
   const [columns, setColumns] = 
                               React.useState(InitColumns)
+                              //React.useState([])
   // call apiRef bypass method
   const { apiRef, _columns } = useApiRef(columns);
 
@@ -131,13 +136,25 @@ export default function DataGridView() {
 
       console.log("useEffect -> columnLister")
       // check undefined when webapp starts
-        const newColumns = columnsParser(columnLister)
-        const newRows = rowsParser(columnLister)
-        // sets columns and rows parsed from uploaded file
-        setColumns(newColumns)
-        setRows(newRows)
+      if(typeof columnLister === "undefined")
+        return
+      const newColumns = columnsParser(columnLister)
+      const newRows = rowsParser(columnLister)
+      // sets columns and rows parsed from uploaded file
+      setColumns(newColumns)
+      setRows(newRows)
 
     }, [columnLister])
+
+    React.useEffect(() => {
+      console.log("useEffect for reducer load workspace")
+      console.log(reducerVar)
+      if(typeof reducerVar === "undefined")
+        return
+      setColumns(reducerVar.columns)
+      setRows(reducerVar.rows)
+      setContent(reducerVar.content)
+    }, [reducerVar])
 
       /* UseEffect for blob visualization content after word replacement*/
    React.useEffect(() => {
@@ -146,6 +163,10 @@ export default function DataGridView() {
      docx.renderAsync(blob, document.getElementById("viewer_docx"))
          .then((x) => console.log("docx: finished"))
    }, [blob])
+
+   React.useEffect(() => {
+      dispatch(loadWorkspace())
+   }, [dispatch])
 
   function RenderButtonPick(props) {
     const { value } = props;
