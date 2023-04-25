@@ -4,10 +4,10 @@ import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import { Button, IconButton, MenuItem, Popover, Container, Typography, Stack} from '@mui/material';
 import * as docx from "docx-preview";
-import ReplaceWords from './ReplaceWords';
-import LoadFile from './LoadFile';
+import ReplaceWords from './components/ReplaceWords';
+import LoadFile from './components/LoadFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
-import MergeDocuments from './MergeDocuments';
+// import MergeDocuments from './components/MergeDocuments';
 // import { FlashOnRounded } from '@mui/icons-material';
 
   /**Function to by pass usage of ApiRef */
@@ -95,18 +95,24 @@ export default function DataGridView() {
             }
           ]
     
-
+  // holds values to be modified when I file is uploaded
   const [columnLister, setColumnLister] = React.useState()
-  const [content, setContent] = React.useState(null);
-  const [open, setOpen] = React.useState(false);
-  const [singleElement, setSingleElement] = React.useState(null);
-  const [checkedRowData, SetCheckedRowData] = React.useState([])
 
+  // set docx content 
+  const [content, setContent] = React.useState(null);
+
+  // popup menu boolean condition to open
+  const [open, setOpen] = React.useState(false);
+  // popup menu sets id row number
+  const [singleElement, setSingleElement] = React.useState(null);
+  
   // rows initialization
   const [rows, setRows] = 
                         React.useState(initRows)
 
   // holds ids of selected rows
+  const [checkedRowData, SetCheckedRowData] = React.useState([])
+
   // blob that contains binary word file
   const [blob, setBlob] = 
                         React.useState();
@@ -126,6 +132,7 @@ export default function DataGridView() {
         // sets columns and rows parsed from uploaded file
         setColumns(newColumns)
         setRows(newRows)
+
     }, [columnLister])
 
       /* UseEffect for blob visualization content after word replacement*/
@@ -190,15 +197,6 @@ export default function DataGridView() {
      return [rowss]
   }
   
-  // const handleClickButton = () => {
-  //   const obj = apiRef.current.getRowModels();
-  //   console.log(apiRef.current.getRowModels());
-  //   // gets correctly created
-  //   console.log(obj.get(1))
-  //   ReplaceWords(content, obj.get(1), "nombre_apellido", setBlob);
-  //   // Example(obj.get(1), setBlob);
-  // }
-
   const handleAddRowClickButton = () => {
 
     const obj_it = apiRef.current.getRowModels()
@@ -256,7 +254,7 @@ export default function DataGridView() {
   }
 
   const handleGenerateDoc = () => {
-    MergeDocuments(content, checkedRowData);
+    // MergeDocuments(content, checkedRowData);
   }
 
 // ====== RETURN ()
@@ -309,26 +307,21 @@ export default function DataGridView() {
   
       <Box sx={{ height: 400, width: '100%' }}>
 
-      <DataGrid
-        rows={rows}
-        columns={_columns}
-        initialState={{
-          pagination: {
-            paginationModel: {
-              pageSize: 5,
+        <DataGrid
+          rows={rows}
+          columns={_columns}
+          initialState={{
+            pagination: {
+              paginationModel: {
+                pageSize: 5,
+              },
             },
-          },
-        }}
-        pageSizeOptions={[5]}
-        checkboxSelection
-        disableRowSelectionOnClick
-        onRowSelectionModelChange = { (ids) => handleCheckBox(ids) }
-      />
-      {/* { content && 
-              <Button variant="contained" color="primary" onClick={handleClickButton}>
-               Generar Documento
-              </Button> 
-      } */}
+          }}
+          pageSizeOptions={[5]}
+          checkboxSelection
+          disableRowSelectionOnClick
+          onRowSelectionModelChange = { (ids) => handleCheckBox(ids) }
+        />
 
       </Box>
 
