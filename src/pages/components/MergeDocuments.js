@@ -5,9 +5,16 @@ import DocxMerger from "@xavicoel/docx-merger";
 
 export default function MergeDocuments(content, ArrayValues) {
 
-    const documents = ArrayValues.map((item) => {
+    // delete id attribute
+    const arrTest = JSON.parse(JSON.stringify(ArrayValues)).map(function(item) { 
+        delete item.id; 
+        return item; 
+    });
+
+    const documents = arrTest.map((item) => {
 
         // create zip
+        console.log(item)
         const zip = new PizZip(content);
         // Onlye one instance permited by Docxtemplater
         const doc = new Docxtemplater(zip, {
