@@ -7,6 +7,7 @@ import * as docx from "docx-preview";
 import ReplaceWords from './ReplaceWords';
 import LoadFile from './LoadFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MergeDocuments from './MergeDocuments';
 // import { FlashOnRounded } from '@mui/icons-material';
 
   /**Function to by pass usage of ApiRef */
@@ -208,8 +209,7 @@ export default function DataGridView() {
 
     // gets last value from array
     const lastItem = valuesArray.slice(-1)
-    lastItem.
-            forEach(item => {
+    lastItem.forEach(item => {
                               for (const [key, value] of Object.entries(item))
                               {
                                 if (key === "id")
@@ -219,12 +219,12 @@ export default function DataGridView() {
                               }
                             })
 
-    console.log(valuesArray)
+    // console.log(valuesArray)
     setRows(valuesArray)
   }
 
   const handleOpenMenu = (event, value) => {
-    console.log(value)
+    // console.log(value)
     setSingleElement(value)
     setOpen(event.currentTarget);
   };
@@ -250,9 +250,13 @@ export default function DataGridView() {
     const selectedIDs = new Set(ids);
     const selectedRowData = rows.filter((row) => 
     selectedIDs.has(row.id));
-    console.log(selectedRowData)
+    // console.log(selectedRowData)
     SetCheckedRowData(selectedRowData)
 
+  }
+
+  const handleGenerateDoc = () => {
+    MergeDocuments(content, checkedRowData);
   }
 
 // ====== RETURN ()
@@ -274,6 +278,7 @@ export default function DataGridView() {
                   <Button 
                   variant="contained" 
                   component="label"
+                  onClick = {handleGenerateDoc}
                   > 
                   Generar DOC
                   </Button>
