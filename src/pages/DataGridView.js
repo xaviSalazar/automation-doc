@@ -248,7 +248,10 @@ export default function DataGridView() {
 
   // Method to save all current changes made with the project.
   window.onbeforeunload = function() {
-    console.log('fire window close ')
+    // call apiRef
+    const obj_it = apiRef.current.getRowModels()
+    // array of rows 
+    const rows = Array.from(obj_it.values())
     dispatch(saveAll({column: columns, row: rows, contenu: content}));
   }
 
