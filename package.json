@@ -13,6 +13,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@xavicoel/docx-merger": "^0.0.1-development",
     "docx-preview": "^0.1.15",
     "docxtemplater": "^3.36.1",
     "file-saver": "^2.0.5",
