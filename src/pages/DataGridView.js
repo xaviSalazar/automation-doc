@@ -223,8 +223,6 @@ export default function DataGridView() {
     // console.log(valuesArray)
     setRows(valuesArray)
 
-   
-
   }
 
   // Method to save all current changes made with the project.
@@ -257,14 +255,20 @@ export default function DataGridView() {
 
   const handleCheckBox = (ids) => {
     const selectedIDs = new Set(ids);
-    const selectedRowData = rows.filter((row) => 
+
+    // call apiRef
+    const obj_it = apiRef.current.getRowModels()
+    // array of rows 
+    const valuesArray = Array.from(obj_it.values())
+    // filter only selected ids
+    const selectedRowData = valuesArray.filter((row) => 
     selectedIDs.has(row.id));
     // console.log(selectedRowData)
     SetCheckedRowData(selectedRowData)
   }
 
   const handleGenerateDoc = () => {
-    console.log(checkedRowData)
+    // console.log(checkedRowData)
     MergeDocuments(content, checkedRowData);
   }
 
@@ -283,7 +287,6 @@ export default function DataGridView() {
           }
 
           { (checkedRowData.length !== 0 ) &&
-
                   <Button 
                   variant="contained" 
                   component="label"
