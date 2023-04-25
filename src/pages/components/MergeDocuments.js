@@ -1,7 +1,8 @@
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
 import { saveAs } from "file-saver";
-import DocxMerger from "docx-merger";
+// import DocxMerger from "@xavicoel/docx-merger";
+// import DocxMerger from "docx-merger";
 
 
 export default function MergeDocuments(content, ArrayValues) {
@@ -29,10 +30,10 @@ export default function MergeDocuments(content, ArrayValues) {
 
     })
 
-    const docxMerge = new DocxMerger({}, documents)
+    // const docxMerge = new DocxMerger({}, documents)
 
-    docxMerge.save('blob',function (data) {
-        saveAs(data,"all_items.docx");
-    });
+    // docxMerge.save('blob',function (data) {
+    //     saveAs(data,"all_items.docx");
+    // });
 
 }
