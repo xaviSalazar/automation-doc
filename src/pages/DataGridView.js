@@ -289,6 +289,7 @@ export default function DataGridView() {
              Subir Archivo
               <input
                 type="file"
+                accept = ".doc, .docx"
                 hidden
                 onChange={(e) => LoadFile(e, setColumnLister, setContent)}
               />
