@@ -1,13 +1,12 @@
 import { filter } from 'lodash';
-import { sentenceCase } from 'change-case';
 import { useState } from 'react';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 // @mui
 import {
   Card,
   Table,
   Stack,
   Paper,
-  Avatar,
   Button,
   Popover,
   Checkbox,
@@ -22,23 +21,24 @@ import {
   TablePagination,
 } from '@mui/material';
 // components
-import Label from '../components/label';
 import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 // import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+import { UserListHead } from '../sections/@dashboard/user';
+
 // mock
-import USERLIST from '../_mock/user';
+// import USERLIST from '../_mock/user';
 
 const MAX_COUNT = 5;
 
 
 const TABLE_HEAD = [
-    { id: 'name', label: 'Name', alignRight: false },
-    { id: 'company', label: 'Company', alignRight: false },
-    { id: 'role', label: 'Role', alignRight: false },
-    { id: 'isVerified', label: 'Verified', alignRight: false },
-    { id: 'status', label: 'Status', alignRight: false },
+    { id: 'name', label: 'Archivo', alignRight: false },
+    { id: 'timestamp', label: 'Fecha de Creacion', alignRight: false },
+    { id: 'size', label: 'Talla Archivo', alignRight: false },
+    // { id: 'isVerified', label: 'Verified', alignRight: false },
+    // { id: 'status', label: 'Status', alignRight: false },
     { id: '' },
   ];
   
@@ -133,7 +133,7 @@ export default function UserPage() {
   
     const handleSelectAllClick = (event) => {
       if (event.target.checked) {
-        const newSelecteds = USERLIST.map((n) => n.name);
+        const newSelecteds = uploadedFiles.map((n) => n.name);
         setSelected(newSelecteds);
         return;
       }
@@ -169,9 +169,9 @@ export default function UserPage() {
       setFilterName(event.target.value);
     };
   
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - USERLIST.length) : 0;
+    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - uploadedFiles.length) : 0;
   
-    const filteredUsers = applySortFilter(USERLIST, getComparator(order, orderBy), filterName);
+    const filteredUsers = applySortFilter(uploadedFiles, getComparator(order, orderBy), filterName);
   
     const isNotFound = !filteredUsers.length && !!filterName;
   
@@ -204,44 +204,46 @@ export default function UserPage() {
             <Scrollbar>
               <TableContainer sx={{ minWidth: 800 }}>
                 <Table>
-                  {/* <UserListHead
+                  <UserListHead
                     order={order}
                     orderBy={orderBy}
                     headLabel={TABLE_HEAD}
-                    rowCount={USERLIST.length}
+                    rowCount={uploadedFiles.length}
                     numSelected={selected.length}
                     onRequestSort={handleRequestSort}
                     onSelectAllClick={handleSelectAllClick}
-                  /> */}
+                  />
                   <TableBody>
                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
-                      const { id, name, role, status, company, avatarUrl, isVerified } = row;
-                      const selectedUser = selected.indexOf(name) !== -1;
+                    //   const { id, name, role, status, company, avatarUrl, isVerified } = row;
+                    const { name, lastModified, size } = row;
+                    
+                    const selectedUser = selected.indexOf(name) !== -1;
   
                       return (
-                        <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                        <TableRow hover key={name} tabIndex={-1} role="checkbox" selected={selectedUser}>
                           <TableCell padding="checkbox">
                             <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
                           </TableCell>
   
                           <TableCell component="th" scope="row" padding="none">
                             <Stack direction="row" alignItems="center" spacing={2}>
-                              <Avatar alt={name} src={avatarUrl} />
+                              <IconButton> <TextSnippetIcon /></IconButton>
                               <Typography variant="subtitle2" noWrap>
                                 {name}
                               </Typography>
                             </Stack>
                           </TableCell>
   
-                          <TableCell align="left">{company}</TableCell>
+                          <TableCell align="left">{lastModified}</TableCell>
   
-                          <TableCell align="left">{role}</TableCell>
+                          <TableCell align="left">{size}</TableCell>
   
-                          <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
+                          {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell> */}
   
-                          <TableCell align="left">
+                          {/* <TableCell align="left">
                             <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label>
-                          </TableCell>
+                          </TableCell> */}
   
                           <TableCell align="right">
                             <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
@@ -288,7 +290,7 @@ export default function UserPage() {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={USERLIST.length}
+              count={uploadedFiles.length}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
@@ -328,63 +330,4 @@ export default function UserPage() {
       </>
     );
   }
-  
-
-
-
-// = come back to this 
-// const MAX_COUNT = 5;
-
-// function App() {
-// 	const [uploadedFiles, setUploadedFiles] = useState([])
-//     const [fileLimit, setFileLimit] = useState(false);
-
-
-//     const handleUploadFiles = files => {
-//         const uploaded = [...uploadedFiles];
-//         let limitExceeded = false;
-//         files.some((file) => {
-//             if (uploaded.findIndex((f) => f.name === file.name) === -1) {
-//                 uploaded.push(file);
-//                 if (uploaded.length === MAX_COUNT) setFileLimit(true);
-//                 if (uploaded.length > MAX_COUNT) {
-//                     alert(`You can only add a maximum of ${MAX_COUNT} files`);
-//                     setFileLimit(false);
-//                     limitExceeded = true;
-//                     return true;
-//                 }
-//             }
-//         })
-//         if (!limitExceeded) setUploadedFiles(uploaded)
-
-//     }
-
-//     const handleFileEvent =  (e) => {
-//         const chosenFiles = Array.prototype.slice.call(e.target.files)
-//         handleUploadFiles(chosenFiles);
-//         console.log(chosenFiles)
-//     }
-
-//     return (
-//                 <Box>
-//                     <Button 
-//                     variant="contained" 
-//                     component="label"
-//                     > 
-//                     Subir Archivo
-//                         <input
-//                         id     = "fileUpload"
-//                         type   = "file"
-//                         multiple
-//                         accept = ".doc, .docx"
-//                         hidden
-//                         onChange={(e) => handleFileEvent(e)}
-//                         disabled={fileLimit}
-//                         />
-//                     </Button>
-//                 </Box>
-// 	);
-// }
-
-// export default App;
 
