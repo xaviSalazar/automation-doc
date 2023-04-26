@@ -7,6 +7,10 @@ import DocUpload from './pages/DocUpload';
 export default function Router() {
     const routes = useRoutes([
       {
+        path: '/',
+        element: <DashboardLayout />,
+      },
+      {
         path: '/automation-doc',
         element: <DashboardLayout />,
         children: [
