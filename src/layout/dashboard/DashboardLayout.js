@@ -1,12 +1,10 @@
-
-import React from 'react';
-// import { useState } from 'react';
-import DataGridView from '../pages/DataGridView';
+import { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
 //
-// import Header from './header';
-// import Nav from './nav';
+import Header from './header';
+import Nav from './nav';
 
 // ----------------------------------------------------------------------
 
@@ -35,18 +33,14 @@ const Main = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function DashboardLayout() {
-//   const [open, setOpen] = useState(false);
-// const [columnLister, setColumnLister] = React.useState()
-// const [content, setContent] = React.useState(null);
+  const [open, setOpen] = useState(false);
 
   return (
     <StyledRoot>
-      {/* <Header onOpenNav={() => setOpen(true)} />
-      <Nav openNav={open} onCloseNav={() => setOpen(false)} /> */}
+      <Header onOpenNav={() => setOpen(true)} />
+      <Nav openNav={open} onCloseNav={() => setOpen(false)} />
       <Main>
-        {/* <LoadFile setColumnLister={setColumnLister} setContent={setContent} /> */}
-         <DataGridView />
-        {/* <Outlet /> */}
+        <Outlet />
       </Main>
     </StyledRoot>
   );

@@ -1,19 +1,20 @@
-import {useRoutes} from 'react-router-dom';
+import {useRoutes, Navigate} from 'react-router-dom';
 // layouts 
-import DashboardLayout from './layout/DashboardLayout';
+import DashboardLayout from './layout/dashboard'
+import DataGridView from './pages/DataGridView';
 
 export default function Router() {
     const routes = useRoutes([
       {
-        path: 'automation-doc',
+        path: '/automation-doc',
         element: <DashboardLayout />,
-        // children: [
-        //   { element: <Navigate to="/dashboard/app" />, index: true },
-        //   { path: 'app', element: <DashboardAppPage /> },
+        children: [
+          { element: <Navigate to="/automation-doc/edit" />, index: true },
+          { path: 'edit', element: <DataGridView /> },
         //   { path: 'user', element: <UserPage /> },
         //   { path: 'products', element: <ProductsPage /> },
         //   { path: 'blog', element: <BlogPage /> },
-        // ],
+         ],
       },
     //   {
     //     path: 'login',

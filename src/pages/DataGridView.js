@@ -5,11 +5,11 @@ import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import { Button, IconButton, MenuItem, Popover, Container, Typography, Stack} from '@mui/material';
 import * as docx from "docx-preview";
-import ReplaceWords from './components/ReplaceWords';
-import LoadFile from './components/LoadFile';
+import ReplaceWords from './libs/ReplaceWords';
+import LoadFile from './libs/LoadFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {saveAll, loadWorkspace} from '../redux/workspace/workspaceAction';
-import MergeDocuments from './components/MergeDocuments';
+import MergeDocuments from './libs/MergeDocuments';
 // import { FlashOnRounded } from '@mui/icons-material';
 
   /**Function to by pass usage of ApiRef */

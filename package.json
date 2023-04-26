@@ -6,6 +6,8 @@
   "dependencies": {
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@faker-js/faker": "^7.6.0",
+    "@iconify/react": "^4.1.0",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.12.1",
     "@mui/x-data-grid": "^6.2.0",
@@ -14,6 +16,8 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@xavicoel/docx-merger": "^0.0.1-development",
+    "change-case": "^4.1.2",
+    "date-fns": "^2.29.3",
     "docx-preview": "^0.1.15",
     "docxtemplater": "^3.36.1",
     "file-saver": "^2.0.5",
