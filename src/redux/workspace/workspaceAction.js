@@ -1,7 +1,6 @@
 import { loadSuccess } from "./workspaceSlice";
 
 export const saveAll = (data) => async (dispatch) => {
-
     try 
     {
         localStorage.setItem('workspace', JSON.stringify(data));
@@ -10,7 +9,6 @@ export const saveAll = (data) => async (dispatch) => {
     {
         console.log(error.message);
     }
-
 }
 
 export const loadWorkspace = () => async(dispatch) => {
@@ -26,3 +24,4 @@ export const loadWorkspace = () => async(dispatch) => {
     }
 
 }
+

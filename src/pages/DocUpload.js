@@ -1,5 +1,5 @@
 import { filter } from 'lodash';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 // @mui
 import {
@@ -25,6 +25,8 @@ import Iconify from '../components/iconify';
 import Scrollbar from '../components/scrollbar';
 // sections
 // import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
+import { useDispatch, useSelector } from 'react-redux';
+import { saveFiles, loadFiles } from '../redux/filesStore/filesAction';
 import { UserListHead } from '../sections/@dashboard/user';
 
 // mock
@@ -92,33 +94,91 @@ export default function UserPage() {
 
     const [uploadedFiles, setUploadedFiles] = useState([])
 
-    const handleUploadFiles = files => {
-        const uploaded = [...uploadedFiles];
-        let limitExceeded = false;
-        files.some((file) => {
-            if (uploaded.findIndex((f) => f.name === file.name) === -1) {
-                uploaded.push(file);
-                if (uploaded.length === MAX_COUNT) setFileLimit(true);
-                if (uploaded.length > MAX_COUNT) {
-                    alert(`You can only add a maximum of ${MAX_COUNT} files`);
-                    setFileLimit(false);
-                    limitExceeded = true;
-                    return true;
-                }
-            }
-        })
-        if (!limitExceeded) setUploadedFiles(uploaded)
-    }
+    const reducerFiles = useSelector(state => state.filesSaved)
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+
+      dispatch(loadFiles())
+
+    }, [dispatch])
+
+    useEffect(() => {
+      
+      if(typeof reducerFiles.filesArray.length === 0)
+        return
+
+        console.log(reducerFiles.filesArray)
+  
+        setUploadedFiles(reducerFiles.filesArray)
+    }, [reducerFiles])
+
+    const handleUploadFiles = async files => {
+
+      const uploaded = [...uploadedFiles];
+      let limitExceeded = false;
+      files.some((file) => {
+          if (uploaded.findIndex((f) => f.name === file.name) === -1) {
+
+              // reader do
+              let reader = new FileReader();
+             
+              uploaded.push(file);
+              if (uploaded.length === MAX_COUNT) setFileLimit(true);
+              if (uploaded.length > MAX_COUNT) {
+                  alert(`You can only add a maximum of ${MAX_COUNT} files`);
+                  setFileLimit(false);
+                  limitExceeded = true;
+                  return true;
+              }
+          }
+
+      })
+
+       // Convert the FileList into an array and iterate
+       let filesAsync = Array.from(files).map(file => {    
+        // Define a new file reader
+        let reader = new FileReader();
+        // Create a new promise
+        return new Promise(resolve => {
+            
+            // Resolve the promise after reading file
+            reader.onload = () => resolve({
+                                            name: file.name, 
+                                            content: reader.result,
+                                            timestamp: file.lastModified,
+                                            size: file.size
+                                          });
+            
+            // Reade the file as a text
+            reader.readAsText(file);
+         });
+      });
+
+      let res = await Promise.all(filesAsync)
+      
+      if (!limitExceeded) 
+      {
+        setUploadedFiles(uploaded)
+        dispatch(saveFiles(res));
+      }
+
+  }
 
     const handleFileEvent =  (e) => {
         const chosenFiles = Array.prototype.slice.call(e.target.files)
         handleUploadFiles(chosenFiles);
-        console.log(chosenFiles)
     }
 
   
-    const handleOpenMenu = (event) => {
+    const handleOpenMenu = (event, name) => {
+      console.log(name)
       setOpen(event.currentTarget);
+    };
+
+    const handleOpenIcon = (event, name) => {
+      console.log(name)
     };
   
     const handleCloseMenu = () => {
@@ -216,7 +276,7 @@ export default function UserPage() {
                   <TableBody>
                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     //   const { id, name, role, status, company, avatarUrl, isVerified } = row;
-                    const { name, lastModified, size } = row;
+                    const { name, timestamp, size } = row;
                     
                     const selectedUser = selected.indexOf(name) !== -1;
   
@@ -228,14 +288,14 @@ export default function UserPage() {
   
                           <TableCell component="th" scope="row" padding="none">
                             <Stack direction="row" alignItems="center" spacing={2}>
-                              <IconButton> <TextSnippetIcon /></IconButton>
+                              <IconButton onClick={(e) => handleOpenIcon(e,name)}> <TextSnippetIcon /></IconButton>
                               <Typography variant="subtitle2" noWrap>
                                 {name}
                               </Typography>
                             </Stack>
                           </TableCell>
   
-                          <TableCell align="left">{lastModified}</TableCell>
+                          <TableCell align="left">{timestamp}</TableCell>
   
                           <TableCell align="left">{size}</TableCell>
   
@@ -246,7 +306,7 @@ export default function UserPage() {
                           </TableCell> */}
   
                           <TableCell align="right">
-                            <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                            <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e,name)}>
                               <Iconify icon={'eva:more-vertical-fill'} />
                             </IconButton>
                           </TableCell>
