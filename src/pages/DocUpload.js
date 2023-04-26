@@ -28,6 +28,7 @@ import Scrollbar from '../components/scrollbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveFiles, loadFiles } from '../redux/filesStore/filesAction';
 import { UserListHead } from '../sections/@dashboard/user';
+import { redirect, useNavigate} from 'react-router-dom';
 
 // mock
 // import USERLIST from '../_mock/user';
@@ -98,6 +99,8 @@ export default function UserPage() {
 
     const dispatch = useDispatch();
 
+    const navigate = useNavigate();
+
     useEffect(() => {
 
       dispatch(loadFiles())
@@ -106,7 +109,7 @@ export default function UserPage() {
 
     useEffect(() => {
       
-      if(typeof reducerFiles.filesArray.length === 0)
+      if(reducerFiles.filesArray === null)
         return
 
         console.log(reducerFiles.filesArray)
@@ -152,7 +155,7 @@ export default function UserPage() {
                                           });
             
             // Reade the file as a text
-            reader.readAsText(file);
+            reader.readAsBinaryString(file);
          });
       });
 
@@ -179,6 +182,13 @@ export default function UserPage() {
 
     const handleOpenIcon = (event, name) => {
       console.log(name)
+      console.log(`/templates/${name}`)
+
+      // redirect("/login");
+
+      
+
+      navigate({pathname: `/automation-doc/templates/${name}`})
     };
   
     const handleCloseMenu = () => {

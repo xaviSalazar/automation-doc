@@ -10,6 +10,9 @@ import LoadFile from './libs/LoadFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {saveAll, loadWorkspace} from '../redux/workspace/workspaceAction';
 import MergeDocuments from './libs/MergeDocuments';
+import { useLocation } from 'react-router-dom';
+import { loadFiles } from '../redux/filesStore/filesAction';
+import SelectFile from './libs/SelectFile';
 // import { FlashOnRounded } from '@mui/icons-material';
 
   /**Function to by pass usage of ApiRef */
@@ -37,6 +40,8 @@ import MergeDocuments from './libs/MergeDocuments';
 // ===========================================================================
 export default function DataGridView() {
 
+        // const { params } = useLoaderData();
+        // console.log(params)
     /** Initial column Values for first render */
     const InitColumns = [
       { field: 'id', headerName: 'ID', width: 50, renderCell: RenderButtonPick,},
@@ -97,6 +102,9 @@ export default function DataGridView() {
             }
           ]
     
+  const { pathname } = useLocation();
+  console.log(pathname)
+
   // holds values to be modified when I file is uploaded
   const [columnLister, setColumnLister] = React.useState()
 
@@ -131,6 +139,26 @@ export default function DataGridView() {
   // call apiRef bypass method
   const { apiRef, _columns } = useApiRef(columns);
 
+  const reducerFiles = useSelector(state => state.filesSaved)
+
+
+    React.useEffect(() => {
+
+      dispatch(loadFiles())
+
+    }, [dispatch])
+
+
+    React.useEffect(() => {
+      
+      if(reducerFiles.filesArray === null)
+        return
+
+        SelectFile(pathname, setColumnLister, setContent, reducerFiles.filesArray)
+  
+        // setUploadedFiles(reducerFiles.filesArray)
+    }, [reducerFiles])
+
     /* UseEffect to process columns and rows from parsed document */
     React.useEffect(() => {
 
@@ -148,15 +176,15 @@ export default function DataGridView() {
     // eslint-disable-next-line
     }, [columnLister])
 
-    React.useEffect(() => {
-      console.log("useEffect for reducer load workspace")
-      // console.log(reducerVar)
-      if(typeof reducerVar === "undefined")
-        return
-      setColumns(reducerVar.columns)
-      setRows(reducerVar.rows)
-      setContent(reducerVar.content)
-    }, [reducerVar])
+    // React.useEffect(() => {
+    //   console.log("useEffect for reducer load workspace")
+    //   // console.log(reducerVar)
+    //   if(typeof reducerVar === "undefined")
+    //     return
+    //   setColumns(reducerVar.columns)
+    //   setRows(reducerVar.rows)
+    //   setContent(reducerVar.content)
+    // }, [reducerVar])
 
       /* UseEffect for blob visualization content after word replacement*/
    React.useEffect(() => {
@@ -322,7 +350,7 @@ export default function DataGridView() {
                   </Button>
           }
 
-          <Button 
+          {/* <Button 
             variant="contained" 
             component="label"
           > 
@@ -333,7 +361,7 @@ export default function DataGridView() {
                 hidden
                 onChange={(e) => LoadFile(e, setColumnLister, setContent)}
               />
-          </Button>
+          </Button> */}
       
         { content &&
           <Button 

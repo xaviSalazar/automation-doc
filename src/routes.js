@@ -11,8 +11,17 @@ export default function Router() {
         element: <DashboardLayout />,
         children: [
           { element: <Navigate to="/automation-doc/edit" />, index: true },
-          { path: 'edit', element: <DataGridView /> },
-          { path: 'templates', element: <DocUpload /> },
+          { 
+            path: 'templates', 
+            element: <DataGridView /> ,
+          },
+          { 
+            path: 'templates/:name', 
+            element: <DataGridView />,
+          },
+          { path:  'edit', 
+            element: <DocUpload /> 
+          },
         //   { path: 'products', element: <ProductsPage /> },
         //   { path: 'blog', element: <BlogPage /> },
          ],
