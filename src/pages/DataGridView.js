@@ -6,7 +6,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { Button, IconButton, MenuItem, Popover, Container, Typography, Stack} from '@mui/material';
 import * as docx from "docx-preview";
 import ReplaceWords from './libs/ReplaceWords';
-import LoadFile from './libs/LoadFile';
+// import LoadFile from './libs/LoadFile';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {saveAll, loadWorkspace} from '../redux/workspace/workspaceAction';
 import MergeDocuments from './libs/MergeDocuments';
@@ -119,7 +119,7 @@ export default function DataGridView() {
   const dispatch = useDispatch();
 
   // reducers load variables workspace
-  const reducerVar = useSelector(state => state.workspace)
+  // const reducerVar = useSelector(state => state.workspace)
   
   // rows initialization
   const [rows, setRows] = 
@@ -157,7 +157,7 @@ export default function DataGridView() {
         SelectFile(pathname, setColumnLister, setContent, reducerFiles.filesArray)
   
         // setUploadedFiles(reducerFiles.filesArray)
-    }, [reducerFiles])
+    }, [reducerFiles, pathname])
 
     /* UseEffect to process columns and rows from parsed document */
     React.useEffect(() => {
@@ -308,8 +308,8 @@ export default function DataGridView() {
   }
 
   const handleCheckBox = (ids) => {
-    const selectedIDs = new Set(ids);
 
+    const selectedIDs = new Set(ids);
     // call apiRef
     const obj_it = apiRef.current.getRowModels()
     // array of rows 
@@ -319,10 +319,11 @@ export default function DataGridView() {
     selectedIDs.has(row.id));
     console.log(selectedRowData)
     SetCheckedRowData(selectedRowData)
+
   }
 
   const handleGenerateDoc = () => {
-    // console.log(checkedRowData)
+    console.log(checkedRowData)
     MergeDocuments(content, checkedRowData);
   }
 
