@@ -95,7 +95,7 @@ const SelectFile = (pathname, setColumnLister, setContent, filesArray) => {
     var doc = new Docxtemplater( zip, {delimiters: {start: '12op1j2po1j2poj1po', end: 'op21j4po21jp4oj1op24j'}});
 
     const uniqueWords = checkFiles(doc, zip);
-    setColumnLister(uniqueWords);
+    setColumnLister({columns: uniqueWords, fileName: fileExists.name});
 };
 
 export default SelectFile;

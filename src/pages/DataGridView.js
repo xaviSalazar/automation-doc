@@ -106,7 +106,7 @@ export default function DataGridView() {
   console.log(pathname)
 
   // holds values to be modified when I file is uploaded
-  const [columnLister, setColumnLister] = React.useState()
+  const [columnLister, setColumnLister] = React.useState({columns: [], fileName: ""})
 
   // set docx content 
   const [content, setContent] = React.useState(null);
@@ -164,11 +164,11 @@ export default function DataGridView() {
 
       console.log("useEffect -> columnLister")
       // check undefined when webapp starts
-      if(typeof columnLister === "undefined")
+      if(typeof columnLister.columns === "undefined")
         return
       
-      const newColumns = columnsParser(columnLister)
-      const newRows = rowsParser(columnLister)
+      const newColumns = columnsParser(columnLister.columns)
+      const newRows = rowsParser(columnLister.columns)
       // sets columns and rows parsed from uploaded file
       setColumns(newColumns)
       setRows(newRows)
@@ -333,10 +333,10 @@ export default function DataGridView() {
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
 
-         {content ? <Typography variant="h4" gutterBottom>
-                    Datos 
+         {content ? <Typography variant="h5" gutterBottom>
+                     {`Editando archivo:     ${columnLister.fileName}`}
                     </Typography> 
-                  : <Typography variant="h4" gutterBottom> 
+                  : <Typography variant="h5" gutterBottom> 
                     Primero subir un documento
                     </Typography>
           }
