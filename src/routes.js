@@ -3,18 +3,31 @@ import {useRoutes, Navigate} from 'react-router-dom';
 import DashboardLayout from './layout/dashboard'
 import DataGridView from './pages/DataGridView';
 import DocUpload from './pages/DocUpload';
+import Home from './pages/Home';
 
 export default function Router() {
     const routes = useRoutes([
       {
         path: '/',
         element: <DashboardLayout />,
+        children: [
+          { element: <Navigate to="/home" />, index: true },
+          {
+            path: 'home',
+            element: <Home />,
+          },
+
+        ]
       },
       {
         path: '/automation-doc',
         element: <DashboardLayout />,
         children: [
-          { element: <Navigate to="/automation-doc/edit" />, index: true },
+          { element: <Navigate to="/automation-doc/home" />, index: true },
+          {
+            path: 'home',
+            element: <Home />,
+          },
           { 
             path: 'templates', 
             element: <DataGridView /> ,
