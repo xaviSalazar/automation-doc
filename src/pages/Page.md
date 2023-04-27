@@ -14,7 +14,7 @@ La palabra que encerramos entres llaves es ***{nombre}***
 
 Tal como la siguiente imagen:  
 
-![ImagenTemplate](https://raw.githubusercontent.com/xaviSalazar/automation-doc/master/public/templates/TEMPLATE_EXAMPLE.png)
+![ImagenTemplate](https://raw.githubusercontent.com/xaviSalazar/automation-doc/master/public/templates/TEMPLATE.png)
 
 
 Como se puede observar en la foto superior todas las   
