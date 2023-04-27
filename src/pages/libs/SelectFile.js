@@ -14,8 +14,10 @@ const checkFiles = (doc, zip) => {
 
   let matchDoc, matchHeading, matchFooter = null
   // matches all words inside { }
-  const regex = /\{(\w+)\}/g;
-  
+  // const regex = /\{(\p{L}+\p{M}*)+\}/gu;
+  // const regex = /\{(\p{L}+\p{M}*\d+)\}/gu
+  const regex = /{([a-zA-ZñáéíóúÁÉÍÓÚ0-9]+)}/g
+
   const document = zip.files[xmlTypes['document']]
   const header = zip.files[xmlTypes['head']]
   const footer = zip.files[xmlTypes['foot']]
@@ -42,7 +44,7 @@ const checkFiles = (doc, zip) => {
     matchFooter = footText.match(regex)?.map(match => match.slice(1, -1));
   }
 
-  // console.log("document -> ", matchDoc)
+  console.log("document -> ", matchDoc)
   // console.log("header -> ", matchHeading)
   // console.log("footer -> ", matchFooter)
 
@@ -54,7 +56,7 @@ const checkFiles = (doc, zip) => {
 
   const concatenated = concat(matchDoc, matchHeading, matchFooter)
 
-  // console.log("concatenated -> ", concatenated)
+  console.log("concatenated -> ", concatenated)
 
   const uniqueWords = unique(concatenated)
 
