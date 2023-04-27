@@ -1,25 +1,35 @@
 // component
-import SvgColor from '../../../components/svg-color';
+// import SvgColor from '../../../components/svg-color';
+import HomeIcon from '@mui/icons-material/Home';
+import NoteAddIcon from '@mui/icons-material/NoteAdd';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
 
 // ----------------------------------------------------------------------
 
-const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
+const Icons = {
+  home: <HomeIcon />,
+  document: <NoteAddIcon />,
+  autoTemplate: <AutorenewIcon/>
+}
+// const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
+
+const icon = (name) => Icons[`${name}`]
 
 const navConfig = [
   {
     title: 'Home',
     path: '/automation-doc/home',
-    icon: icon('ic_analytics'),
+    icon: icon("home"),
   },
   {
-    title: 'Agreagar Documento',
+    title: 'Agregar Documento',
     path: '/automation-doc/edit',
-    icon: icon('ic_analytics'),
+    icon: icon('document'),
   },
   {
     title: 'Templates Automatico',
     path: '/automation-doc/templates',
-    icon: icon('ic_user'),
+    icon: icon('autoTemplate'),
   },
   // {
   //   title: 'product',
