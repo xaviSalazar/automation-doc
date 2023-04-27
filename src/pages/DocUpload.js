@@ -28,7 +28,7 @@ import Scrollbar from '../components/scrollbar';
 import { useDispatch, useSelector } from 'react-redux';
 import { saveFiles, loadFiles } from '../redux/filesStore/filesAction';
 import { UserListHead } from '../sections/@dashboard/user';
-import { redirect, useNavigate} from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 
 // mock
 // import USERLIST from '../_mock/user';
@@ -112,7 +112,7 @@ export default function UserPage() {
       if(reducerFiles.filesArray === null)
         return
 
-        console.log(reducerFiles.filesArray)
+        // console.log(reducerFiles.filesArray)
   
         setUploadedFiles(reducerFiles.filesArray)
     }, [reducerFiles])
@@ -123,9 +123,6 @@ export default function UserPage() {
       let limitExceeded = false;
       files.some((file) => {
           if (uploaded.findIndex((f) => f.name === file.name) === -1) {
-
-              // reader do
-              let reader = new FileReader();
              
               uploaded.push(file);
               if (uploaded.length === MAX_COUNT) setFileLimit(true);
@@ -234,10 +231,10 @@ export default function UserPage() {
       setRowsPerPage(parseInt(event.target.value, 10));
     };
   
-    const handleFilterByName = (event) => {
-      setPage(0);
-      setFilterName(event.target.value);
-    };
+    // const handleFilterByName = (event) => {
+    //   setPage(0);
+    //   setFilterName(event.target.value);
+    // };
   
     const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - uploadedFiles.length) : 0;
   
