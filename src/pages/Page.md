@@ -22,7 +22,7 @@ variables modificables son encerradas entre ***{}***
 
 Puede descargar este archivo de prueba del siguiente link
 
-[Descargame click aqui](https://d1d5i0xjsb5dtw.cloudfront.net/DocumentoDePrueba.docx)   
+[Descargame click aqui](https://d1d5i0xjsb5dtw.cloudfront.net/CartaModelo.docx)   
 
 Una vez descargado el archivo word puedes seguir a la pagina de agregar documento   
 Sube tu archivo y seras llevado a una pagina donde podras automatizarlo
