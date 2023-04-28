@@ -3,13 +3,15 @@
 import HomeIcon from '@mui/icons-material/Home';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
+import DesignServicesIcon from '@mui/icons-material/DesignServices';
 
 // ----------------------------------------------------------------------
 
 const Icons = {
   home: <HomeIcon />,
   document: <NoteAddIcon />,
-  autoTemplate: <AutorenewIcon/>
+  autoTemplate: <AutorenewIcon/>,
+  generateAi: <DesignServicesIcon/>
 }
 // const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
 
@@ -30,6 +32,11 @@ const navConfig = [
     title: 'Templates Automatico',
     path: '/automation-doc/templates',
     icon: icon('autoTemplate'),
+  },
+  {
+    title: 'Generador AI',
+    path: '/automation-doc/generate',
+    icon: icon('generateAi'),
   },
   // {
   //   title: 'product',

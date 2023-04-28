@@ -4,6 +4,7 @@ import DashboardLayout from './layout/dashboard'
 import DataGridView from './pages/DataGridView';
 import DocUpload from './pages/DocUpload';
 import Home from './pages/Home';
+import AiGenerator from './pages/AiGenerator';
 
 export default function Router() {
     const routes = useRoutes([
@@ -36,9 +37,15 @@ export default function Router() {
             path: 'templates/:name', 
             element: <DataGridView />,
           },
-          { path:  'edit', 
+          { 
+            path:  'edit', 
             element: <DocUpload /> 
           },
+          {
+            path: 'generate',
+            element: <AiGenerator />
+
+          }
         //   { path: 'products', element: <ProductsPage /> },
         //   { path: 'blog', element: <BlogPage /> },
          ],
