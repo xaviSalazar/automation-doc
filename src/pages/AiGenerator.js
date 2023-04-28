@@ -214,6 +214,7 @@ const htmlString = `<!DOCTYPE html>
 export default function AiGenerator() {
 
     async function downloadDocx(params) {
+        // console.log("button")
         // const fileBuffer = await HTMLtoDOCX(htmlString, null, {
         //   table: { row: { cantSplit: true } },
         //   footer: true,
