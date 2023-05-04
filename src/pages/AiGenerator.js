@@ -1,4 +1,5 @@
-// import HTMLtoDOCX from 'html-to-docx-dinnye';
+
+import HTMLtoDOCX from 'html-to-docx-dinnye';
 import { Box, Button, Container } from '@mui/material';
 import { saveAs } from 'file-saver';
 
@@ -11,14 +12,7 @@ const htmlString = `<!DOCTYPE html>
     <body>
         <div>
             <p>Taken from wikipedia</p>
-            <img
-                src="data:image/png;base64, iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg=="
-                alt="Red dot"
-            />
-            <img
-                src="https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"
-                alt="Red dot"
-            />
+         
         </div>
         <div>
             <h1>This is heading 1</h1>
@@ -214,14 +208,14 @@ const htmlString = `<!DOCTYPE html>
 export default function AiGenerator() {
 
     async function downloadDocx(params) {
-        // console.log("button")
-        // const fileBuffer = await HTMLtoDOCX(htmlString, null, {
-        //   table: { row: { cantSplit: true } },
-        //   footer: true,
-        //   pageNumber: true,
-        // });
+        console.log("button")
+        const fileBuffer = await HTMLtoDOCX(htmlString, null, {
+          table: { row: { cantSplit: true } },
+          footer: true,
+          pageNumber: true,
+        });
     
-        // saveAs(fileBuffer, 'html-to-docx.docx');
+        saveAs(fileBuffer, 'html-to-docx.docx');
       }
 
       return (
