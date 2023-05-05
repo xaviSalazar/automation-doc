@@ -1,5 +1,6 @@
 
-import HTMLtoDOCX from 'html-to-docx-dinnye';
+import HTMLtoDOCX from 'html-to-docx';
+
 import { Box, Button, Container } from '@mui/material';
 import { saveAs } from 'file-saver';
 
@@ -208,7 +209,9 @@ const htmlString = `<!DOCTYPE html>
 export default function AiGenerator() {
 
     async function downloadDocx(params) {
+
         console.log("button")
+
         const fileBuffer = await HTMLtoDOCX(htmlString, null, {
           table: { row: { cantSplit: true } },
           footer: true,
