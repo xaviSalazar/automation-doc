@@ -2,11 +2,16 @@
 import HTMLtoDOCX from 'html-to-docx';
 import * as React from 'react';
 import * as docx from "docx-preview";
-import { Box, Button, Container } from '@mui/material';
+import { Box, Button, Container, Paper } from '@mui/material';
 // import { saveAs } from 'file-saver';
 import { httpManager } from '../managers/httpManagers';
+import InputBase from '@mui/material/InputBase';
+import IconButton from '@mui/material/IconButton';
+import SendIcon from '@mui/icons-material/Send';
 
 export default function AiGenerator() {
+
+    let textInserted;
 
     // blob that contains binary word file
     const [blob, setBlob] =
@@ -20,6 +25,9 @@ export default function AiGenerator() {
             .then((x) => console.log("docx: finished"))
     }, [blob])
 
+
+    //------------------------------------------------
+    //------------------------------------------------
     async function downloadDocx(params) {
 
         console.log("button")
@@ -44,11 +52,43 @@ export default function AiGenerator() {
         } catch (e) {
             console.log(e.message)
         }
-
     }
+//------------------------------------------------
+
+const onChange = (event) => {
+    // console.log(event.target.value);
+    textInserted = event.target.value
+};
+
+const onClickSend = (event) => {
+    if (textInserted === undefined || textInserted === "" ) return;
+        console.log("envio: ")
+        console.log(textInserted)
+};
 
     return (
         <Container>
+            <Box>
+
+            <Paper
+            component="form"
+            sx={{ p: '2px 4px', display: 'flex', alignItems: 'center', width: 400 }}
+            >
+            <InputBase
+            sx={{ ml: 1, flex: 1 }}
+            placeholder="Que documento desea?"
+            inputProps={{ 'aria-label': 'generar documento' }}
+            multiline
+            onChange={onChange}
+            />
+
+            <IconButton onClick={onClickSend} color="primary" sx={{ p: '10px' }} aria-label="directions">
+                <SendIcon/>
+            </IconButton>
+
+            </Paper>
+
+            </Box>
             <Box>
                 <Button
                     variant="contained"
