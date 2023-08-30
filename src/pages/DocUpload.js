@@ -184,11 +184,6 @@ export default function UserPage() {
     const handleOpenIcon = (event, name) => {
       console.log(name)
       console.log(`/templates/${name}`)
-
-      // redirect("/login");
-
-      
-
       navigate({pathname: `/automation-doc/templates/${name}`})
     };
   
@@ -390,12 +385,12 @@ export default function UserPage() {
         >
           <MenuItem>
             <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
-            Edit
+            Editar
           </MenuItem>
   
           <MenuItem sx={{ color: 'error.main' }}>
             <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
-            Delete
+            Eliminar
           </MenuItem>
         </Popover>
       </>
