@@ -40,7 +40,7 @@ const MAX_COUNT = 5;
 const TABLE_HEAD = [
     { id: 'name', label: 'Archivo', alignRight: false },
     { id: 'timestamp', label: 'Fecha de Creacion', alignRight: false },
-    { id: 'size', label: 'Talla Archivo', alignRight: false },
+    { id: 'size', label: 'Talla Archivo kbyte', alignRight: false },
     // { id: 'isVerified', label: 'Verified', alignRight: false },
     // { id: 'status', label: 'Status', alignRight: false },
     { id: '' },
@@ -58,11 +58,12 @@ const TABLE_HEAD = [
     return 0;
   }
 
-  const timestampToDate = ({ timestamp }) => {
+  const timestampToDate = ( timestamp ) => {
     const dateObject = new Date(timestamp);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    const dateString = dateObject.toLocaleDateString('en-US', options);
-    return dateString;
+    const options = { year: 'numeric', month: 'long', 
+                      day: 'numeric', hour: 'numeric',
+                      minute: 'numeric',};
+    return dateObject.toLocaleDateString('en-US', options);
   };
   
   function getComparator(order, orderBy) {
