@@ -135,7 +135,7 @@ export default function AiGenerator() {
           position: inputPosition === 'bottom' ? 'fixed' : 'relative',
           bottom: inputPosition === 'bottom' ? 0 : 'auto',
           boxShadow:'0px 0px 10px rgba(0, 0, 0, 0.2)',
-          backgroundColor: highlight ? 'green' : 'transparent', // Highlight background color
+          backgroundColor: highlight ? '#ccc' : 'transparent', // Highlight background color
           transition: 'background-color 0.5s ease-in-out', // Add a smooth transition effect
         }}
         onClick={handleInputClick}

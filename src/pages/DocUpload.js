@@ -40,7 +40,7 @@ const MAX_COUNT = 5;
 const TABLE_HEAD = [
     { id: 'name', label: 'Archivo', alignRight: false },
     { id: 'timestamp', label: 'Fecha de Creacion', alignRight: false },
-    { id: 'size', label: 'Talla Archivo kbyte', alignRight: false },
+    { id: 'size', label: 'Talla Archivo kbyte', alignRight: true },
     // { id: 'isVerified', label: 'Verified', alignRight: false },
     // { id: 'status', label: 'Status', alignRight: false },
     { id: '' },
@@ -319,7 +319,7 @@ export default function UserPage() {
   
                           <TableCell align="left">{timestampToDate(timestamp)}</TableCell>
   
-                          <TableCell align="left">{size}</TableCell>
+                          <TableCell align="right">{size}</TableCell>
   
                           {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell> */}
   
