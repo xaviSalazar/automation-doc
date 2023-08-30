@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 // @mui
 import {
+  Box,
   Card,
   Table,
   Stack,
@@ -258,7 +259,6 @@ export default function UserPage() {
     const isNotFound = !filteredUsers.length && !!filterName;
   
     return (
-      <>
         <Container>
           <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
 
@@ -282,9 +282,8 @@ export default function UserPage() {
   
           <Card>
             {/* <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} /> */}
-  
-            <Scrollbar>
-              <TableContainer sx={{ minWidth: 800 }}>
+           
+              <TableContainer sx={{height: 500, minWidth: 800 }}>
                 <Table>
                   <UserListHead
                     order={order}
@@ -367,7 +366,7 @@ export default function UserPage() {
                   )}
                 </Table>
               </TableContainer>
-            </Scrollbar>
+            
   
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
@@ -379,8 +378,7 @@ export default function UserPage() {
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
           </Card>
-        </Container>
-  
+        
         <Popover
           open={Boolean(open)}
           anchorEl={open}
@@ -409,7 +407,7 @@ export default function UserPage() {
             Eliminar
           </MenuItem>
         </Popover>
-      </>
+        </Container>
     );
   }
 
