@@ -26,9 +26,10 @@ import Scrollbar from '../components/scrollbar';
 // sections
 // import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveFiles, loadFiles } from '../redux/filesStore/filesAction';
+import { saveFiles, loadFiles, deleteElement } from '../redux/filesStore/filesAction';
 import { UserListHead } from '../sections/@dashboard/user';
 import { useNavigate} from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 // mock
 // import USERLIST from '../_mock/user';
@@ -56,6 +57,13 @@ const TABLE_HEAD = [
     }
     return 0;
   }
+
+  const timestampToDate = ({ timestamp }) => {
+    const dateObject = new Date(timestamp);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    const dateString = dateObject.toLocaleDateString('en-US', options);
+    return dateString;
+  };
   
   function getComparator(order, orderBy) {
     return order === 'desc'
@@ -95,6 +103,8 @@ export default function UserPage() {
 
     const [uploadedFiles, setUploadedFiles] = useState([])
 
+    const [deleteId, setDeleteId] = useState(null);
+
     const reducerFiles = useSelector(state => state.filesSaved)
 
     const dispatch = useDispatch();
@@ -112,7 +122,7 @@ export default function UserPage() {
       if(reducerFiles.filesArray === null)
         return
 
-        // console.log(reducerFiles.filesArray)
+        console.log(reducerFiles.filesArray)
   
         setUploadedFiles(reducerFiles.filesArray)
     }, [reducerFiles])
@@ -145,6 +155,7 @@ export default function UserPage() {
             
             // Resolve the promise after reading file
             reader.onload = () => resolve({
+                                            id: uuidv4(),
                                             name: file.name, 
                                             content: reader.result,
                                             timestamp: file.lastModified,
@@ -176,13 +187,12 @@ export default function UserPage() {
     }
 
   
-    const handleOpenMenu = (event, name) => {
-      console.log(name)
+    const handleOpenMenu = (event, name, id) => {
+      setDeleteId(id)
       setOpen(event.currentTarget);
     };
 
     const handleOpenIcon = (event, name) => {
-      console.log(name)
       console.log(`/templates/${name}`)
       navigate({pathname: `/automation-doc/templates/${name}`})
     };
@@ -229,6 +239,11 @@ export default function UserPage() {
       setPage(0);
       setRowsPerPage(parseInt(event.target.value, 10));
     };
+
+    const onClickEliminar = () => {
+      setOpen(null);
+      dispatch(deleteElement(deleteId));
+    }
   
     // const handleFilterByName = (event) => {
     //   setPage(0);
@@ -282,7 +297,7 @@ export default function UserPage() {
                   <TableBody>
                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     //   const { id, name, role, status, company, avatarUrl, isVerified } = row;
-                    const { name, timestamp, size } = row;
+                    const { id, name, timestamp, size } = row;
                     
                     const selectedUser = selected.indexOf(name) !== -1;
   
@@ -301,7 +316,7 @@ export default function UserPage() {
                             </Stack>
                           </TableCell>
   
-                          <TableCell align="left">{timestamp}</TableCell>
+                          <TableCell align="left">{timestampToDate(timestamp)}</TableCell>
   
                           <TableCell align="left">{size}</TableCell>
   
@@ -312,7 +327,7 @@ export default function UserPage() {
                           </TableCell> */}
   
                           <TableCell align="right">
-                            <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e,name)}>
+                            <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, name, id)}>
                               <Iconify icon={'eva:more-vertical-fill'} />
                             </IconButton>
                           </TableCell>
@@ -388,7 +403,7 @@ export default function UserPage() {
             Editar
           </MenuItem>
   
-          <MenuItem sx={{ color: 'error.main' }}>
+          <MenuItem onClick={onClickEliminar} sx={{ color: 'error.main' }}>
             <Iconify icon={'eva:trash-2-outline'} sx={{ mr: 2 }} />
             Eliminar
           </MenuItem>

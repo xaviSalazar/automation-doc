@@ -28,3 +28,16 @@ export const loadFiles = () => async(dispatch) => {
 
 }
 
+export const deleteElement = (keyToDelete) => async(dispatch) => {
+    try 
+    {
+        const loadData = JSON.parse(localStorage.getItem("files"))
+        // delete element 
+        const updatedData = loadData.filter((item) => item.id !== keyToDelete);
+        localStorage.setItem('files', JSON.stringify(updatedData));
+        dispatch(loadSuccessFiles(updatedData))   
+    } catch (error) {
+        console.log(error.message)
+    }
+}
+

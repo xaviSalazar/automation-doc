@@ -11,6 +11,8 @@ const filesSlice = createSlice({
         loadSuccessFiles: (state, action) => {
             state.filesArray = action.payload
         }
+
+        
     }
 });
 
