@@ -3,7 +3,6 @@ import { useState, useEffect } from 'react';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 // @mui
 import {
-  Box,
   Card,
   Table,
   Stack,
@@ -23,7 +22,7 @@ import {
 } from '@mui/material';
 // components
 import Iconify from '../components/iconify';
-import Scrollbar from '../components/scrollbar';
+// import Scrollbar from '../components/scrollbar';
 // sections
 // import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 import { useDispatch, useSelector } from 'react-redux';
@@ -175,6 +174,7 @@ export default function UserPage() {
 
       res.some((file) => {
       uploaded.push(file)
+      return null
       })
 
       if (!limitExceeded) 
