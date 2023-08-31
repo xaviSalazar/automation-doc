@@ -1,81 +1,11 @@
-
-// import HTMLtoDOCX from 'html-to-docx';
-// import * as React from 'react';
-// import * as docx from "docx-preview";
-// import { Box, Button, Container, Paper } from '@mui/material';
-// // import { saveAs } from 'file-saver';
-// import { httpManager } from '../managers/httpManagers';
-// import InputBase from '@mui/material/InputBase';
-// import IconButton from '@mui/material/IconButton';
-// import SendIcon from '@mui/icons-material/Send';
-
-// export default function AiGenerator() {
-
-//     const [value, setValue] = React.useState("");
-
-//     // blob that contains binary word file
-//     const [blob, setBlob] =
-//         React.useState();
-
-//     /* UseEffect for blob visualization content after word replacement*/
-//     React.useEffect(() => {
-//         if (typeof blob === "undefined")
-//             return
-//         docx.renderAsync(blob, document.getElementById("viewer_docx"))
-//             .then((x) => console.log("docx: finished"))
-//     }, [blob])
-
-
-//     //------------------------------------------------
-//     //------------------------------------------------
-//     async function downloadDocx(params) {
-
-//         console.log("button")
-
-//         try {
-
-//             const fetchDocument = await httpManager.retrieveDocumentXml()
-
-//             console.log(fetchDocument.data)
-
-//             const fileBuffer = await HTMLtoDOCX(fetchDocument.data, null, {
-//                 table: { row: { cantSplit: true } },
-//                 footer: true,
-//                 pageNumber: true,
-//             });
-
-//             console.log(typeof fileBuffer)
-//             setBlob(fileBuffer)
-
-//             // saveAs(fileBuffer, 'html-to-docx.docx');
-
-//         } catch (e) {
-//             console.log(e.message)
-//         }
-//     }
-// //------------------------------------------------
-
-//             </Box>
-//             {/* <Box>
-//                 <Button
-//                     variant="contained"
-//                     onClick={downloadDocx}
-//                 >
-//                     PRESIONAME
-//                 </Button>
-//             </Box> */}
-
-//             <Box id='viewer_docx' />
-//         </Container>
-//     );
-
-// }
-
+import HTMLtoDOCX from 'html-to-docx';
 import React, { useState, useRef, useEffect } from 'react';
+import * as docx from "docx-preview";
 import { httpManager } from '../managers/httpManagers';
 import {
   Container,
   Box,
+  Button,
   Paper,
   InputBase,
   IconButton,
@@ -92,16 +22,27 @@ export default function AiGenerator() {
   const [inputPosition, setInputPosition] = useState('top');
   const [highlight, setHighlight] = useState(false);
   const messagesContainerRef = useRef(null);
+  const [blob, setBlob] = useState();
+  const [htmlDoc, setHtmlDoc] = useState()
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
   };
+
+    /* UseEffect for blob visualization content after word replacement*/
+    useEffect(() => {
+        if (typeof blob === "undefined")
+            return
+        docx.renderAsync(blob, document.getElementById("viewer_docx"))
+            .then((x) => console.log("docx: finished"))
+    }, [blob])
 
   const contactServer = async (msg) => {
     const response = await httpManager.retrieveChat(msg); 
     console.log(messages)
     if(response.data.message)
     setMessages([...messages, msg, response.data.message]);
+    setHtmlDoc(response.data.message)
   }
 
   const handleSendMessage = async () => {
@@ -132,6 +73,21 @@ export default function AiGenerator() {
         }, 1000); // Adjust the delay duration as needed
       }
   };
+
+    async function downloadDocx() {
+        try {
+            const fileBuffer = await HTMLtoDOCX(htmlDoc, null, {
+                table: { row: { cantSplit: true } },
+                footer: true,
+                pageNumber: true,
+            });
+
+            setBlob(fileBuffer)
+
+        } catch (e) {
+            console.log(e.message)
+        }
+    }
 
   useEffect(() => {
     if (messagesContainerRef.current) {
@@ -186,6 +142,18 @@ export default function AiGenerator() {
           ))}
         </List>
       </Box>
+
+
+      <Box>
+        <Button
+            variant="contained"
+            onClick={downloadDocx}
+        >
+          VER Documento
+        </Button>
+      </Box> 
+
+             <Box id='viewer_docx' />
     </Container>
   );
 };
