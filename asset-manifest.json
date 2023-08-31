@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/automation-doc/static/css/main.4efb37a3.css",
-    "main.js": "/automation-doc/static/js/main.981b295c.js",
-    "static/js/27.050adf4d.chunk.js": "/automation-doc/static/js/27.050adf4d.chunk.js",
+    "main.js": "/automation-doc/static/js/main.8c3723b5.js",
+    "static/js/27.1ba845ca.chunk.js": "/automation-doc/static/js/27.1ba845ca.chunk.js",
     "static/media/Page.md": "/automation-doc/static/media/Page.62bf5e1922d5c68c3b06.md",
     "index.html": "/automation-doc/index.html"
   },
   "entrypoints": [
     "static/css/main.4efb37a3.css",
-    "static/js/main.981b295c.js"
+    "static/js/main.8c3723b5.js"
   ]
 }
