@@ -2,10 +2,10 @@ import axios from "axios"
 
 const API_BASE_URL = "http://localhost:3001";
 
-const retrieveDocumentXml = async() => {
-    return await axios.get(`${API_BASE_URL}/fetchDocument`)
+const retrieveChat = async(chatText) => {
+    return await axios.post(`${API_BASE_URL}/fetchDocument`, chatText)
 }
 
 export const httpManager = {
-    retrieveDocumentXml
+    retrieveChat
 }

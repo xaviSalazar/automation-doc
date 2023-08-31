@@ -72,6 +72,7 @@
 // }
 
 import React, { useState, useRef, useEffect } from 'react';
+import { httpManager } from '../managers/httpManagers';
 import {
   Container,
   Box,
@@ -85,6 +86,7 @@ import {
 import SendIcon from '@mui/icons-material/Send';
 
 export default function AiGenerator() {
+
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState([]);
   const [inputPosition, setInputPosition] = useState('top');
@@ -95,15 +97,29 @@ export default function AiGenerator() {
     setInputValue(event.target.value);
   };
 
-  const handleSendMessage = () => {
+  const contactServer = async (msg) => {
+    const response = await httpManager.retrieveChat(msg); 
+    console.log(messages)
+    if(response.data.message)
+    setMessages([...messages, msg, response.data.message]);
+  }
+
+  const handleSendMessage = async () => {
+
     if (!inputPosition && inputValue.trim() !== '') {
         setInputPosition('bottom');
       }
 
-    if (inputValue.trim() !== '') {
-      setMessages([...messages, inputValue]);
-      setInputValue('');
-    }
+      try {
+        if (inputValue.trim() !== '') {
+          const copySent = inputValue
+          setInputValue('');
+          console.log(messages)
+          contactServer(copySent)
+        }
+      } catch (e) {
+        console.log(e.message)
+      }
   };
 
 
