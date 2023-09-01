@@ -38,7 +38,7 @@ export default function AiGenerator() {
     }, [blob])
 
   const contactServer = async (msg) => {
-    const response = await httpManager.retrieveChat(msg); 
+    const response = await httpManager.retrieveChat({msg: msg}); 
     console.log(messages)
     if(response.data.message)
     setMessages([...messages, msg, response.data.message]);
