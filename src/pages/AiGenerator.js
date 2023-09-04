@@ -5,6 +5,7 @@ import { httpManager } from '../managers/httpManagers';
 import {
   Container,
   Box,
+  CircularProgress,
   Button,
   Paper,
   InputBase,
@@ -23,7 +24,9 @@ export default function AiGenerator() {
   const [highlight, setHighlight] = useState(false);
   const messagesContainerRef = useRef(null);
   const [blob, setBlob] = useState();
-  const [htmlDoc, setHtmlDoc] = useState()
+  const [htmlDoc, setHtmlDoc] = useState();
+  // loading state variable after message sent
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -38,12 +41,20 @@ export default function AiGenerator() {
     }, [blob])
 
   const contactServer = async (msg) => {
-    const response = await httpManager.retrieveChat({msg: msg}); 
-    console.log(messages)
-    if(response.data.message)
-    setMessages([...messages, msg, response.data.message]);
-    setHtmlDoc(response.data.message)
-  }
+    try {
+            const response = await httpManager.retrieveChat({msg: msg}); 
+            if(response.data)
+            {
+              setMessages((prevMessages) => [...prevMessages, response.data.result[0].message.content])
+              setHtmlDoc(response.data.result[0].message.content)
+            }
+    //setMessages((prevMessages) => [...prevMessages, response.data])
+        } catch(error) {
+          console.log(error.message)
+        } finally {
+          setIsLoading(false)
+        }
+      }
 
   const handleSendMessage = async () => {
 
@@ -55,7 +66,9 @@ export default function AiGenerator() {
         if (inputValue.trim() !== '') {
           const copySent = inputValue
           setInputValue('');
+          setMessages((prevMessages) => [...prevMessages, copySent ])
           console.log(messages)
+          setIsLoading(true); // Set loading state to true
           contactServer(copySent)
         }
       } catch (e) {
@@ -112,7 +125,9 @@ export default function AiGenerator() {
         }}
         onClick={handleInputClick}
       >
-        <InputBase
+         {isLoading ? (
+          <CircularProgress size={24} /> // Show loading icon
+          ) : ( <InputBase
           sx={{ ml: 1, flex: 1 }}
           onChange={handleInputChange}
           placeholder="Escribe que necesitas..."
@@ -120,6 +135,7 @@ export default function AiGenerator() {
           inputProps={{ 'aria-label': 'chat message input' }}
           multiline
         />
+          )}
         <IconButton
           onClick={handleSendMessage}
           color="primary"
@@ -143,15 +159,18 @@ export default function AiGenerator() {
         </List>
       </Box>
 
-
       <Box>
-        <Button
+        {isLoading ? (
+          <CircularProgress size={24} /> // Show loading icon
+        ) : (
+          <Button
             variant="contained"
             onClick={downloadDocx}
-        >
-          VER Documento
-        </Button>
-      </Box> 
+          >
+            VER Documento
+          </Button>
+        )}
+      </Box>
 
              <Box id='viewer_docx' />
     </Container>
