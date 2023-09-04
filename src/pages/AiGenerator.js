@@ -5,6 +5,7 @@ import { httpManager } from '../managers/httpManagers';
 import {
   Container,
   Box,
+  ButtonGroup,
   CircularProgress,
   Button,
   Paper,
@@ -45,10 +46,19 @@ export default function AiGenerator() {
             const response = await httpManager.retrieveChat({msg: msg}); 
             if(response.data)
             {
-              setMessages((prevMessages) => [...prevMessages, response.data.result[0].message.content])
+              // setMessages((prevMessages) => [...prevMessages, {type: 'received' , content: response.data.result[0].message.content}])
+              setMessages((prevMessages) => [
+                ...prevMessages,
+                {
+                  type: 'received',
+                  content: response.data.result[0].message.content,
+                  buttons: [
+                    { label: 'Visualizar Documento', onClick: () => downloadDocx(response.data.result[0].message.content) },
+                  ],
+                },
+              ]);
               setHtmlDoc(response.data.result[0].message.content)
             }
-    //setMessages((prevMessages) => [...prevMessages, response.data])
         } catch(error) {
           console.log(error.message)
         } finally {
@@ -66,7 +76,7 @@ export default function AiGenerator() {
         if (inputValue.trim() !== '') {
           const copySent = inputValue
           setInputValue('');
-          setMessages((prevMessages) => [...prevMessages, copySent ])
+          setMessages((prevMessages) => [...prevMessages, { type: 'sent', content: copySent} ])
           console.log(messages)
           setIsLoading(true); // Set loading state to true
           contactServer(copySent)
@@ -87,9 +97,10 @@ export default function AiGenerator() {
       }
   };
 
-    async function downloadDocx() {
+    const  downloadDocx = async (content) => {
         try {
-            const fileBuffer = await HTMLtoDOCX(htmlDoc, null, {
+          // console.log('html: ', content)
+            const fileBuffer = await HTMLtoDOCX(content, null, {
                 table: { row: { cantSplit: true } },
                 footer: true,
                 pageNumber: true,
@@ -151,15 +162,31 @@ export default function AiGenerator() {
         sx={{ height: 'calc(100vh - 150px)', overflowY: 'auto' }}
       >
         <List sx={{ width: '100%', maxWidth: 400 }}>
-          {messages.map((message, index) => (
+                {messages.map((message, index) => (
             <ListItem key={index} disableGutters>
-              <ListItemText primary={message} />
-            </ListItem>
+              {message.type === 'sent' && (
+                <ListItemText primary={message.content} />
+              )}
+              {message.type === 'received' && (
+                <div>
+                  <ListItemText primary={message.content} />
+                  {message.buttons && (
+                    <ButtonGroup>
+                      {message.buttons.map((button, buttonIndex) => (
+                        <Button key={buttonIndex} onClick={button.onClick}>
+                          {button.label}
+                        </Button>
+                      ))}
+                    </ButtonGroup>
+                  )}
+                </div>
+              )}
+           </ListItem>
           ))}
         </List>
       </Box>
 
-      <Box>
+      {/* <Box>
         {isLoading ? (
           <CircularProgress size={24} /> // Show loading icon
         ) : (
@@ -170,7 +197,7 @@ export default function AiGenerator() {
             VER Documento
           </Button>
         )}
-      </Box>
+      </Box> */}
 
              <Box id='viewer_docx' />
     </Container>
