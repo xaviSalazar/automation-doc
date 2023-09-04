@@ -43,21 +43,28 @@ export default function AiGenerator() {
 
   const contactServer = async (msg) => {
     try {
-            const response = await httpManager.retrieveChat({msg: msg}); 
+
+            //const response = await httpManager.retrieveChat({msg: msg}); 
+            const response = await httpManager.retrieveDocument({msg: msg})
+
+            
+            // response is new blob 
             if(response.data)
             {
-              // setMessages((prevMessages) => [...prevMessages, {type: 'received' , content: response.data.result[0].message.content}])
-              setMessages((prevMessages) => [
-                ...prevMessages,
-                {
-                  type: 'received',
-                  content: response.data.result[0].message.content,
-                  buttons: [
-                    { label: 'Visualizar Documento', onClick: () => downloadDocx(response.data.result[0].message.content) },
-                  ],
-                },
-              ]);
-              setHtmlDoc(response.data.result[0].message.content)
+              // // setMessages((prevMessages) => [...prevMessages, {type: 'received' , content: response.data.result[0].message.content}])
+              // setMessages((prevMessages) => [
+              //   ...prevMessages,
+              //   {
+              //     type: 'received',
+              //     content: response.data.result[0].message.content,
+              //     buttons: [
+              //       { label: 'Visualizar Documento', onClick: () => downloadDocx(response.data.result[0].message.content) },
+              //     ],
+              //   },
+              // ]);
+              //setHtmlDoc(response.data.result[0].message.content)
+              setBlob(new Blob([response.data]))
+
             }
         } catch(error) {
           console.log(error.message)

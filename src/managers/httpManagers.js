@@ -7,6 +7,13 @@ const retrieveChat = async(chatText) => {
     return await axios.post(`${API_BASE_URL}/fetchDocument`, chatText)
 }
 
+const retrieveDocument = async(chatText) => {
+    return await axios.post(`${API_BASE_URL}/fetchDocument`, chatText, {
+    responseType: 'blob', // Important: Set response type to 'blob'
+  });
+}
+
 export const httpManager = {
-    retrieveChat
+    retrieveChat,
+    retrieveDocument
 }
