@@ -19,10 +19,14 @@ import SendIcon from '@mui/icons-material/Send';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 
+const initChat = [{ type: 'received', content: "Hola! Mi nombre es Lord Barkis y puedo ayudarte a generar cualquier documento." }, 
+                  { type: 'received', content: "Por ejemplo: " },
+                  { type: 'received', content: "Tan solo escribe \"Quiero una carta de renuncia\"." }, ]
+
 export default function AiGenerator() {
 
   const [inputValue, setInputValue] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(initChat);
   const [inputPosition, setInputPosition] = useState('top');
   const [highlight, setHighlight] = useState(false);
   const messagesContainerRef = useRef(null);
