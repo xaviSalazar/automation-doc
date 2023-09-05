@@ -59,18 +59,27 @@ export default function AiGenerator() {
 
       // response is new blob 
       if (response.data) {
+        // Update loading state to false
+      setIsLoading(false);
+
         setMessages((prevMessages) => [
           ...prevMessages,
           {
             type: 'received',
             content: "nuevo documento recibido",
             buttons: [
-              { label: 'Visualizar Documento', onClick: () => downloadBlob(new Blob([response.data])) },
+              { label: 'Visualizar Documento', 
+                onClick: () => downloadBlob(new Blob([response.data])) 
+              },
             ],
           },
         ]);
-        //setHtmlDoc(response.data.result[0].message.content)
-        // setBlob(new Blob([response.data]))
+
+        setMessages((prevMessages) =>
+                      prevMessages.map((message, index) =>
+                        index === prevMessages.length - 1 ? { ...message, isLoading: false } : message
+                      )
+    );
       }
     } catch (error) {
       console.log(error.message)
@@ -80,24 +89,24 @@ export default function AiGenerator() {
   }
 
   const handleSendMessage = async () => {
-
     if (!inputPosition && inputValue.trim() !== '') {
       setInputPosition('bottom');
     }
-
+  
     try {
       if (inputValue.trim() !== '') {
-        const copySent = inputValue
+        const copySent = inputValue;
         setInputValue('');
         setMessages((prevMessages) => [...prevMessages, { type: 'sent', content: copySent }])
         console.log(messages)
         setIsLoading(true); // Set loading state to true
-        contactServer(copySent)
+        contactServer(copySent);
       }
     } catch (e) {
-      console.log(e.message)
+      console.log(e.message);
     }
   };
+  
 
 
   const handleInputClick = () => {
@@ -161,6 +170,7 @@ export default function AiGenerator() {
           >
             <List sx={{ width: '100%' }}>
               {messages.map((message, index) => (
+
                 <ListItem
                   key={index}
                   disableGutters
@@ -170,34 +180,37 @@ export default function AiGenerator() {
                     alignItems: message.type === 'sent' ? 'flex-end' : 'flex-start',
                   }}
                 >
-                  <ListItemText
-                    primary={message.content}
-                    sx={{
-                      backgroundColor: message.type === 'sent' ? '#DCF8C6' : '#E3F2FD',
-                      padding: '8px',
-                      borderRadius: '8px',
-                      maxWidth: '75%',
-                      marginBottom: '4px',
-                    }}
-                  />
-                  {message.buttons && (
-                    <ButtonGroup>
-                      {message.buttons.map((button, buttonIndex) => (
-                        <Button
-                          key={buttonIndex}
-                          onClick={button.onClick}
-                          sx={{
-                            backgroundColor: message.type === 'sent' ? '#DCF8C6' : '#E3F2FD',
-                            '&:hover': {
-                              backgroundColor: message.type === 'sent' ? '#B7E69E' : '#90CAF9',
-                            },
-                          }}
-                        >
-                          {button.label}
-                        </Button>
-                      ))}
-                    </ButtonGroup>
-                  )}
+                      <ListItemText
+                        primary={message.content}
+                        sx={{
+                          backgroundColor: message.type === 'sent' ? '#DCF8C6' : '#E3F2FD',
+                          padding: '8px',
+                          borderRadius: '8px',
+                          maxWidth: '75%',
+                          marginBottom: '4px',
+                        }}
+                      />
+                      {isLoading && index === messages.length - 1 && (
+        <CircularProgress size={16} color="inherit" sx={{ alignSelf: 'flex-start', marginRight: 2 }} />
+      )}
+                      {message.buttons && (
+                        <ButtonGroup>
+                          {message.buttons.map((button, buttonIndex) => (
+                            <Button
+                              key={buttonIndex}
+                              onClick={button.onClick}
+                              sx={{
+                                backgroundColor: message.type === 'sent' ? '#DCF8C6' : '#E3F2FD',
+                                '&:hover': {
+                                  backgroundColor: message.type === 'sent' ? '#B7E69E' : '#90CAF9',
+                                },
+                              }}
+                            >
+                              {button.label}
+                            </Button>
+                          ))}
+                        </ButtonGroup>
+                      )}
                 </ListItem>
               ))}
             </List>
