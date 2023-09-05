@@ -128,9 +128,9 @@ export default function AiGenerator() {
   return (
 
     <Container
-    sx={{
-      justifyContent: 'center',
-    }}
+      sx={{
+        justifyContent: 'center',
+      }}
     >
 
       {viewDoc ? (<>
@@ -144,7 +144,60 @@ export default function AiGenerator() {
         <Box id='viewer_docx' /> </>) :
 
         (
-          <>
+          <Box
+            ref={messagesContainerRef}
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center', // Center content horizontally
+              width: '100%', // Take the whole width of the container
+              height: 'calc(100vh - 150px)',
+              overflowY: 'auto',
+            }}
+          >
+            <List sx={{ width: '100%' }}>
+              {messages.map((message, index) => (
+                <ListItem
+                  key={index}
+                  disableGutters
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: message.type === 'sent' ? 'flex-end' : 'flex-start',
+                  }}
+                >
+                  <ListItemText
+                    primary={message.content}
+                    sx={{
+                      backgroundColor: message.type === 'sent' ? '#DCF8C6' : '#E3F2FD',
+                      padding: '8px',
+                      borderRadius: '8px',
+                      maxWidth: '75%',
+                      marginBottom: '4px',
+                    }}
+                  />
+                  {message.buttons && (
+                    <ButtonGroup>
+                      {message.buttons.map((button, buttonIndex) => (
+                        <Button
+                          key={buttonIndex}
+                          onClick={button.onClick}
+                          sx={{
+                            backgroundColor: message.type === 'sent' ? '#DCF8C6' : '#E3F2FD',
+                            '&:hover': {
+                              backgroundColor: message.type === 'sent' ? '#B7E69E' : '#90CAF9',
+                            },
+                          }}
+                        >
+                          {button.label}
+                        </Button>
+                      ))}
+                    </ButtonGroup>
+                  )}
+                </ListItem>
+              ))}
+            </List>
+
             <Paper
               component="form"
               sx={{
@@ -163,7 +216,7 @@ export default function AiGenerator() {
               {isLoading ? (
                 <CircularProgress size={24} /> // Show loading icon
               ) : (<InputBase
-                sx={{ ml: 1, flex: 1 }}
+                sx={{ ml: 1, flex: 1, width: 700 }}
                 onChange={handleInputChange}
                 placeholder="Escribe que necesitas..."
                 value={inputValue}
@@ -180,55 +233,7 @@ export default function AiGenerator() {
                 <SendIcon />
               </IconButton>
             </Paper>
-
-            <Box
-              ref={messagesContainerRef}
-              sx={{ height: 'calc(100vh - 150px)', overflowY: 'auto' }}
-            >
-              <List sx={{ width: '100%', maxWidth: 400 }}>
-                {messages.map((message, index) => (
-                  <ListItem
-                    key={index}
-                    disableGutters
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: message.type === 'sent' ? 'flex-end' : 'flex-start',
-                    }}
-                  >
-                    <ListItemText
-                      primary={message.content}
-                      sx={{
-                        backgroundColor: message.type === 'sent' ? '#DCF8C6' : '#E3F2FD',
-                        padding: '8px',
-                        borderRadius: '8px',
-                        maxWidth: '75%',
-                        marginBottom: '4px',
-                      }}
-                    />
-                    {message.buttons && (
-                      <ButtonGroup>
-                        {message.buttons.map((button, buttonIndex) => (
-                          <Button
-                            key={buttonIndex}
-                            onClick={button.onClick}
-                            sx={{
-                              backgroundColor: message.type === 'sent' ? '#DCF8C6' : '#E3F2FD',
-                              '&:hover': {
-                                backgroundColor: message.type === 'sent' ? '#B7E69E' : '#90CAF9',
-                              },
-                            }}
-                          >
-                            {button.label}
-                          </Button>
-                        ))}
-                      </ButtonGroup>
-                    )}
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-          </>
+          </Box>
         )}
     </Container>
   );
