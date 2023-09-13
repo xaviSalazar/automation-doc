@@ -191,7 +191,7 @@ export default function AiGenerator() {
                         }}
                       />
                       {isLoading && index === messages.length - 1 && (
-        <CircularProgress size={16} color="inherit" sx={{ alignSelf: 'flex-start', marginRight: 2 }} />
+        <CircularProgress size={40} color="inherit" sx={{ alignSelf: 'flex-start', marginRight: 2 }} />
       )}
                       {message.buttons && (
                         <ButtonGroup>
