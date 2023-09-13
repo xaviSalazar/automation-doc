@@ -5,6 +5,8 @@ import DataGridView from './pages/DataGridView';
 import DocUpload from './pages/DocUpload';
 import Home from './pages/Home';
 import AiGenerator from './pages/AiGenerator';
+import SignIn from './pages/SignIn';
+import SignUp from "./pages/SignUp"
 
 export default function Router() {
     const routes = useRoutes([
@@ -46,14 +48,16 @@ export default function Router() {
             element: <AiGenerator />
 
           }
-        //   { path: 'products', element: <ProductsPage /> },
-        //   { path: 'blog', element: <BlogPage /> },
          ],
       },
-    //   {
-    //     path: 'login',
-    //     element: <LoginPage />,
-    //   },
+      {
+        path: '/login',
+        element: <SignIn />,
+      },
+      {
+        path: '/signup',
+        element: <SignUp />,
+      },
     //   {
     //     element: <SimpleLayout />,
     //     children: [
