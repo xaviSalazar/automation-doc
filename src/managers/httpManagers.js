@@ -1,7 +1,7 @@
 import axios from "axios"
 
-const API_BASE_URL = "http://localhost:3001";
-// const API_BASE_URL = "https://automationdoc-xavicoel.b4a.run";
+// const API_BASE_URL = "http://localhost:3001";
+const API_BASE_URL = "https://automationdoc-xavicoel.b4a.run";
 
 const retrieveChat = async(chatText) => {
     return await axios.post(`${API_BASE_URL}/fetchDocument`, chatText)
@@ -29,11 +29,21 @@ const userAuth = async (data) => {
     return await axios.get(`${API_BASE_URL}/authUser`, data)
 }
 
+const googleLogin = async (data) =>{
+    return await axios.post(`${API_BASE_URL}/googleLogin`, data)
+}
+
+const facebookLogin = async (data) => {
+    return await axios.post(`${API_BASE_URL}/facebookLogin`, data)
+}
+
 export const httpManager = {
     retrieveChat,
     retrieveDocument,
     registerUser,
     loginUser,
     userAuth, 
-    logoutUser
+    logoutUser, 
+    googleLogin,
+    facebookLogin
 }
