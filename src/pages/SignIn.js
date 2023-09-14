@@ -12,7 +12,12 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { httpManager } from '../managers/httpManagers';
+import CircularProgress from '@mui/material/CircularProgress';
+
+// redux
+import { useDispatch, useSelector } from 'react-redux';
+import { doLogin } from '../redux/loginStore/loginAction';
+import { useNavigate } from 'react-router-dom';
 
 function Copyright(props) {
   return (
@@ -33,18 +38,25 @@ const defaultTheme = createTheme();
 
 export default function SignIn() {
 
-  const handleSubmit = (event) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const {isAuth, isLoading, error} = useSelector(state => state.login)
+
+  React.useEffect(() => {
+    if(isAuth === true) {
+      navigate('/home')
+    } 
+  }, [isAuth])
+
+  const handleSubmit = async (event) => {
+
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    try {
-      httpManager.loginUser({
+      dispatch(doLogin({
         email: data.get('email'),
         password: data.get('password'),
-      })
-    } catch (error) {
-      console.log(error.message)
-    }
+      }))
 
   };
 
@@ -91,6 +103,8 @@ export default function SignIn() {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
+
+           { isLoading ?<CircularProgress/> :(
             <Button
               type="submit"
               fullWidth
@@ -99,6 +113,7 @@ export default function SignIn() {
             >
               Sign In
             </Button>
+            )}
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
@@ -106,7 +121,7 @@ export default function SignIn() {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="#/automation-doc/signup" variant="body2">
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>

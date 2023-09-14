@@ -7,14 +7,34 @@ import Home from './pages/Home';
 import AiGenerator from './pages/AiGenerator';
 import SignIn from './pages/SignIn';
 import SignUp from "./pages/SignUp"
+import { autoLogin } from './redux/loginStore/loginAction';
+import { useDispatch, useSelector} from 'react-redux';
+import { useEffect } from 'react';
+
+
+// Create a function to check if the user is authenticated
+// const isAuthenticated = () => {
+//   const token = localStorage.getItem('customerToken'); // Get the JWT from storage
+//   if(token)
+//     return true; // Return true if a token is present, false otherwise
+// };
 
 export default function Router() {
+
+  const { isAuth } = useSelector(state => state.login)
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(autoLogin())
+  },[])
+
     const routes = useRoutes([
       {
         path: '/',
-        element: <DashboardLayout />,
+        element:  <DashboardLayout />,
         children: [
-          { element: <Navigate to="/home" />, index: true },
+          { element: isAuth ? <Navigate to="/home" /> : <Navigate to="/automation-doc/login" />, index: true },
           {
             path: 'home',
             element: <Home />,
@@ -33,30 +53,30 @@ export default function Router() {
           },
           { 
             path: 'templates', 
-            element: <DataGridView /> ,
+            element: isAuth ? <DataGridView />  : <Navigate to="/automation-doc/login" /> ,
           },
           { 
             path: 'templates/:name', 
-            element: <DataGridView />,
+            element: isAuth ? <DataGridView /> : <Navigate to="/automation-doc/login" />,
           },
           { 
             path:  'edit', 
-            element: <DocUpload /> 
+            element: isAuth ? <DocUpload />  : <Navigate to="/automation-doc/login" />,
           },
           {
             path: 'generate',
-            element: <AiGenerator />
+            element: isAuth ? <AiGenerator />  : <Navigate to="/automation-doc/login" />,
 
-          }
+          },
+          {
+            path: 'login',
+            element: <SignIn />,
+          },
+          {
+            path: 'signup',
+            element: <SignUp />,
+          },
          ],
-      },
-      {
-        path: '/login',
-        element: <SignIn />,
-      },
-      {
-        path: '/signup',
-        element: <SignUp />,
       },
     //   {
     //     element: <SimpleLayout />,

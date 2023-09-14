@@ -7,10 +7,11 @@ import { bgBlur } from '../../../utils/cssStyles';
 // components
 import Iconify from '../../../components/iconify';
 //
-import Searchbar from './Searchbar';
+// import Searchbar from './Searchbar';
 import AccountPopover from './AccountPopover';
 import LanguagePopover from './LanguagePopover';
 import NotificationsPopover from './NotificationsPopover';
+import {  useSelector } from 'react-redux';
 
 // ----------------------------------------------------------------------
 
@@ -43,6 +44,10 @@ Header.propTypes = {
 };
 
 export default function Header({ onOpenNav }) {
+
+
+  const {isAuth} = useSelector(state => state.login)
+
   return (
     <StyledRoot>
       <StyledToolbar>
@@ -60,7 +65,7 @@ export default function Header({ onOpenNav }) {
         {/* <Searchbar /> */}
         <Box sx={{ flexGrow: 1 }} />
 
-        <Stack
+      {  isAuth && <Stack
           direction="row"
           alignItems="center"
           spacing={{
@@ -72,6 +77,8 @@ export default function Header({ onOpenNav }) {
           <NotificationsPopover />
           <AccountPopover />
         </Stack>
+        }
+
       </StyledToolbar>
     </StyledRoot>
   );

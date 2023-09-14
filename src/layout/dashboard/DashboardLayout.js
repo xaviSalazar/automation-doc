@@ -3,8 +3,11 @@ import { Outlet } from 'react-router-dom';
 // @mui
 import { styled } from '@mui/material/styles';
 //
+import { useEffect } from 'react';
 import Header from './header';
 import Nav from './nav';
+import {  useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 // ----------------------------------------------------------------------
 
@@ -34,6 +37,16 @@ const Main = styled('div')(({ theme }) => ({
 
 export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const {isAuth} = useSelector(state => state.login)
+
+  useEffect(() => {
+    if(isAuth === false) 
+    {
+      navigate('/home')
+    } 
+  }, [isAuth])
 
   return (
     <StyledRoot>
