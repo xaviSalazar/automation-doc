@@ -20,22 +20,22 @@ const icon = (name) => Icons[`${name}`]
 const navConfig = [
   {
     title: 'Home',
-    path: '/automation-doc/home',
+    path: '/home',
     icon: icon("home"),
   },
   {
     title: 'Agregar Documento',
-    path: '/automation-doc/edit',
+    path: '/edit',
     icon: icon('document'),
   },
   {
     title: 'Templates Automatico',
-    path: '/automation-doc/templates',
+    path: '/templates',
     icon: icon('autoTemplate'),
   },
   {
     title: 'Generador AI',
-    path: '/automation-doc/generate',
+    path: '/generate',
     icon: icon('generateAi'),
   },
   // {

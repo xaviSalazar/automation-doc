@@ -30,42 +30,42 @@ export default function Router() {
   },[])
 
     const routes = useRoutes([
+      // {
+      //   path: '/',
+      //   element:  <DashboardLayout />,
+      //   children: [
+      //     { element: isAuth ? <Navigate to="/home" /> : <Navigate to="/login" />, index: true },
+      //     {
+      //       path: 'home',
+      //       element: <Home />,
+      //     },
+
+      //   ]
+      // },
       {
         path: '/',
-        element:  <DashboardLayout />,
-        children: [
-          { element: isAuth ? <Navigate to="/home" /> : <Navigate to="/automation-doc/login" />, index: true },
-          {
-            path: 'home',
-            element: <Home />,
-          },
-
-        ]
-      },
-      {
-        path: '/automation-doc',
         element: <DashboardLayout />,
         children: [
-          { element: <Navigate to="/automation-doc/home" />, index: true },
+          { element: <Navigate to="/home" />, index: true },
           {
             path: 'home',
             element: <Home />,
           },
           { 
             path: 'templates', 
-            element: isAuth ? <DataGridView />  : <Navigate to="/automation-doc/login" /> ,
+            element: isAuth ? <DataGridView />  : <Navigate to="/login" /> ,
           },
           { 
             path: 'templates/:name', 
-            element: isAuth ? <DataGridView /> : <Navigate to="/automation-doc/login" />,
+            element: isAuth ? <DataGridView /> : <Navigate to="/login" />,
           },
           { 
             path:  'edit', 
-            element: isAuth ? <DocUpload />  : <Navigate to="/automation-doc/login" />,
+            element: isAuth ? <DocUpload />  : <Navigate to="/login" />,
           },
           {
             path: 'generate',
-            element: isAuth ? <AiGenerator />  : <Navigate to="/automation-doc/login" />,
+            element: isAuth ? <AiGenerator />  : <Navigate to="/login" />,
 
           },
           {

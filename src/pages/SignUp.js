@@ -48,7 +48,7 @@ export default function SignUp() {
       })
       if(result.status === 200){
         // succesfully registered go to login page
-        navigate("/automation-doc/login") 
+        navigate("/login") 
       }
     } catch (error) {
       console.log(error.message)

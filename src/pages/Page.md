@@ -27,4 +27,4 @@ Puede descargar este archivo de prueba del siguiente link
 Una vez descargado el archivo word puedes seguir a la pagina de agregar documento   
 Sube tu archivo y seras llevado a una pagina donde podras automatizarlo
 
-[Llevame a subir el documento](https://xavisalazar.github.io/automation-doc/#/automation-doc/edit)
+[Llevame a subir el documento](https://scribeharmony.com/edit)

@@ -198,7 +198,7 @@ export default function UserPage() {
 
     const handleOpenIcon = (event, name) => {
       console.log(`/templates/${name}`)
-      navigate({pathname: `/automation-doc/templates/${name}`})
+      navigate({pathname: `/templates/${name}`})
     };
   
     const handleCloseMenu = () => {
