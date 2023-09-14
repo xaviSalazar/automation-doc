@@ -19,8 +19,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { doLogin } from '../redux/loginStore/loginAction';
 import { useNavigate } from 'react-router-dom';
 
-import AuthSocial from './libs/login-oauth/AuthSocial';
-
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -65,7 +63,6 @@ export default function SignIn() {
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
-      <AuthSocial />
         <CssBaseline />
         <Box
           sx={{

@@ -23,48 +23,6 @@ export const doLogin = (data) => async (dispatch) => {
 
 }
 
-export const doGoogleLogin = (data) => async (dispatch) => {
-
-    // first dispatch the loading
-    dispatch(loginPending()) 
-    try {
-        // fetch data from api 
-        const result = await httpManager.googleLogin(data)
-        if(result.status === 200) {
-        // succesfully registered go to login page 
-        const token = result['data']['token']
-        localStorage.setItem('customerToken', token)
-        dispatch(loginSuccess("test"))
-        } else if(result.status === 401){
-            dispatch(loginFail(result['data']['message']))
-        }
-    } catch (error) {
-        dispatch(loginFail(error.message));
-    }
-
-}
-
-export const doFacebookLogin = (data) => async (dispatch) => {
-
-    // first dispatch the loading
-    dispatch(loginPending()) 
-    try {
-        // fetch data from api 
-        const result = await httpManager.facebookLogin(data)
-        if(result.status === 200) {
-        // succesfully registered go to login page 
-        const token = result['data']['token']
-        localStorage.setItem('customerToken', token)
-        dispatch(loginSuccess("test"))
-        } else if(result.status === 401){
-            dispatch(loginFail(result['data']['message']))
-        }
-    } catch (error) {
-        dispatch(loginFail(error.message));
-    }
-
-}
-
 export const autoLogin = () => async(dispatch) => {
     try {
         dispatch(loginPending())
