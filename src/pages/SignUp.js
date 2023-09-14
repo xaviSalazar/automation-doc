@@ -13,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { httpManager } from '../managers/httpManagers';
+import { useNavigate } from 'react-router-dom';
+
 
 function Copyright(props) {
   return (
@@ -32,19 +34,22 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-
-
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
     try {
-      httpManager.registerUser({
+      const result = await httpManager.registerUser({
         username: data.get('firstName'),
         email: data.get('email'),
         password: data.get('password')
       })
+      if(result.status === 200){
+        // succesfully registered go to login page
+        navigate("/automation-doc/login") 
+      }
     } catch (error) {
       console.log(error.message)
     }

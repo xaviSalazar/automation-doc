@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react';
+import { useState } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
@@ -40,6 +40,10 @@ export default function AccountPopover() {
   const handleClose = () => {
     setOpen(null);
     dispatch(doLogout())
+  };
+
+  const handleCloseMenu = () => {
+    setOpen(null);
   };
 
   return (
@@ -96,7 +100,7 @@ export default function AccountPopover() {
 
         <Stack sx={{ p: 1 }}>
           {MENU_OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={handleClose}>
+            <MenuItem key={option.label} onClick={handleCloseMenu}>
               {option.label}
             </MenuItem>
           ))}
