@@ -70,12 +70,13 @@ const SelectFile = (pathname, setColumnLister, setContent, filesArray) => {
     const regexPathname = /\/([^\/]+)$/;
     // name after the /templates/nameFile.docx
     const urlFileName = pathname.match(regexPathname).pop();
+    console.log(urlFileName)
 
     // create local variable for array 
     const modifiableArray = JSON.parse(JSON.stringify(filesArray))
     // function to match the pathname
     function removeValue(value, index, arr) {
-      if(value.name === urlFileName) {
+      if(value.title === urlFileName) {
         arr.splice(index,1);
         return true;
       }
@@ -84,10 +85,12 @@ const SelectFile = (pathname, setColumnLister, setContent, filesArray) => {
 
     // filter from list of files
     const fileExists = modifiableArray.filter(removeValue).pop()
+    console.log(fileExists)
 
     if(typeof fileExists === "undefined") return;
 
-    const content = fileExists.content
+    console.log(fileExists)
+    const content = fileExists.binary_data
     // set content (this is the editable content)
     setContent(content);
     // create a new pizzip

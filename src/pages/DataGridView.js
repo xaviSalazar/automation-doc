@@ -154,6 +154,7 @@ export default function DataGridView() {
       if(reducerFiles.filesArray === null)
         return
 
+        console.log(reducerFiles.filesArray)
         SelectFile(pathname, setColumnLister, setContent, reducerFiles.filesArray)
   
         // setUploadedFiles(reducerFiles.filesArray)

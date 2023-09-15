@@ -13,7 +13,7 @@ export const doLogin = (data) => async (dispatch) => {
         // succesfully registered go to login page 
         const token = result['data']['token']
         localStorage.setItem('customerToken', token)
-        dispatch(loginSuccess("test"))
+        dispatch(loginSuccess(result['data']))
         } else if(result.status === 401){
             dispatch(loginFail(result['data']['message']))
         }
@@ -34,7 +34,7 @@ export const doGoogleLogin = (data) => async (dispatch) => {
         // succesfully registered go to login page 
         const token = result['data']['token']
         localStorage.setItem('customerToken', token)
-        dispatch(loginSuccess("test"))
+        dispatch(loginSuccess(result['data']))
         } else if(result.status === 401){
             dispatch(loginFail(result['data']['message']))
         }
@@ -55,7 +55,7 @@ export const doFacebookLogin = (data) => async (dispatch) => {
         // succesfully registered go to login page 
         const token = result['data']['token']
         localStorage.setItem('customerToken', token)
-        dispatch(loginSuccess("test"))
+        dispatch(loginSuccess(result['data']))
         } else if(result.status === 401){
             dispatch(loginFail(result['data']['message']))
         }
@@ -76,7 +76,7 @@ export const autoLogin = () => async(dispatch) => {
           const result = await httpManager.userAuth(config)
           // console.log(result)
           if(result.status === 200) {
-            dispatch(loginSuccess("test"))
+            dispatch(loginSuccess(result['data']))
           } else {
             dispatch(loginFail(result['data']['message']))
           }

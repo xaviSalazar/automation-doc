@@ -1,6 +1,7 @@
 import { filter } from 'lodash';
 import { useState, useEffect } from 'react';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import {httpManager} from '../managers/httpManagers'
 // @mui
 import {
   Card,
@@ -38,9 +39,9 @@ const MAX_COUNT = 5;
 
 
 const TABLE_HEAD = [
-    { id: 'name', label: 'Archivo', alignRight: false },
-    { id: 'timestamp', label: 'Fecha de Creacion', alignRight: false },
-    { id: 'size', label: 'Talla Archivo kbyte', alignRight: true },
+    { id: 'title', label: 'Archivo', alignRight: false },
+    { id: 'created_at', label: 'Fecha de Creacion', alignRight: false },
+    { id: 'file_size', label: 'Talla Archivo kbyte', alignRight: true },
     // { id: 'isVerified', label: 'Verified', alignRight: false },
     // { id: 'status', label: 'Status', alignRight: false },
     { id: '' },
@@ -58,8 +59,8 @@ const TABLE_HEAD = [
     return 0;
   }
 
-  const timestampToDate = ( timestamp ) => {
-    const dateObject = new Date(timestamp);
+  const timestampToDate = ( created_at ) => {
+    const dateObject = new Date(created_at);
     const options = { year: 'numeric', month: 'long', 
                       day: 'numeric', hour: 'numeric',
                       minute: 'numeric',};
@@ -94,7 +95,7 @@ export default function UserPage() {
   
     const [selected, setSelected] = useState([]);
   
-    const [orderBy, setOrderBy] = useState('name');
+    const [orderBy, setOrderBy] = useState('title');
   
     const [filterName, setFilterName] = useState('');
   
@@ -107,6 +108,8 @@ export default function UserPage() {
     const [deleteId, setDeleteId] = useState(null);
 
     const reducerFiles = useSelector(state => state.filesSaved)
+    const {userCard} = useSelector(state => state.login)
+    console.log(userCard)
 
     const dispatch = useDispatch();
 
@@ -134,7 +137,7 @@ export default function UserPage() {
       const uploaded = [...uploadedFiles];
       let limitExceeded = false;
       files.some((file) => {
-          if (!uploaded.some((f) => f.name === file.name)) {
+          if (!uploaded.some((f) => f.name.trim().replace(/\s+/g, '') === file.name.trim().replace(/\s+/g, ''))) {
               console.log('file: ', file)
               handledItems.push(file);
               if (uploaded.length === MAX_COUNT) setFileLimit(true);
@@ -159,10 +162,12 @@ export default function UserPage() {
             // Resolve the promise after reading file
             reader.onload = () => resolve({
                                             id: uuidv4(),
-                                            name: file.name, 
-                                            content: reader.result,
-                                            timestamp: file.lastModified,
-                                            size: file.size
+                                            user_id: userCard['id'],
+                                            title: file.name.trim().replace(/\s+/g, ''), 
+                                            binary_data: reader.result,
+                                            content: "word",
+                                            created_at: file.lastModified,
+                                            file_size: file.size
                                           });
             
             // Reade the file as a text
@@ -171,6 +176,10 @@ export default function UserPage() {
       });
 
       let res = await Promise.all(filesAsync)
+
+      console.log(res)
+
+      await httpManager.documentUpload(res)
 
       res.some((file) => {
       uploaded.push(file)
@@ -185,9 +194,9 @@ export default function UserPage() {
 
   }
 
-    const handleFileEvent =  (e) => {
-        const chosenFiles = Array.prototype.slice.call(e.target.files)
-        handleUploadFiles(chosenFiles);
+     const handleFileEvent =  async (e) => {
+      const chosenFiles = Array.from(e.target.files); // Convert the FileList to an array
+      await handleUploadFiles(chosenFiles);
     }
 
   
@@ -213,7 +222,7 @@ export default function UserPage() {
   
     const handleSelectAllClick = (event) => {
       if (event.target.checked) {
-        const newSelecteds = uploadedFiles.map((n) => n.name);
+        const newSelecteds = uploadedFiles.map((n) => n.title);
         setSelected(newSelecteds);
         return;
       }
@@ -299,28 +308,28 @@ export default function UserPage() {
                   <TableBody>
                     {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     //   const { id, name, role, status, company, avatarUrl, isVerified } = row;
-                    const { id, name, timestamp, size } = row;
+                    const { id, title, created_at, file_size } = row;
                     
-                    const selectedUser = selected.indexOf(name) !== -1;
+                    const selectedUser = selected.indexOf(title) !== -1;
   
                       return (
-                        <TableRow hover key={name} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                        <TableRow hover key={title} tabIndex={-1} role="checkbox" selected={selectedUser}>
                           <TableCell padding="checkbox">
-                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
+                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, title)} />
                           </TableCell>
   
                           <TableCell component="th" scope="row" padding="none">
                             <Stack direction="row" alignItems="center" spacing={2}>
-                              <IconButton onClick={(e) => handleOpenIcon(e,name)}> <TextSnippetIcon /></IconButton>
+                              <IconButton onClick={(e) => handleOpenIcon(e,title)}> <TextSnippetIcon /></IconButton>
                               <Typography variant="subtitle2" noWrap>
-                                {name}
+                                {title}
                               </Typography>
                             </Stack>
                           </TableCell>
   
-                          <TableCell align="left">{timestampToDate(timestamp)}</TableCell>
+                          <TableCell align="left">{timestampToDate(created_at)}</TableCell>
   
-                          <TableCell align="right">{size}</TableCell>
+                          <TableCell align="right">{file_size}</TableCell>
   
                           {/* <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell> */}
   
@@ -329,7 +338,7 @@ export default function UserPage() {
                           </TableCell> */}
   
                           <TableCell align="right">
-                            <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, name, id)}>
+                            <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, title, id)}>
                               <Iconify icon={'eva:more-vertical-fill'} />
                             </IconButton>
                           </TableCell>
