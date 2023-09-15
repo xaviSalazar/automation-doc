@@ -2,13 +2,12 @@
 import { Stack, Divider, Typography } from '@mui/material';
 // component
 
-import FacebookLogin from 'react-facebook-login';
-
-import { GoogleLogin } from 'react-google-login';
-import { gapi } from 'gapi-script';
-import { useEffect } from 'react';
-import { doFacebookLogin, doGoogleLogin } from '../../../redux/loginStore/loginAction';
+// import FacebookLogin from 'react-facebook-login';
+import { doGoogleLogin } from '../../../redux/loginStore/loginAction';
 import { useDispatch } from 'react-redux';
+import { GoogleLogin } from '@react-oauth/google';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 
 
 // ----------------------------------------------------------------------
@@ -21,28 +20,14 @@ export default function AuthSocial() {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
-  const clientId = '739497935634-lqeff7f2654mbakdlrhv5inrhg4taons.apps.googleusercontent.com';
-
-  useEffect(() => {
-    const initClient = () => {
-          gapi.client.init({
-          clientId: clientId,
-          scope: ''
-        });
-      };
-      gapi.load('client:auth2', initClient);
-  });
 
   const onSuccess = async (res) => {
-
-    console.log('success:', res);
-    dispatch(doGoogleLogin({name: res['profileObj']['name'], email: res['profileObj']['email']}))
-    
+    dispatch(doGoogleLogin({ clientId: res['clientId'], credential: res['credential'] }))
   };
 
-  
+
   const onFailure = (err) => {
-      console.log('failed:', err);
+    console.log('failed:', err);
   };
 
   // const responseGoogle = (response) => {
@@ -52,46 +37,35 @@ export default function AuthSocial() {
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
   // --------------------------------------------------------------------------
-  const responseFacebook = async (response) => {
-    console.log(response);
+  // const responseFacebook = async (response) => {
+  //   console.log(response);
 
-    dispatch(doFacebookLogin({accessToken: response.accessToken,
-      userID: response.userID}))
-  }
- 
+  //   dispatch(doFacebookLogin({accessToken: response.accessToken,
+  //     userID: response.userID}))
+  // }
 
-  
-  
+
+
+
   return (
     <>
-       <Stack direction="row" spacing={2}>
-        <FacebookLogin
+      <Stack direction="row" spacing={2}>
+        {/* <FacebookLogin
           textButton="INGRESA CON FACEBOOK"
           appId="1713658689034375" //APP ID NOT CREATED YET
           fields="name,email,picture"
           callback={responseFacebook}
-        />
+        /> */}
 
-       <GoogleLogin
-          clientId={clientId}
-          buttonText="INGRESA CON GOOGLE"
-          onSuccess={onSuccess}
-          onFailure={onFailure}
-          cookiePolicy={'single_host_origin'}
-          isSignedIn={false}
-      />
 
-        {/* <Button fullWidth size="large" color="inherit" variant="outlined">
-          <Iconify icon="eva:google-fill" color="#DF3E30" width={22} height={22} />
-        </Button>
+        <GoogleOAuthProvider clientId="888743510322-ovaintflo66ck52h76307kcqbse71fm0.apps.googleusercontent.com">
 
-        <Button fullWidth size="large" color="inherit" variant="outlined">
-          <Iconify icon="eva:facebook-fill" color="#1877F2" width={22} height={22} />
-        </Button> */}
+          <GoogleLogin
+            onSuccess={onSuccess}
+            onError={onFailure}
+          />
 
-        {/* <Button fullWidth size="large" color="inherit" variant="outlined">
-          <Iconify icon="eva:twitter-fill" color="#1C9CEA" width={22} height={22} />
-        </Button> */}
+        </GoogleOAuthProvider>
       </Stack>
 
       <Divider sx={{ my: 3 }}>

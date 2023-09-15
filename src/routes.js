@@ -27,7 +27,7 @@ export default function Router() {
 
   useEffect(() => {
     dispatch(autoLogin())
-  },[])
+  },[dispatch])
 
     const routes = useRoutes([
       // {
