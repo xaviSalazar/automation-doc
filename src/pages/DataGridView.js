@@ -138,8 +138,7 @@ export default function DataGridView() {
                               //React.useState([])
   // call apiRef bypass method
   const { apiRef, _columns } = useApiRef(columns);
-
-  const reducerFiles = useSelector(state => state.filesSaved)
+  const { selectDoc, docsArray } = useSelector(state => state.documentState)
 
 
     React.useEffect(() => {
@@ -151,14 +150,14 @@ export default function DataGridView() {
 
     React.useEffect(() => {
       
-      if(reducerFiles.filesArray === null)
+      if(docsArray.length === 0)
         return
 
-        console.log(reducerFiles.filesArray)
-        SelectFile(pathname, setColumnLister, setContent, reducerFiles.filesArray)
+        console.log(docsArray)
+        SelectFile(selectDoc, setColumnLister, setContent, docsArray)
   
         // setUploadedFiles(reducerFiles.filesArray)
-    }, [reducerFiles, pathname])
+    }, [docsArray, selectDoc])
 
     /* UseEffect to process columns and rows from parsed document */
     React.useEffect(() => {

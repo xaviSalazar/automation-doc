@@ -2,6 +2,7 @@ import { filter } from 'lodash';
 import { useState, useEffect } from 'react';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {httpManager} from '../managers/httpManagers'
+import { loadDocs, editThisDoc, delDoc} from '../redux/documentStore/documentAction';
 // @mui
 import {
   Card,
@@ -34,9 +35,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 // mock
 // import USERLIST from '../_mock/user';
-
-const MAX_COUNT = 5;
-
 
 const TABLE_HEAD = [
     { id: 'title', label: 'Archivo', alignRight: false },
@@ -103,50 +101,31 @@ export default function UserPage() {
 
     const [fileLimit, setFileLimit] = useState(false);
 
-    const [uploadedFiles, setUploadedFiles] = useState([])
+    // const [uploadedFiles, setUploadedFiles] = useState([])
 
-    const [deleteId, setDeleteId] = useState(null);
+    const [docIdPop, setDocIdPop] = useState(null);
 
-    const reducerFiles = useSelector(state => state.filesSaved)
     const {userCard} = useSelector(state => state.login)
-    console.log(userCard)
+
+    const {totalDocs, docsArray} = useSelector(state => state.documentState)
 
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
 
     useEffect(() => {
-
-      dispatch(loadFiles())
-
-    }, [dispatch])
-
-    useEffect(() => {
-      
-      if(reducerFiles.filesArray === null)
-        return
-
-        console.log(reducerFiles.filesArray)
-  
-        setUploadedFiles(reducerFiles.filesArray)
-    }, [reducerFiles])
+        dispatch(loadDocs(page, rowsPerPage, userCard['id']))
+    }, [page, dispatch]);
 
     const handleUploadFiles = async files => {
 
       let handledItems = [];
-      const uploaded = [...uploadedFiles];
       let limitExceeded = false;
+
+      // to check for not repeated files.
       files.some((file) => {
-          if (!uploaded.some((f) => f.name.trim().replace(/\s+/g, '') === file.name.trim().replace(/\s+/g, ''))) {
-              console.log('file: ', file)
+          if (!docsArray.some((f) => f.title.trim().replace(/\s+/g, '') === file.name.trim().replace(/\s+/g, ''))) {
               handledItems.push(file);
-              if (uploaded.length === MAX_COUNT) setFileLimit(true);
-              if (uploaded.length > MAX_COUNT) {
-                  alert(`You can only add a maximum of ${MAX_COUNT} files`);
-                  setFileLimit(false);
-                  limitExceeded = true;
-                  return true;
-              }
           }
           return false;
       })
@@ -157,8 +136,7 @@ export default function UserPage() {
         // Define a new file reader
         let reader = new FileReader();
         // Create a new promise
-        return new Promise(resolve => {
-            
+        return new Promise(resolve => {  
             // Resolve the promise after reading file
             reader.onload = () => resolve({
                                             id: uuidv4(),
@@ -175,33 +153,21 @@ export default function UserPage() {
          });
       });
 
-      let res = await Promise.all(filesAsync)
+      let binary_files = await Promise.all(filesAsync)
+      console.log(binary_files)
 
-      console.log(res)
-
-      await httpManager.documentUpload(res)
-
-      res.some((file) => {
-      uploaded.push(file)
-      return null
-      })
-
-      if (!limitExceeded) 
-      {
-        setUploadedFiles(uploaded)
-        dispatch(saveFiles(uploaded));
-      }
+      await httpManager.documentUpload(binary_files)
 
   }
 
      const handleFileEvent =  async (e) => {
-      const chosenFiles = Array.from(e.target.files); // Convert the FileList to an array
+      const chosenFiles = Array.from(e.target.files);
       await handleUploadFiles(chosenFiles);
     }
 
   
     const handleOpenMenu = (event, name, id) => {
-      setDeleteId(id)
+      setDocIdPop(id)
       setOpen(event.currentTarget);
     };
 
@@ -222,18 +188,19 @@ export default function UserPage() {
   
     const handleSelectAllClick = (event) => {
       if (event.target.checked) {
-        const newSelecteds = uploadedFiles.map((n) => n.title);
+        const newSelecteds = docsArray.map((n) => n.id);
+        console.log(newSelecteds)
         setSelected(newSelecteds);
         return;
       }
       setSelected([]);
     };
   
-    const handleClick = (event, name) => {
-      const selectedIndex = selected.indexOf(name);
+    const handleClick = (event, id) => {
+      const selectedIndex = selected.indexOf(id);
       let newSelected = [];
       if (selectedIndex === -1) {
-        newSelected = newSelected.concat(selected, name);
+        newSelected = newSelected.concat(selected, id);
       } else if (selectedIndex === 0) {
         newSelected = newSelected.concat(selected.slice(1));
       } else if (selectedIndex === selected.length - 1) {
@@ -245,27 +212,37 @@ export default function UserPage() {
     };
   
     const handleChangePage = (event, newPage) => {
+      console.log('handleChangePage: ', newPage)
       setPage(newPage);
+      dispatch(loadDocs(newPage, rowsPerPage, userCard['id']))
     };
   
     const handleChangeRowsPerPage = (event) => {
       setPage(0);
-      setRowsPerPage(parseInt(event.target.value, 10));
+      dispatch(loadDocs(0, rowsPerPage, userCard['id']))
     };
 
     const onClickEliminar = () => {
       setOpen(null);
-      dispatch(deleteElement(deleteId));
+      dispatch(deleteElement(docIdPop));
+      dispatch(delDoc({docId: docIdPop}));
     }
+
+    const onClickEditar = () => {
+      setOpen(null)
+      dispatch(editThisDoc(docIdPop))
+      navigate("/templates")
+    }
+
   
     // const handleFilterByName = (event) => {
     //   setPage(0);
     //   setFilterName(event.target.value);
     // };
   
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - uploadedFiles.length) : 0;
+    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - docsArray.length) : 0;
   
-    const filteredUsers = applySortFilter(uploadedFiles, getComparator(order, orderBy), filterName);
+    const filteredUsers = applySortFilter(docsArray, getComparator(order, orderBy), filterName);
   
     const isNotFound = !filteredUsers.length && !!filterName;
   
@@ -300,22 +277,22 @@ export default function UserPage() {
                     order={order}
                     orderBy={orderBy}
                     headLabel={TABLE_HEAD}
-                    rowCount={uploadedFiles.length}
+                    rowCount={docsArray.length}
                     numSelected={selected.length}
                     onRequestSort={handleRequestSort}
                     onSelectAllClick={handleSelectAllClick}
                   />
                   <TableBody>
-                    {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                    {docsArray.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     //   const { id, name, role, status, company, avatarUrl, isVerified } = row;
                     const { id, title, created_at, file_size } = row;
                     
-                    const selectedUser = selected.indexOf(title) !== -1;
+                    const selectedUser = selected.indexOf(id) !== -1;
   
                       return (
-                        <TableRow hover key={title} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                        <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
                           <TableCell padding="checkbox">
-                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, title)} />
+                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, id)} />
                           </TableCell>
   
                           <TableCell component="th" scope="row" padding="none">
@@ -382,7 +359,7 @@ export default function UserPage() {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={uploadedFiles.length}
+              count={parseInt(totalDocs, 10)}   // variable that makes the pages counting.
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
@@ -408,7 +385,7 @@ export default function UserPage() {
             },
           }}
         >
-          <MenuItem>
+          <MenuItem onClick={onClickEditar} >
             <Iconify icon={'eva:edit-fill'} sx={{ mr: 2 }} />
             Editar
           </MenuItem>

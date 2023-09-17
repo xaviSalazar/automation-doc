@@ -63,20 +63,20 @@ const checkFiles = (doc, zip) => {
   return uniqueWords;
 }
 
-const SelectFile = (pathname, setColumnLister, setContent, filesArray) => {
+const SelectFile = (docId, setColumnLister, setContent, filesArray) => {
 
     // match name after "/"
     // eslint-disable-next-line
-    const regexPathname = /\/([^\/]+)$/;
-    // name after the /templates/nameFile.docx
-    const urlFileName = pathname.match(regexPathname).pop();
-    console.log(urlFileName)
+    // const regexPathname = /\/([^\/]+)$/;
+    // // name after the /templates/nameFile.docx
+    // const urlFileName = pathname.match(regexPathname).pop();
+    // console.log(urlFileName)
 
     // create local variable for array 
     const modifiableArray = JSON.parse(JSON.stringify(filesArray))
     // function to match the pathname
     function removeValue(value, index, arr) {
-      if(value.title === urlFileName) {
+      if(value.id === docId) {
         arr.splice(index,1);
         return true;
       }
@@ -89,7 +89,6 @@ const SelectFile = (pathname, setColumnLister, setContent, filesArray) => {
 
     if(typeof fileExists === "undefined") return;
 
-    console.log(fileExists)
     const content = fileExists.binary_data
     // set content (this is the editable content)
     setContent(content);

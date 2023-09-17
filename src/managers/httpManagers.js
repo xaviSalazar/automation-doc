@@ -1,7 +1,7 @@
 import axios from "axios"
 
-const API_BASE_URL = "http://localhost:3001";
-// const API_BASE_URL = "https://automationdoc-xavicoel.b4a.run";
+// const API_BASE_URL = "http://localhost:3001";
+const API_BASE_URL = "https://automationdoc-xavicoel.b4a.run";
 
 const retrieveChat = async(chatText) => {
     return await axios.post(`${API_BASE_URL}/fetchDocument`, chatText)
@@ -40,6 +40,15 @@ const facebookLogin = async (data) => {
 const documentUpload = async (data) => {
     return await axios.post(`${API_BASE_URL}/saveDocuments`, data)
 }
+
+const getDocuments = async (page, rowsPerPage, userId) => {
+    return await axios.get(`${API_BASE_URL}/documents?page=${page}&rowsPerPage=${rowsPerPage}&userId=${userId}`);
+}
+
+const deleteDocuments = async (docId) =>{
+    return await axios.post(`${API_BASE_URL}/deleteDocument`, docId);
+}
+
 export const httpManager = {
     retrieveChat,
     retrieveDocument,
@@ -49,5 +58,7 @@ export const httpManager = {
     logoutUser, 
     googleLogin,
     facebookLogin,
-    documentUpload
+    documentUpload,
+    getDocuments,
+    deleteDocuments
 }

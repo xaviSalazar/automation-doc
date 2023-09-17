@@ -2,6 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 import workspaceReducer from "./workspace/workspaceSlice"
 import filesReducer from "./filesStore/filesSlice"
 import loginReducer from "./loginStore/loginSlice"
+import documentReducer from "./documentStore/documentSlice"
 // import abogadosReducer from './mainlayout/mainlayoutSlice'
 // import loginReducer from './login/loginSlice'
 // import userReducer  from './authenticate/userSlice'
@@ -13,7 +14,8 @@ const store = configureStore({
     reducer: {
         workspace: workspaceReducer,
         filesSaved: filesReducer,
-        login: loginReducer
+        login: loginReducer,
+        documentState: documentReducer,
         // list of reducers
         // abogados: abogadosReducer,
         // login: loginReducer,

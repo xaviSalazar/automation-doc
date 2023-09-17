@@ -55,10 +55,10 @@ export default function Router() {
             path: 'templates', 
             element: isAuth ? <DataGridView />  : <Navigate to="/login" /> ,
           },
-          { 
-            path: 'templates/:name', 
-            element: isAuth ? <DataGridView /> : <Navigate to="/login" />,
-          },
+          // { 
+          //   path: 'templates/:name', 
+          //   element: isAuth ? <DataGridView /> : <Navigate to="/login" />,
+          // },
           { 
             path:  'edit', 
             element: isAuth ? <DocUpload />  : <Navigate to="/login" />,
