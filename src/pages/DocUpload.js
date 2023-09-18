@@ -21,6 +21,7 @@ import {
   IconButton,
   TableContainer,
   TablePagination,
+  CircularProgress 
 } from '@mui/material';
 // components
 import Iconify from '../components/iconify';
@@ -107,13 +108,14 @@ export default function UserPage() {
 
     const {userCard} = useSelector(state => state.login)
 
-    const {totalDocs, docsArray} = useSelector(state => state.documentState)
+    const {totalDocs, docsArray, isLoading, cachePage} = useSelector(state => state.documentState)
 
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
 
     useEffect(() => {
+        if(cachePage.includes(page)) {return};
         dispatch(loadDocs(page, rowsPerPage, userCard['id']))
     }, [page, dispatch]);
 
@@ -214,12 +216,15 @@ export default function UserPage() {
     const handleChangePage = (event, newPage) => {
       console.log('handleChangePage: ', newPage)
       setPage(newPage);
+      if(cachePage.includes(newPage)) {return};
       dispatch(loadDocs(newPage, rowsPerPage, userCard['id']))
     };
   
     const handleChangeRowsPerPage = (event) => {
+      console.log('handleChangeRowsPerPage')
+      setRowsPerPage(event.target.value)
       setPage(0);
-      dispatch(loadDocs(0, rowsPerPage, userCard['id']))
+      dispatch(loadDocs(0, event.target.value, userCard['id']))
     };
 
     const onClickEliminar = () => {
@@ -272,6 +277,8 @@ export default function UserPage() {
             {/* <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} /> */}
            
               <TableContainer sx={{height: 500, minWidth: 800 }}>
+                {
+                  isLoading ? <CircularProgress /> : (
                 <Table>
                   <UserListHead
                     order={order}
@@ -353,6 +360,8 @@ export default function UserPage() {
                     </TableBody>
                   )}
                 </Table>
+                )
+              }
               </TableContainer>
             
   

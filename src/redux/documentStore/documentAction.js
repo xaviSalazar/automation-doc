@@ -1,7 +1,9 @@
-import { loadSuccessDocs, selectDoc } from "./documentSlice";
+import { loadSuccessDocs, selectDoc, loadingPending, deletedSuccess } from "./documentSlice";
 import { httpManager } from "../../managers/httpManagers";
 
 export const loadDocs = (paging, rowsPerPage, userId) => async (dispatch) => {
+
+    dispatch(loadingPending())
 
     try {
         const response = await httpManager.getDocuments(paging, rowsPerPage, userId);
@@ -31,13 +33,12 @@ export const editThisDoc = (docId) => async (dispatch) => {
 }
 
 export const delDoc = (docId) => async (dispatch) => {
-
   try {
     const response = await httpManager.deleteDocuments(docId)
     if (response.status === 200) {
+      dispatch(deletedSuccess())
       console.log('delete')
    } 
- 
   } catch (error){
     console.log(error.message)
   }
