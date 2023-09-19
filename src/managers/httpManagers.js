@@ -49,6 +49,14 @@ const deleteDocuments = async (docId) =>{
     return await axios.post(`${API_BASE_URL}/deleteDocument`, docId);
 }
 
+const getChatHistory = async (senderId, receiverId, page, messagesPerPage ) => {
+    return await axios.get(`${API_BASE_URL}/chatHistory?senderId=${senderId}&receiverId=${receiverId}&page=${page}&messagesPerPage=${messagesPerPage}`);
+}
+
+const sendAiMessage = async(msgObj) => {
+    return await axios.post(`${API_BASE_URL}/sendAiMsg`, msgObj)
+}
+
 export const httpManager = {
     retrieveChat,
     retrieveDocument,
@@ -60,5 +68,7 @@ export const httpManager = {
     facebookLogin,
     documentUpload,
     getDocuments,
-    deleteDocuments
+    deleteDocuments,
+    getChatHistory,
+    sendAiMessage
 }

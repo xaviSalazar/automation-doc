@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import * as docx from "docx-preview";
-import { httpManager } from '../managers/httpManagers';
 import { saveAs } from "file-saver";
+import { useDispatch, useSelector } from 'react-redux';
+import { loadHistory, sendMsg} from '../redux/conversationStore/conversationAction';
 import {
   Container,
   Box,
@@ -23,6 +24,56 @@ const initChat = [{ type: 'received', content: "Hola! Mi nombre es Lord Barkis y
                   { type: 'received', content: "Por ejemplo: " },
                   { type: 'received', content: "Tan solo escribe \"Quiero una carta de renuncia\"." }, ]
 
+
+const startFirstTimeMsg = (msg, senderId, receiverId) => {
+
+  const msgPart = [{ role: 'system', 
+                    content: `Eres un experto redactor de documentos de todo tipo. Y los escribes con las siguientes condiciones:
+                                                Si respondes un documento formatealo dentro de los tags <!DOCTYPE html></html>, 
+                                                todos los campos que sean a llenar que esten dentro
+                                                de llaves en camel case. Por ejemplo: \{detalleDelMotivo\}`,
+                    senderId: senderId,
+                    receiverIde: receiverId},
+                    {role: 'user', 
+                    content: msg,
+                    senderId: senderId,
+                    receiverIde: receiverId}]
+
+  return msgPart
+}
+
+function separateTextAndHTML(inputText) {
+  // Define regular expressions to match the start and end of the HTML block
+  const htmlStartRegex = /<!DOCTYPE html>/i;
+  const htmlEndRegex = /<\/html>/i;
+
+  // Find the positions of the HTML block start and end
+  const startIndex = inputText.search(htmlStartRegex);
+  const endIndex = inputText.search(htmlEndRegex);
+
+  // Check if both HTML start and end tags are found
+  if (startIndex !== -1 && endIndex !== -1) {
+    // Extract the text before and after the HTML block
+    const textBeforeHTML = inputText.slice(0, startIndex);
+    const htmlContent = inputText.slice(startIndex, endIndex + 7); // Include the closing </html> tag
+    const textAfterHTML = inputText.slice(endIndex + 7); // Exclude the closing </html> tag
+
+    return {
+      textBeforeHTML,
+      htmlContent,
+      textAfterHTML,
+    };
+  } else {
+    // HTML tags not found, return the entire input as text
+    return {
+      textBeforeHTML: inputText,
+      htmlContent: '',
+      textAfterHTML: '',
+    };
+  }
+}
+
+
 export default function AiGenerator() {
 
   const [inputValue, setInputValue] = useState('');
@@ -34,6 +85,9 @@ export default function AiGenerator() {
   const [viewDoc, setViewDoc] = useState(false);
   // loading state variable after message sent
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { conversationArr, isNewConversation } = useSelector(state => state.conversationHistory)
+  const {userCard} = useSelector(state => state.login)
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -44,6 +98,15 @@ export default function AiGenerator() {
     setBlob(null)
   }
 
+  useEffect(() => {
+    dispatch(loadHistory(userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589", 0, 30))
+  }, [userCard])
+
+  useEffect(() => {
+    setMessages(filterMsgPart(conversationArr))
+    console.log(messages)
+  }, [conversationArr])
+
   /* UseEffect for blob visualization content after word replacement*/
   useEffect(() => {
     if (typeof blob === "undefined")
@@ -52,55 +115,53 @@ export default function AiGenerator() {
       .then((x) => console.log("docx: finished"))
   }, [blob])
 
-  const contactServer = async (msg) => {
-    try {
-      //const response = await httpManager.retrieveChat({msg: msg}); 
-      const response = await httpManager.retrieveDocument({ msg: msg })
+const filterMsgPart = (arr) => {
+  return arr.map((item) => {
 
-      // response is new blob 
-      if (response.data) {
-        // Update loading state to false
-      setIsLoading(false);
+    const text_separation = separateTextAndHTML(item.content)
 
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            type: 'received',
-            content: "nuevo documento recibido",
-            buttons: [
-              { label: 'Visualizar Documento', 
-                onClick: () => downloadBlob(new Blob([response.data])) 
-              },
-            ],
-          },
-        ]);
+    const msg = item.content.includes('<!DOCTYPE html>')
+    ? text_separation.textBeforeHTML: item.content
 
-        setMessages((prevMessages) =>
-                      prevMessages.map((message, index) =>
-                        index === prevMessages.length - 1 ? { ...message, isLoading: false } : message
-                      )
-    );
-      }
-    } catch (error) {
-      console.log(error.message)
-    } finally {
-      setIsLoading(false)
+    const isAttachment = item.attachment !== null
+    ?[ 
+      { label: item.title, 
+        onClick: () => downloadBlob(new Uint8Array(atob(item.attachment).split('').map(char => char.charCodeAt(0)))) 
+      },
+    ]
+     : [];
+    return {
+      role: item.role,
+      content: msg,
+      buttons: isAttachment
     }
-  }
+});
+}
 
   const handleSendMessage = async () => {
+
     if (!inputPosition && inputValue.trim() !== '') {
       setInputPosition('bottom');
     }
   
     try {
       if (inputValue.trim() !== '') {
-        const copySent = inputValue;
-        setInputValue('');
-        setMessages((prevMessages) => [...prevMessages, { type: 'sent', content: copySent }])
-        console.log(messages)
-        setIsLoading(true); // Set loading state to true
-        contactServer(copySent);
+         const copySent = inputValue;
+         setInputValue('');
+         if(isNewConversation) { 
+          // array [system message, user message]
+          const startChat = startFirstTimeMsg(copySent,userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589")
+          // dispatch 
+          dispatch(sendMsg(startChat, isNewConversation, userCard['id']))
+          console.log(startChat)
+        } else {
+          const obj = {role: 'user', 
+                      content: copySent,
+                      senderId: userCard['id'],
+                      receiverIde: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589"
+                    }
+          dispatch(sendMsg([obj], isNewConversation, userCard['id']))
+        }
       }
     } catch (e) {
       console.log(e.message);
@@ -177,13 +238,13 @@ export default function AiGenerator() {
                   sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: message.type === 'sent' ? 'flex-end' : 'flex-start',
+                    alignItems: message.role === 'user' ? 'flex-end' : 'flex-start',
                   }}
                 >
                       <ListItemText
                         primary={message.content}
                         sx={{
-                          backgroundColor: message.type === 'sent' ? '#DCF8C6' : '#E3F2FD',
+                          backgroundColor: message.role === 'user' ? '#DCF8C6' : '#E3F2FD',
                           padding: '8px',
                           borderRadius: '8px',
                           maxWidth: '75%',
@@ -200,9 +261,9 @@ export default function AiGenerator() {
                               key={buttonIndex}
                               onClick={button.onClick}
                               sx={{
-                                backgroundColor: message.type === 'sent' ? '#DCF8C6' : '#E3F2FD',
+                                backgroundColor: message.role === 'user' ? '#DCF8C6' : '#E3F2FD',
                                 '&:hover': {
-                                  backgroundColor: message.type === 'sent' ? '#B7E69E' : '#90CAF9',
+                                  backgroundColor: message.role === 'user' ? '#B7E69E' : '#90CAF9',
                                 },
                               }}
                             >
