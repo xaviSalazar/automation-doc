@@ -1,9 +1,7 @@
-import { loadingHistory, loadMsgSuccessful, loadingMessage, loadingFailed, loadSuccessHistory, sendMessage } from "./conversationSlice";
+import { loadMsgSuccessful, loadSuccessHistory, sendMessage } from "./conversationSlice";
 import { httpManager } from "../../managers/httpManagers";
 
 export const loadHistory = (senderId, receiverId, page, messagesPerPage) => async (dispatch) => {
-
-    dispatch(loadingHistory())
 
     try {
         const response = await httpManager.getChatHistory(senderId, receiverId, page, messagesPerPage)
@@ -23,14 +21,10 @@ export const loadHistory = (senderId, receiverId, page, messagesPerPage) => asyn
 
 export const sendMsg = (object, isNewConversation, senderId) => async (dispatch) => {
     try{
-        console.log(object)
         dispatch(sendMessage(object))
-
         const response = await httpManager.sendAiMessage({msgArray:object, isNewConversation: isNewConversation, senderId: senderId})
 
         if (response.status === 200) {
-            //dispatch(loadSuccessHistory(response.data.conversation))
-            //console.log(response.data)
             dispatch(loadMsgSuccessful(response.data))
         } 
     } catch(e) {

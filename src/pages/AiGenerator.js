@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import * as docx from "docx-preview";
 import { saveAs } from "file-saver";
 import { useDispatch, useSelector } from 'react-redux';
-import { loadHistory, sendMsg} from '../redux/conversationStore/conversationAction';
+import { loadHistory, sendMsg } from '../redux/conversationStore/conversationAction';
 import {
   Container,
   Box,
@@ -20,24 +20,28 @@ import SendIcon from '@mui/icons-material/Send';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 
-const initChat = [{ type: 'received', content: "Hola! Mi nombre es Lord Barkis y puedo ayudarte a generar cualquier documento." }, 
-                  { type: 'received', content: "Por ejemplo: " },
-                  { type: 'received', content: "Tan solo escribe \"Quiero una carta de renuncia\"." }, ]
+const initChat = [{ type: 'received', content: "Hola! Mi nombre es Lord Barkis y puedo ayudarte a generar cualquier documento." },
+{ type: 'received', content: "Por ejemplo: " },
+{ type: 'received', content: "Tan solo escribe \"Quiero una carta de renuncia\"." },]
 
 
 const startFirstTimeMsg = (msg, senderId, receiverId) => {
 
-  const msgPart = [{ role: 'system', 
-                    content: `Eres un experto redactor de documentos de todo tipo. Y los escribes con las siguientes condiciones:
+  const msgPart = [{
+    role: 'system',
+    content: `Eres un experto redactor de documentos de todo tipo. Y los escribes con las siguientes condiciones:
                                                 Si respondes un documento formatealo dentro de los tags <!DOCTYPE html></html>, 
                                                 todos los campos que sean a llenar que esten dentro
                                                 de llaves en camel case. Por ejemplo: \{detalleDelMotivo\}`,
-                    senderId: senderId,
-                    receiverIde: receiverId},
-                    {role: 'user', 
-                    content: msg,
-                    senderId: senderId,
-                    receiverIde: receiverId}]
+    senderId: senderId,
+    receiverIde: receiverId
+  },
+  {
+    role: 'user',
+    content: msg,
+    senderId: senderId,
+    receiverIde: receiverId
+  }]
 
   return msgPart
 }
@@ -84,10 +88,9 @@ export default function AiGenerator() {
   const [blob, setBlob] = useState();
   const [viewDoc, setViewDoc] = useState(false);
   // loading state variable after message sent
-  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
-  const { conversationArr, isNewConversation } = useSelector(state => state.conversationHistory)
-  const {userCard} = useSelector(state => state.login)
+  const { conversationArr, isNewConversation, isLoadingMessage } = useSelector(state => state.conversationHistory)
+  const { userCard } = useSelector(state => state.login)
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -115,51 +118,53 @@ export default function AiGenerator() {
       .then((x) => console.log("docx: finished"))
   }, [blob])
 
-const filterMsgPart = (arr) => {
-  return arr.map((item) => {
+  const filterMsgPart = (arr) => {
+    return arr.map((item) => {
 
-    const text_separation = separateTextAndHTML(item.content)
+      const text_separation = separateTextAndHTML(item.content)
 
-    const msg = item.content.includes('<!DOCTYPE html>')
-    ? text_separation.textBeforeHTML: item.content
+      const msg = item.content.includes('<!DOCTYPE html>')
+        ? text_separation.textBeforeHTML : item.content
 
-    const isAttachment = item.attachment !== null
-    ?[ 
-      { label: item.title, 
-        onClick: () => downloadBlob(new Uint8Array(atob(item.attachment).split('').map(char => char.charCodeAt(0)))) 
-      },
-    ]
-     : [];
-    return {
-      role: item.role,
-      content: msg,
-      buttons: isAttachment
-    }
-});
-}
+      const isAttachment = item.attachment !== null
+        ? [
+          {
+            label: item.title,
+            onClick: () => downloadBlob(new Uint8Array(atob(item.attachment).split('').map(char => char.charCodeAt(0))))
+          },
+        ]
+        : [];
+      return {
+        role: item.role,
+        content: msg,
+        buttons: isAttachment
+      }
+    });
+  }
 
   const handleSendMessage = async () => {
 
     if (!inputPosition && inputValue.trim() !== '') {
       setInputPosition('bottom');
     }
-  
+
     try {
       if (inputValue.trim() !== '') {
-         const copySent = inputValue;
-         setInputValue('');
-         if(isNewConversation) { 
+        const copySent = inputValue;
+        setInputValue('');
+        if (isNewConversation) {
           // array [system message, user message]
-          const startChat = startFirstTimeMsg(copySent,userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589")
+          const startChat = startFirstTimeMsg(copySent, userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589")
           // dispatch 
           dispatch(sendMsg(startChat, isNewConversation, userCard['id']))
           console.log(startChat)
         } else {
-          const obj = {role: 'user', 
-                      content: copySent,
-                      senderId: userCard['id'],
-                      receiverIde: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589"
-                    }
+          const obj = {
+            role: 'user',
+            content: copySent,
+            senderId: userCard['id'],
+            receiverIde: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589"
+          }
           dispatch(sendMsg([obj], isNewConversation, userCard['id']))
         }
       }
@@ -167,7 +172,7 @@ const filterMsgPart = (arr) => {
       console.log(e.message);
     }
   };
-  
+
 
 
   const handleInputClick = () => {
@@ -182,6 +187,7 @@ const filterMsgPart = (arr) => {
 
   const downloadBlob = async (content) => {
     try {
+      console.log(content)
       setBlob(content)
       setViewDoc(true)
     } catch (e) {
@@ -241,37 +247,37 @@ const filterMsgPart = (arr) => {
                     alignItems: message.role === 'user' ? 'flex-end' : 'flex-start',
                   }}
                 >
-                      <ListItemText
-                        primary={message.content}
-                        sx={{
-                          backgroundColor: message.role === 'user' ? '#DCF8C6' : '#E3F2FD',
-                          padding: '8px',
-                          borderRadius: '8px',
-                          maxWidth: '75%',
-                          marginBottom: '4px',
-                        }}
-                      />
-                      {isLoading && index === messages.length - 1 && (
-        <CircularProgress size={40} color="inherit" sx={{ alignSelf: 'flex-start', marginRight: 2 }} />
-      )}
-                      {message.buttons && (
-                        <ButtonGroup>
-                          {message.buttons.map((button, buttonIndex) => (
-                            <Button
-                              key={buttonIndex}
-                              onClick={button.onClick}
-                              sx={{
-                                backgroundColor: message.role === 'user' ? '#DCF8C6' : '#E3F2FD',
-                                '&:hover': {
-                                  backgroundColor: message.role === 'user' ? '#B7E69E' : '#90CAF9',
-                                },
-                              }}
-                            >
-                              {button.label}
-                            </Button>
-                          ))}
-                        </ButtonGroup>
-                      )}
+                  <ListItemText
+                    primary={message.content}
+                    sx={{
+                      backgroundColor: message.role === 'user' ? '#DCF8C6' : '#E3F2FD',
+                      padding: '8px',
+                      borderRadius: '8px',
+                      maxWidth: '75%',
+                      marginBottom: '4px',
+                    }}
+                  />
+                  {isLoadingMessage && index === messages.length - 1 && (
+                    <CircularProgress size={40} color="inherit" sx={{ alignSelf: 'flex-start', marginRight: 2 }} />
+                  )}
+                  {message.buttons && (
+                    <ButtonGroup>
+                      {message.buttons.map((button, buttonIndex) => (
+                        <Button
+                          key={buttonIndex}
+                          onClick={button.onClick}
+                          sx={{
+                            backgroundColor: message.role === 'user' ? '#DCF8C6' : '#E3F2FD',
+                            '&:hover': {
+                              backgroundColor: message.role === 'user' ? '#B7E69E' : '#90CAF9',
+                            },
+                          }}
+                        >
+                          {button.label}
+                        </Button>
+                      ))}
+                    </ButtonGroup>
+                  )}
                 </ListItem>
               ))}
             </List>
@@ -291,7 +297,7 @@ const filterMsgPart = (arr) => {
               }}
               onClick={handleInputClick}
             >
-              {isLoading ? (
+              {isLoadingMessage ? (
                 <CircularProgress size={24} /> // Show loading icon
               ) : (<InputBase
                 sx={{ ml: 1, flex: 1, width: 700 }}
