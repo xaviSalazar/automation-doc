@@ -86,6 +86,7 @@ export default function AiGenerator() {
   const [highlight, setHighlight] = useState(false);
   const messagesContainerRef = useRef(null);
   const [blob, setBlob] = useState();
+  const [downldBlob, setDownldBlob] = useState()
   const [viewDoc, setViewDoc] = useState(false);
   // loading state variable after message sent
   const dispatch = useDispatch();
@@ -130,7 +131,7 @@ export default function AiGenerator() {
         ? [
           {
             label: item.title,
-            onClick: () => downloadBlob(new Uint8Array(atob(item.attachment).split('').map(char => char.charCodeAt(0))))
+            onClick: () => downloadBlob(item.attachment)
           },
         ]
         : [];
@@ -187,18 +188,16 @@ export default function AiGenerator() {
 
   const downloadBlob = async (content) => {
     try {
-      console.log(content)
-      setBlob(content)
+      setBlob(new Uint8Array(atob(content).split('').map(char => char.charCodeAt(0))))
+      setDownldBlob(new Blob([ new Uint8Array(atob(content).split('').map(char => char.charCodeAt(0))) ]))
       setViewDoc(true)
     } catch (e) {
       console.log(e.message)
     }
   }
-
   const saveFile = () => {
-    saveAs(blob, `Archivo.docx`);
+    saveAs(downldBlob, `DownloadedFile.docx`);
   }
-
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
