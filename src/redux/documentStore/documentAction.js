@@ -28,8 +28,8 @@ export const editThisDoc = (docId) => async (dispatch) => {
 
     const response = await httpManager.downloadFileBinary(docId)
     if (response.status === 200) {
-      console.log(response.data['attachment_binary'])
-      dispatch(selectDoc(response.data['attachment_binary']))
+      console.log(response.data)
+      dispatch(selectDoc(response.data))
    } 
   else {
     console.error('Error fetching documents:', response.statusText);
