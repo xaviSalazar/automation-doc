@@ -32,25 +32,3 @@ export const sendMsg = (object, isNewConversation, senderId) => async (dispatch)
     }
 }
 
-// export const editThisDoc = (docId) => async (dispatch) => {
-
-//   try {
-//     console.log(docId)
-//     dispatch(selectDoc(docId))
-//   } catch (error){
-//     console.log(error.message)
-//   }
-
-// }
-
-// export const delDoc = (docId) => async (dispatch) => {
-//   try {
-//     const response = await httpManager.deleteDocuments(docId)
-//     if (response.status === 200) {
-//       dispatch(deletedSuccess())
-//       console.log('delete')
-//    } 
-//   } catch (error){
-//     console.log(error.message)
-//   }
-// }

@@ -63,7 +63,7 @@ const checkFiles = (doc, zip) => {
   return uniqueWords;
 }
 
-const SelectFile = (docId, setColumnLister, setContent, filesArray) => {
+const SelectFile = (base64Content, setColumnLister, setContent, filesArray) => {
 
     // match name after "/"
     // eslint-disable-next-line
@@ -73,23 +73,22 @@ const SelectFile = (docId, setColumnLister, setContent, filesArray) => {
     // console.log(urlFileName)
 
     // create local variable for array 
-    const modifiableArray = JSON.parse(JSON.stringify(filesArray))
-    // function to match the pathname
-    function removeValue(value, index, arr) {
-      if(value.id === docId) {
-        arr.splice(index,1);
-        return true;
-      }
-      return false;
-    }
+    // const modifiableArray = JSON.parse(JSON.stringify(filesArray))
+    // // function to match the pathname
+    // function removeValue(value, index, arr) {
+    //   if(value.id === docId) {
+    //     arr.splice(index,1);
+    //     return true;
+    //   }
+    //   return false;
+    // }
 
     // filter from list of files
-    const fileExists = modifiableArray.filter(removeValue).pop()
-    console.log(fileExists)
+    // const fileExists = modifiableArray.filter(removeValue).pop()
+    // console.log(fileExists)
 
-    if(typeof fileExists === "undefined") return;
-
-    const content = fileExists.binary_data
+    // if(typeof fileExists === "undefined") return;
+    const content = new Uint8Array(atob(base64Content).split('').map(char => char.charCodeAt(0)))
     // set content (this is the editable content)
     setContent(content);
     // create a new pizzip
@@ -99,7 +98,7 @@ const SelectFile = (docId, setColumnLister, setContent, filesArray) => {
     var doc = new Docxtemplater( zip, {delimiters: {start: '12op1j2po1j2poj1po', end: 'op21j4po21jp4oj1op24j'}});
 
     const uniqueWords = checkFiles(doc, zip);
-    setColumnLister({columns: uniqueWords, fileName: fileExists.name});
+    setColumnLister({columns: uniqueWords, fileName: "editando"});
 };
 
 export default SelectFile;

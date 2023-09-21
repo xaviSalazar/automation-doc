@@ -2,6 +2,8 @@ import { filter } from 'lodash';
 import { useState, useEffect } from 'react';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import {httpManager} from '../managers/httpManagers'
+import axios from "axios"
+
 import { loadDocs, editThisDoc, delDoc} from '../redux/documentStore/documentAction';
 // @mui
 import {
@@ -121,44 +123,70 @@ export default function UserPage() {
 
     const handleUploadFiles = async files => {
 
-      let handledItems = [];
-      let limitExceeded = false;
+      const formData = new FormData(); // Create a new FormData object
 
-      // to check for not repeated files.
-      files.some((file) => {
-          if (!docsArray.some((f) => f.title.trim().replace(/\s+/g, '') === file.name.trim().replace(/\s+/g, ''))) {
-              handledItems.push(file);
-          }
-          return false;
-      })
+      formData.append('user_id', userCard['id']);
+        // Append each selected file to the FormData object
+        files.forEach((file) => {
+          // You can also append additional data to the FormData object if needed
+          formData.append('files', file); // 'files' should match the field name expected by the server
+        });
 
-      console.log('files', handledItems)
-       // Convert the FileList into an array and iterate
-       let filesAsync = Array.from(handledItems).map(file => {    
-        // Define a new file reader
-        let reader = new FileReader();
-        // Create a new promise
-        return new Promise(resolve => {  
-            // Resolve the promise after reading file
-            reader.onload = () => resolve({
-                                            id: uuidv4(),
-                                            user_id: userCard['id'],
-                                            title: file.name.trim().replace(/\s+/g, ''), 
-                                            binary_data: reader.result,
-                                            content: "word",
-                                            created_at: file.lastModified,
-                                            file_size: file.size
-                                          });
+
+      // Send a POST request to your server with Axios
+    const response = await axios.post('http://localhost:3001/uploadMultipleDocs', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data', // Set the Content-Type header to multipart/form-data
+      },
+    });
+
+    if (response.status === 200) {
+      console.log('Files uploaded successfully');
+      // Handle the response from the server if necessary
+    } else {
+      console.error('File upload failed');
+      // Handle the error
+    }
+
+      
+      // let handledItems = [];
+      // let limitExceeded = false;
+
+      // // to check for not repeated files.
+      // files.some((file) => {
+      //     if (!docsArray.some((f) => f.title.trim().replace(/\s+/g, '') === file.name.trim().replace(/\s+/g, ''))) {
+      //         handledItems.push(file);
+      //     }
+      //     return false;
+      // })
+
+      // console.log('files', handledItems)
+      //  // Convert the FileList into an array and iterate
+      //  let filesAsync = Array.from(handledItems).map(file => {    
+      //   // Define a new file reader
+      //   let reader = new FileReader();
+      //   // Create a new promise
+      //   return new Promise(resolve => {  
+      //       // Resolve the promise after reading file
+      //       reader.onload = () => resolve({
+      //                                       id: uuidv4(),
+      //                                       user_id: userCard['id'],
+      //                                       title: file.name.trim().replace(/\s+/g, ''), 
+      //                                       binary_data: reader.result,
+      //                                       content: "word",
+      //                                       created_at: file.lastModified,
+      //                                       file_size: file.size
+      //                                     });
             
-            // Reade the file as a text
-            reader.readAsBinaryString(file);
-         });
-      });
+      //       // Reade the file as a text
+      //       reader.readAsBinaryString(file);
+      //    });
+      // });
 
-      let binary_files = await Promise.all(filesAsync)
-      console.log(binary_files)
+      // let binary_files = await Promise.all(filesAsync)
+      // console.log(binary_files)
 
-      await httpManager.documentUpload(binary_files)
+      // await httpManager.documentUpload(binary_files)
 
   }
 
@@ -190,7 +218,7 @@ export default function UserPage() {
   
     const handleSelectAllClick = (event) => {
       if (event.target.checked) {
-        const newSelecteds = docsArray.map((n) => n.id);
+        const newSelecteds = docsArray.map((n) => n.attachment_id);
         console.log(newSelecteds)
         setSelected(newSelecteds);
         return;
@@ -214,14 +242,12 @@ export default function UserPage() {
     };
   
     const handleChangePage = (event, newPage) => {
-      console.log('handleChangePage: ', newPage)
       setPage(newPage);
       if(cachePage.includes(newPage)) {return};
       dispatch(loadDocs(newPage, rowsPerPage, userCard['id']))
     };
   
     const handleChangeRowsPerPage = (event) => {
-      console.log('handleChangeRowsPerPage')
       setRowsPerPage(event.target.value)
       setPage(0);
       dispatch(loadDocs(0, event.target.value, userCard['id']))
@@ -235,6 +261,7 @@ export default function UserPage() {
 
     const onClickEditar = () => {
       setOpen(null)
+      console.log(docIdPop)
       dispatch(editThisDoc(docIdPop))
       navigate("/templates")
     }
@@ -292,21 +319,21 @@ export default function UserPage() {
                   <TableBody>
                     {docsArray.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
                     //   const { id, name, role, status, company, avatarUrl, isVerified } = row;
-                    const { id, title, created_at, file_size } = row;
+                    const { attachment_id, file_name, created_at, file_size } = row;
                     
-                    const selectedUser = selected.indexOf(id) !== -1;
+                    const selectedUser = selected.indexOf(attachment_id) !== -1;
   
                       return (
-                        <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
+                        <TableRow hover key={attachment_id} tabIndex={-1} role="checkbox" selected={selectedUser}>
                           <TableCell padding="checkbox">
-                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, id)} />
+                            <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, attachment_id)} />
                           </TableCell>
   
                           <TableCell component="th" scope="row" padding="none">
                             <Stack direction="row" alignItems="center" spacing={2}>
-                              <IconButton onClick={(e) => handleOpenIcon(e,title)}> <TextSnippetIcon /></IconButton>
+                              <IconButton onClick={(e) => handleOpenIcon(e,file_name)}> <TextSnippetIcon /></IconButton>
                               <Typography variant="subtitle2" noWrap>
-                                {title}
+                                {file_name}
                               </Typography>
                             </Stack>
                           </TableCell>
@@ -322,7 +349,7 @@ export default function UserPage() {
                           </TableCell> */}
   
                           <TableCell align="right">
-                            <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, title, id)}>
+                            <IconButton size="large" color="inherit" onClick={(e) => handleOpenMenu(e, file_name, attachment_id)}>
                               <Iconify icon={'eva:more-vertical-fill'} />
                             </IconButton>
                           </TableCell>

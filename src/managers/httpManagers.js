@@ -61,6 +61,11 @@ const downloadHistoryDocument = async(documentId) => {
     return await axios.get(`${API_BASE_URL}/downloadDocumentHistory?documentId=${documentId}`)
 }
 
+const downloadFileBinary = async(attachmentId) => {
+    return await axios.get(`${API_BASE_URL}/downloadFileBinary?attachmentId=${attachmentId}`)
+}
+
+
 export const httpManager = {
     retrieveChat,
     retrieveDocument,
@@ -75,5 +80,6 @@ export const httpManager = {
     deleteDocuments,
     getChatHistory,
     sendAiMessage,
-    downloadHistoryDocument
+    downloadHistoryDocument,
+    downloadFileBinary
 }

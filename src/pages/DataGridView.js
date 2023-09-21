@@ -153,6 +153,8 @@ export default function DataGridView() {
       if(docsArray.length === 0)
         return
 
+      if(selectDoc === null) return
+
         console.log(docsArray)
         SelectFile(selectDoc, setColumnLister, setContent, docsArray)
   

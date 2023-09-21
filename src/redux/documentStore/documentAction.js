@@ -24,8 +24,16 @@ export const loadDocs = (paging, rowsPerPage, userId) => async (dispatch) => {
 export const editThisDoc = (docId) => async (dispatch) => {
 
   try {
-    console.log(docId)
-    dispatch(selectDoc(docId))
+    console.log(`editing doc: ${docId}`)
+
+    const response = await httpManager.downloadFileBinary(docId)
+    if (response.status === 200) {
+      console.log(response.data['attachment_binary'])
+      dispatch(selectDoc(response.data['attachment_binary']))
+   } 
+  else {
+    console.error('Error fetching documents:', response.statusText);
+  }
   } catch (error){
     console.log(error.message)
   }
