@@ -3,6 +3,7 @@ import * as docx from "docx-preview";
 import { saveAs } from "file-saver";
 import { useDispatch, useSelector } from 'react-redux';
 import { loadHistory, sendMsg } from '../redux/conversationStore/conversationAction';
+import { httpManager } from '../managers/httpManagers';
 import {
   Container,
   Box,
@@ -127,11 +128,11 @@ export default function AiGenerator() {
       const msg = item.content.includes('<!DOCTYPE html>')
         ? text_separation.textBeforeHTML : item.content
 
-      const isAttachment = item.attachment !== null
+      const isAttachment = item.attachment_id !== null
         ? [
           {
             label: item.title,
-            onClick: () => downloadBlob(item.attachment)
+            onClick: () => downloadBlob(item.attachment_id)
           },
         ]
         : [];
@@ -186,12 +187,22 @@ export default function AiGenerator() {
     }
   };
 
-  const downloadBlob = async (content) => {
+  const downloadBlob = async (docId) => {
+
     try {
-      setBlob(new Uint8Array(atob(content).split('').map(char => char.charCodeAt(0))))
-      setDownldBlob(new Blob([ new Uint8Array(atob(content).split('').map(char => char.charCodeAt(0))) ]))
+
+    
+    const response = await httpManager.downloadHistoryDocument(docId);
+
+    if(response.status === 200)
+    {
+      console.log(response.data)
+      const {attachment} = response.data
+      setBlob(new Uint8Array(atob(attachment).split('').map(char => char.charCodeAt(0))))
+      setDownldBlob(new Blob([ new Uint8Array(atob(attachment).split('').map(char => char.charCodeAt(0))) ]))
       setViewDoc(true)
-    } catch (e) {
+    }
+   } catch (e) {
       console.log(e.message)
     }
   }

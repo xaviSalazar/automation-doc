@@ -57,6 +57,10 @@ const sendAiMessage = async(msgObj) => {
     return await axios.post(`${API_BASE_URL}/sendAiMsg`, msgObj)
 }
 
+const downloadHistoryDocument = async(documentId) => {
+    return await axios.get(`${API_BASE_URL}/downloadDocumentHistory?documentId=${documentId}`)
+}
+
 export const httpManager = {
     retrieveChat,
     retrieveDocument,
@@ -70,5 +74,6 @@ export const httpManager = {
     getDocuments,
     deleteDocuments,
     getChatHistory,
-    sendAiMessage
+    sendAiMessage,
+    downloadHistoryDocument
 }
