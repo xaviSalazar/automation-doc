@@ -134,7 +134,7 @@ export default function UserPage() {
 
 
       // Send a POST request to your server with Axios
-    const response = await axios.post('http://localhost:3001/uploadMultipleDocs', formData, {
+    const response = await axios.post('https://automationdoc-xavicoel.b4a.run/uploadMultipleDocs', formData, {
       headers: {
         'Content-Type': 'multipart/form-data', // Set the Content-Type header to multipart/form-data
       },
