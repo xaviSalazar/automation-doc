@@ -13,6 +13,7 @@ import MergeDocuments from './libs/MergeDocuments';
 import { useLocation } from 'react-router-dom';
 import { loadFiles } from '../redux/filesStore/filesAction';
 import SelectFile from './libs/SelectFile';
+import ExcelReader from './libs/excel/ExcelReader.js'
 // import { FlashOnRounded } from '@mui/icons-material';
 
   /**Function to by pass usage of ApiRef */
@@ -178,16 +179,6 @@ export default function DataGridView() {
     // eslint-disable-next-line
     }, [columnLister])
 
-    // React.useEffect(() => {
-    //   console.log("useEffect for reducer load workspace")
-    //   // console.log(reducerVar)
-    //   if(typeof reducerVar === "undefined")
-    //     return
-    //   setColumns(reducerVar.columns)
-    //   setRows(reducerVar.rows)
-    //   setContent(reducerVar.content)
-    // }, [reducerVar])
-
       /* UseEffect for blob visualization content after word replacement*/
    React.useEffect(() => {
      if(typeof blob === "undefined")
@@ -273,7 +264,6 @@ export default function DataGridView() {
                               }
                             })
 
-    // console.log(valuesArray)
     setRows(valuesArray)
 
   }
@@ -283,7 +273,9 @@ export default function DataGridView() {
     // call apiRef
     const obj_it = apiRef.current.getRowModels()
     // array of rows 
+    
     const rows = Array.from(obj_it.values())
+    
     dispatch(saveAll({column: columns, row: rows, contenu: content}));
   }
 
@@ -343,6 +335,8 @@ export default function DataGridView() {
                     </Typography>
           }
 
+          < ExcelReader setRows={setRows} />
+
           { (checkedRowData.length !== 0 ) &&
                   <Button 
                   variant="contained" 
@@ -374,7 +368,7 @@ export default function DataGridView() {
             Crear nueva fila
           </Button>
         }
-          
+
         </Stack>
   
       <Box sx={{ height: 400, width: '100%' }}>

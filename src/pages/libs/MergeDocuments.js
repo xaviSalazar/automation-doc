@@ -14,7 +14,6 @@ export default function MergeDocuments(content, ArrayValues) {
     const documents = arrTest.map((item) => {
 
         // create zip
-        console.log(item)
         const zip = new PizZip(content);
         // Onlye one instance permited by Docxtemplater
         const doc = new Docxtemplater(zip, {
@@ -22,7 +21,6 @@ export default function MergeDocuments(content, ArrayValues) {
             linebreaks: true,
         });
 
-        // console.log(item);
         doc.render(item);
 
         const blob = doc.getZip().generate({
