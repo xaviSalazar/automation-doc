@@ -7,7 +7,7 @@ export const loadHistory = (senderId, receiverId, page, messagesPerPage) => asyn
         const response = await httpManager.getChatHistory(senderId, receiverId, page, messagesPerPage)
         
         if (response.status === 200) {
-            dispatch(loadSuccessHistory(response.data.conversation))
+            dispatch(loadSuccessHistory(response.data))
          } 
         else {
             // dispatch(loadingFailed())
@@ -21,7 +21,7 @@ export const loadHistory = (senderId, receiverId, page, messagesPerPage) => asyn
 
 export const sendMsg = (object, isNewConversation, senderId) => async (dispatch) => {
     try{
-        dispatch(sendMessage(object))
+        dispatch(sendMessage())
         const response = await httpManager.sendAiMessage({msgArray:object, isNewConversation: isNewConversation, senderId: senderId})
 
         if (response.status === 200) {

@@ -82,7 +82,7 @@ function separateTextAndHTML(inputText) {
 export default function AiGenerator() {
 
   const [inputValue, setInputValue] = useState('');
-  const [messages, setMessages] = useState(initChat);
+  const [messages, setMessages] = useState([]);
   const [inputPosition, setInputPosition] = useState('top');
   const [highlight, setHighlight] = useState(false);
   const messagesContainerRef = useRef(null);
@@ -91,8 +91,10 @@ export default function AiGenerator() {
   const [viewDoc, setViewDoc] = useState(false);
   // loading state variable after message sent
   const dispatch = useDispatch();
-  const { conversationArr, isNewConversation, isLoadingMessage } = useSelector(state => state.conversationHistory)
+  const { conversationArr, isNewConversation, isLoadingMessage, hasMore, chatAnswer } = useSelector(state => state.conversationHistory)
   const { userCard } = useSelector(state => state.login)
+
+  const [page, setPage] = useState(0);
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
@@ -104,13 +106,47 @@ export default function AiGenerator() {
   }
 
   useEffect(() => {
-    dispatch(loadHistory(userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589", 0, 30))
-  }, [userCard])
+    console.log('useEffect 1')
+      dispatch(loadHistory(userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589", page, 30));
+  }, [dispatch, userCard, page]);
 
   useEffect(() => {
-    setMessages(filterMsgPart(conversationArr))
-    console.log(messages)
+    if (page > 0) {  // Avoid running on initial render
+      console.log('useEffect 2')
+      dispatch(loadHistory(userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589", page, 30));
+    }
+  }, [dispatch, userCard, page]);
+
+
+  useEffect(() => {
+    console.log('useEffect 3')
+    setMessages(prevMessages => [...filterMsgPart(conversationArr), ...prevMessages]);
   }, [conversationArr])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const { scrollTop, clientHeight, scrollHeight } = messagesContainerRef.current;
+      const nearingTop = scrollTop === 0;
+      if (nearingTop && hasMore) {
+        console.log('useEffect 5')
+        setPage(prevPage => prevPage + 1);
+      }
+    };
+  
+    const messagesContainer = messagesContainerRef.current;
+    messagesContainer.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      messagesContainer.removeEventListener('scroll', handleScroll);
+    };
+  }, [hasMore]);
+
+  useEffect(() =>{
+    if(chatAnswer == '') return;
+    console.log('useEffect 4')
+    setMessages(prevMessages => [...prevMessages, chatAnswer]);
+  }, [chatAnswer])
+  
 
   /* UseEffect for blob visualization content after word replacement*/
   useEffect(() => {
@@ -122,12 +158,12 @@ export default function AiGenerator() {
 
   const filterMsgPart = (arr) => {
     return arr.map((item) => {
-
-      const text_separation = separateTextAndHTML(item.content)
-
+  
+    const text_separation = separateTextAndHTML(item.content)
+  
       const msg = item.content.includes('<!DOCTYPE html>')
         ? text_separation.textBeforeHTML : item.content
-
+  
       const isAttachment = item.attachment_id !== null
         ? [
           {
@@ -136,13 +172,15 @@ export default function AiGenerator() {
           },
         ]
         : [];
-      return {
+        return {
         role: item.role,
         content: msg,
-        buttons: isAttachment
-      }
+        buttons: isAttachment,
+        timestamp: item.timestamp,
+      };
     });
-  }
+  };
+  
 
   const handleSendMessage = async () => {
 
@@ -158,6 +196,7 @@ export default function AiGenerator() {
           // array [system message, user message]
           const startChat = startFirstTimeMsg(copySent, userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589")
           // dispatch 
+          setMessages(prevMessages => [...prevMessages, startChat]);
           dispatch(sendMsg(startChat, isNewConversation, userCard['id']))
           console.log(startChat)
         } else {
@@ -167,6 +206,7 @@ export default function AiGenerator() {
             senderId: userCard['id'],
             receiverIde: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589"
           }
+          setMessages(prevMessages => [...prevMessages, obj]);
           dispatch(sendMsg([obj], isNewConversation, userCard['id']))
         }
       }
@@ -209,6 +249,7 @@ export default function AiGenerator() {
   const saveFile = () => {
     saveAs(downldBlob, `DownloadedFile.docx`);
   }
+
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;

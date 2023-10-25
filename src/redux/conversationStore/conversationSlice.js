@@ -5,6 +5,8 @@ const initialState = {
     isLoadingHistory: true,
     isLoadingMessage: false,
     isNewConversation: false,
+    hasMore: false,
+    chatAnswer: ''
 }
 
 const conversationSlice = createSlice({
@@ -12,14 +14,17 @@ const conversationSlice = createSlice({
     initialState,
     reducers: {
         loadSuccessHistory: (state, action) => {
-            console.log(action.payload)
-            if (action.payload.length === 0) {
+            if (action.payload.conversation.length === 0) {
                 state.isNewConversation = true
-                console.log(state.isNewConversation)
             } else {
                 state.isNewConversation = false
             }
-            state.conversationArr = action.payload
+            // Sort the conversation array by timestamp
+            const sortedConversation = action.payload.conversation.sort((a, b) => {
+                return new Date(a.timestamp) - new Date(b.timestamp);
+            });
+            state.conversationArr = sortedConversation
+            state.hasMore = action.payload.hasMore
             state.isLoadingHistory = false
             state.isLoadingMessage = false
         },
@@ -27,16 +32,13 @@ const conversationSlice = createSlice({
             state.isLoadingHistory = false
             state.isNewConversation = true
         },
-        sendMessage: (state, action) => {
-            const newTemporal = state.conversationArr.concat(action.payload)
-            state.conversationArr = newTemporal
+        sendMessage: (state) => {
             state.isLoadingMessage = true
         },
         loadMsgSuccessful: (state, action) => {
-            state.conversationArr = state.conversationArr.concat(action.payload)
+            state.chatAnswer = action.payload
             state.isNewConversation = false
             state.isLoadingMessage = false
-            console.log(state.conversationArr)
         }
     }
 });
