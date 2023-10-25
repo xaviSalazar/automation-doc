@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import * as docx from "docx-preview";
 import { saveAs } from "file-saver";
 import { useDispatch, useSelector } from 'react-redux';
-import { loadHistory, sendMsg } from '../redux/conversationStore/conversationAction';
+import { loadHistory, appendArrayHistory, sendMsg, cleanReceivedMsg } from '../redux/conversationStore/conversationAction';
 import { httpManager } from '../managers/httpManagers';
 import {
   Container,
@@ -91,7 +91,10 @@ export default function AiGenerator() {
   const [viewDoc, setViewDoc] = useState(false);
   // loading state variable after message sent
   const dispatch = useDispatch();
-  const { conversationArr, isNewConversation, isLoadingMessage, hasMore, chatAnswer } = useSelector(state => state.conversationHistory)
+  const { conversationArr, isNewConversation, 
+        isLoadingMessage, hasMore, chatAnswer,
+        appendHistory } = useSelector(state => state.conversationHistory)
+
   const { userCard } = useSelector(state => state.login)
 
   const [page, setPage] = useState(0);
@@ -106,21 +109,24 @@ export default function AiGenerator() {
   }
 
   useEffect(() => {
-    console.log('useEffect 1')
-      dispatch(loadHistory(userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589", page, 30));
-  }, [dispatch, userCard, page]);
+      dispatch(loadHistory(userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589", page, 10));
+  }, [dispatch, userCard]);
 
   useEffect(() => {
     if (page > 0) {  // Avoid running on initial render
-      console.log('useEffect 2')
-      dispatch(loadHistory(userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589", page, 30));
+      // call append history
+      dispatch(appendArrayHistory(userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589", page, 10));
     }
   }, [dispatch, userCard, page]);
 
 
   useEffect(() => {
-    console.log('useEffect 3')
-    setMessages(prevMessages => [...filterMsgPart(conversationArr), ...prevMessages]);
+    setMessages(prevMessages => [...filterMsgPart(appendHistory), ...prevMessages]);
+  }, [appendHistory])
+
+  // ONLY LOADS FIRST RENDER
+  useEffect(() => {
+    setMessages(filterMsgPart(conversationArr));
   }, [conversationArr])
 
   useEffect(() => {
@@ -143,7 +149,7 @@ export default function AiGenerator() {
 
   useEffect(() =>{
     if(chatAnswer == '') return;
-    console.log('useEffect 4')
+    dispatch(cleanReceivedMsg())
     setMessages(prevMessages => [...prevMessages, chatAnswer]);
   }, [chatAnswer])
   

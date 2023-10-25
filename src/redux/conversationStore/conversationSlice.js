@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
     conversationArr: [],
+    appendHistory: [],
     isLoadingHistory: true,
     isLoadingMessage: false,
     isNewConversation: false,
@@ -28,12 +29,22 @@ const conversationSlice = createSlice({
             state.isLoadingHistory = false
             state.isLoadingMessage = false
         },
+        appendHistory: (state, action) => {
+            const sortedConversation = action.payload.conversation.sort((a, b) => {
+                return new Date(a.timestamp) - new Date(b.timestamp);
+            });
+            state.appendHistory = sortedConversation
+            state.hasMore = action.payload.hasMore
+        },
         loadingFailed: (state) => {
             state.isLoadingHistory = false
             state.isNewConversation = true
         },
         sendMessage: (state) => {
             state.isLoadingMessage = true
+        },
+        cleanRcvBuffer: (state) => {
+            state.chatAnswer = ''
         },
         loadMsgSuccessful: (state, action) => {
             state.chatAnswer = action.payload
@@ -45,6 +56,6 @@ const conversationSlice = createSlice({
 
 const { reducer, actions } = conversationSlice
 
-export const { loadMsgSuccessful, loadSuccessHistory, sendMessage, loadingFailed } = actions
+export const { appendHistory, loadMsgSuccessful, loadSuccessHistory, sendMessage, loadingFailed, cleanRcvBuffer } = actions
 
 export default reducer
