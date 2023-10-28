@@ -65,6 +65,15 @@ const downloadFileBinary = async(attachmentId) => {
     return await axios.get(`${API_BASE_URL}/downloadFileBinary?attachmentId=${attachmentId}`)
 }
 
+const multipleUploadFiles = async(formData) => {
+     // Send a POST request to your server with Axios
+     return await axios.post(`${API_BASE_URL}/uploadMultipleDocs`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Set the Content-Type header to multipart/form-data
+        },
+      });
+}
+
 
 export const httpManager = {
     retrieveChat,
@@ -81,5 +90,6 @@ export const httpManager = {
     getChatHistory,
     sendAiMessage,
     downloadHistoryDocument,
-    downloadFileBinary
+    downloadFileBinary,
+    multipleUploadFiles
 }

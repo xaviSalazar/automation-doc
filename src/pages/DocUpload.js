@@ -1,10 +1,8 @@
 import { filter } from 'lodash';
 import { useState, useEffect } from 'react';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
-import {httpManager} from '../managers/httpManagers'
-import axios from "axios"
 
-import { loadDocs, editThisDoc, delDoc} from '../redux/documentStore/documentAction';
+import { loadDocs, appendloadDocs, editThisDoc, delDoc, uploadMultipleDocs} from '../redux/documentStore/documentAction';
 // @mui
 import {
   Card,
@@ -31,7 +29,6 @@ import Iconify from '../components/iconify';
 // sections
 // import { UserListHead, UserListToolbar } from '../sections/@dashboard/user';
 import { useDispatch, useSelector } from 'react-redux';
-import { saveFiles, loadFiles, deleteElement } from '../redux/filesStore/filesAction';
 import { UserListHead } from '../sections/@dashboard/user';
 import { useNavigate} from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
@@ -111,83 +108,36 @@ export default function UserPage() {
     const {userCard} = useSelector(state => state.login)
 
     const {totalDocs, docsArray, isLoading, cachePage} = useSelector(state => state.documentState)
+    console.log(cachePage)
 
     const dispatch = useDispatch();
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        if(cachePage.includes(page)) {return};
+      console.log('useffect load first time')
+        // if(cachePage.includes(page)) {console.log('inside useffect cache page'); return};
         dispatch(loadDocs(page, rowsPerPage, userCard['id']))
+    }, [dispatch]);
+
+    useEffect(() => {
+      if(page > 0) 
+      {
+        console.log('useEffect appendLoadDocs')
+        dispatch(appendloadDocs(page, rowsPerPage, userCard['id']))
+      }
     }, [page, dispatch]);
 
     const handleUploadFiles = async files => {
-
       const formData = new FormData(); // Create a new FormData object
-
       formData.append('user_id', userCard['id']);
         // Append each selected file to the FormData object
         files.forEach((file) => {
           // You can also append additional data to the FormData object if needed
           formData.append('files', file); // 'files' should match the field name expected by the server
         });
-
-
-      // Send a POST request to your server with Axios
-    const response = await axios.post('https://automationdoc-xavicoel.b4a.run/uploadMultipleDocs', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data', // Set the Content-Type header to multipart/form-data
-      },
-    });
-
-    if (response.status === 200) {
-      console.log('Files uploaded successfully');
-      // Handle the response from the server if necessary
-    } else {
-      console.error('File upload failed');
-      // Handle the error
-    }
-
-      
-      // let handledItems = [];
-      // let limitExceeded = false;
-
-      // // to check for not repeated files.
-      // files.some((file) => {
-      //     if (!docsArray.some((f) => f.title.trim().replace(/\s+/g, '') === file.name.trim().replace(/\s+/g, ''))) {
-      //         handledItems.push(file);
-      //     }
-      //     return false;
-      // })
-
-      // console.log('files', handledItems)
-      //  // Convert the FileList into an array and iterate
-      //  let filesAsync = Array.from(handledItems).map(file => {    
-      //   // Define a new file reader
-      //   let reader = new FileReader();
-      //   // Create a new promise
-      //   return new Promise(resolve => {  
-      //       // Resolve the promise after reading file
-      //       reader.onload = () => resolve({
-      //                                       id: uuidv4(),
-      //                                       user_id: userCard['id'],
-      //                                       title: file.name.trim().replace(/\s+/g, ''), 
-      //                                       binary_data: reader.result,
-      //                                       content: "word",
-      //                                       created_at: file.lastModified,
-      //                                       file_size: file.size
-      //                                     });
-            
-      //       // Reade the file as a text
-      //       reader.readAsBinaryString(file);
-      //    });
-      // });
-
-      // let binary_files = await Promise.all(filesAsync)
-      // console.log(binary_files)
-
-      // await httpManager.documentUpload(binary_files)
-
+        setPage(0);
+        dispatch(uploadMultipleDocs(formData, rowsPerPage, userCard['id']));
   }
 
      const handleFileEvent =  async (e) => {
@@ -243,8 +193,6 @@ export default function UserPage() {
   
     const handleChangePage = (event, newPage) => {
       setPage(newPage);
-      if(cachePage.includes(newPage)) {return};
-      dispatch(loadDocs(newPage, rowsPerPage, userCard['id']))
     };
   
     const handleChangeRowsPerPage = (event) => {
@@ -255,7 +203,6 @@ export default function UserPage() {
 
     const onClickEliminar = () => {
       setOpen(null);
-      dispatch(deleteElement(docIdPop));
       dispatch(delDoc({docId: docIdPop}));
     }
 
@@ -266,7 +213,6 @@ export default function UserPage() {
       navigate("/templates")
     }
 
-  
     // const handleFilterByName = (event) => {
     //   setPage(0);
     //   setFilterName(event.target.value);
