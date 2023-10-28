@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
     Button,
+    IconButton
 } from '@mui/material';
 // excel data types
 import { SheetJSFT } from './types';
@@ -8,6 +9,9 @@ import { SheetJSFT } from './types';
 import { read, utils } from 'xlsx';
 import { make_cols } from './MakeColumns';
 import Iconify from '../../../components/iconify/Iconify';
+import PostAddIcon from '@mui/icons-material/PostAdd';
+import { styled } from '@mui/material/styles';
+
 
 export default function ExcelReader({setRows}) {
 
@@ -57,19 +61,23 @@ export default function ExcelReader({setRows}) {
         }
       }, [file]);
 
+      const Input = styled('input')({
+        display: 'none',
+      });
+
 
 
     return (
-        <Button variant="contained" component="label" startIcon={<Iconify icon="eva:plus-fill" />}>
-            Agregar excel
-            <input
-                id="fileUpload"
-                type="file"
-                accept={SheetJSFT}
-                hidden
-                onChange={(e) => handleChange(e)}
-            />
-        </Button>
+        <label htmlFor="icon-button-file">
+        <Input accept={SheetJSFT} id="icon-button-file" type="file" onChange={(e) => handleChange(e)} />
+        <IconButton
+        color="primary"
+        aria-label="upload picture"
+        component="span"
+        >
+        <PostAddIcon />
+        </IconButton>
+        </label>
     )
 
 }

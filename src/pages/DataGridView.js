@@ -14,6 +14,9 @@ import { useLocation } from 'react-router-dom';
 import { loadFiles } from '../redux/filesStore/filesAction';
 import SelectFile from './libs/SelectFile';
 import ExcelReader from './libs/excel/ExcelReader.js'
+import { downloadExcel } from './libs/excel/ExcelExporter';
+import SaveAsIcon from '@mui/icons-material/SaveAs';
+
 // import { FlashOnRounded } from '@mui/icons-material';
 
   /**Function to by pass usage of ApiRef */
@@ -336,6 +339,14 @@ export default function DataGridView() {
           }
 
           < ExcelReader setRows={setRows} />
+
+          <IconButton
+            size="small"
+            color = "inherit"
+            onClick={() => downloadExcel(rows)}
+          >
+          <SaveAsIcon />
+          </IconButton>
 
           { (checkedRowData.length !== 0 ) &&
                   <Button 
