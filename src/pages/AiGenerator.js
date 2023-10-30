@@ -21,9 +21,9 @@ import SendIcon from '@mui/icons-material/Send';
 import CancelIcon from '@mui/icons-material/Cancel';
 import SaveIcon from '@mui/icons-material/Save';
 
-const initChat = [{ type: 'received', content: "Hola! Mi nombre es Lord Barkis y puedo ayudarte a generar cualquier documento." },
-{ type: 'received', content: "Por ejemplo: " },
-{ type: 'received', content: "Tan solo escribe \"Quiero una carta de renuncia\"." },]
+// const initChat = [{ type: 'received', content: "Hola! Mi nombre es Lord Barkis y puedo ayudarte a generar cualquier documento." },
+// { type: 'received', content: "Por ejemplo: " },
+// { type: 'received', content: "Tan solo escribe \"Quiero una carta de renuncia\"." },]
 
 
 const startFirstTimeMsg = (msg, senderId, receiverId) => {
@@ -131,7 +131,7 @@ export default function AiGenerator() {
 
   useEffect(() => {
     const handleScroll = () => {
-      const { scrollTop, clientHeight, scrollHeight } = messagesContainerRef.current;
+      const { scrollTop  } = messagesContainerRef.current;
       const nearingTop = scrollTop === 0;
       if (nearingTop && hasMore) {
         console.log('useEffect 5')
@@ -148,7 +148,7 @@ export default function AiGenerator() {
   }, [hasMore]);
 
   useEffect(() =>{
-    if(chatAnswer == '') return;
+    if(chatAnswer === '') return;
     dispatch(cleanReceivedMsg())
     setMessages(prevMessages => [...prevMessages, chatAnswer]);
   }, [chatAnswer])

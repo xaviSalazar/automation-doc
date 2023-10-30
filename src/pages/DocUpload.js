@@ -31,7 +31,6 @@ import Iconify from '../components/iconify';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserListHead } from '../sections/@dashboard/user';
 import { useNavigate} from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 
 // mock
 // import USERLIST from '../_mock/user';
