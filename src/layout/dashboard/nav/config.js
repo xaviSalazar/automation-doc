@@ -4,6 +4,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import NoteAddIcon from '@mui/icons-material/NoteAdd';
 import AutorenewIcon from '@mui/icons-material/Autorenew';
 import DesignServicesIcon from '@mui/icons-material/DesignServices';
+import TextsmsIcon from '@mui/icons-material/Textsms';
 
 // ----------------------------------------------------------------------
 
@@ -11,7 +12,8 @@ const Icons = {
   home: <HomeIcon />,
   document: <NoteAddIcon />,
   autoTemplate: <AutorenewIcon/>,
-  generateAi: <DesignServicesIcon/>
+  generateAi: <DesignServicesIcon/>,
+  chatwithDoc: <TextsmsIcon/>,
 }
 // const icon = (name) => <SvgColor src={`/assets/icons/navbar/${name}.svg`} sx={{ width: 1, height: 1 }} />;
 
@@ -38,6 +40,11 @@ const navConfig = [
     path: '/generate',
     icon: icon('generateAi'),
   },
+  {
+    title: 'Documento Chat',
+    path: '/chatpdf',
+    icon: icon('chatwithDoc')
+  }
   // {
   //   title: 'product',
   //   path: '/dashboard/products',

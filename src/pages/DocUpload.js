@@ -1,6 +1,7 @@
 import { filter } from 'lodash';
 import { useState, useEffect } from 'react';
-import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import QuickreplyTwoToneIcon from '@mui/icons-material/QuickreplyTwoTone';
+import { setActiveDocument } from '../redux/chatpdfStore/chatpdfAction'
 
 import { loadDocs, appendloadDocs, editThisDoc, delDoc, uploadMultipleDocs} from '../redux/documentStore/documentAction';
 // @mui
@@ -31,7 +32,6 @@ import Iconify from '../components/iconify';
 import { useDispatch, useSelector } from 'react-redux';
 import { UserListHead } from '../sections/@dashboard/user';
 import { useNavigate} from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 
 // mock
 // import USERLIST from '../_mock/user';
@@ -151,9 +151,10 @@ export default function UserPage() {
       setOpen(event.currentTarget);
     };
 
-    const handleOpenIcon = (event, name) => {
-      console.log(`/templates/${name}`)
-      navigate({pathname: `/templates/${name}`})
+    const handleOpenIcon = async ( row ) => {
+      console.log(row)
+      dispatch(setActiveDocument(row))
+      navigate({pathname: `/chatpdf`})
     };
   
     const handleCloseMenu = () => {
@@ -238,7 +239,7 @@ export default function UserPage() {
                             id     = "fileUpload"
                             type   = "file"
                             multiple
-                            accept = ".doc, .docx"
+                            accept = ".doc, .docx .pdf"
                             hidden
                             onChange={(e) => handleFileEvent(e)}
                             disabled={fileLimit}
@@ -277,7 +278,7 @@ export default function UserPage() {
   
                           <TableCell component="th" scope="row" padding="none">
                             <Stack direction="row" alignItems="center" spacing={2}>
-                              <IconButton onClick={(e) => handleOpenIcon(e,file_name)}> <TextSnippetIcon /></IconButton>
+                              <IconButton onClick={(e) => handleOpenIcon(row)}> <QuickreplyTwoToneIcon /></IconButton>
                               <Typography variant="subtitle2" noWrap>
                                 {file_name}
                               </Typography>

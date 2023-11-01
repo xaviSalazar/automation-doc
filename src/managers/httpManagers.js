@@ -57,6 +57,10 @@ const sendAiMessage = async(msgObj) => {
     return await axios.post(`${API_BASE_URL}/sendAiMsg`, msgObj)
 }
 
+const sendchatpdfMessage = async(msgObj) => {
+    return await axios.post(`${API_BASE_URL}/chatDocument`, msgObj)
+}
+
 const downloadHistoryDocument = async(documentId) => {
     return await axios.get(`${API_BASE_URL}/downloadDocumentHistory?documentId=${documentId}`)
 }
@@ -72,6 +76,10 @@ const multipleUploadFiles = async(formData) => {
           'Content-Type': 'multipart/form-data', // Set the Content-Type header to multipart/form-data
         },
       });
+}
+
+const chatPdfPost = async(data) => {
+    return await axios.post(`${API_BASE_URL}/chatDocument`, data)
 }
 
 
@@ -91,5 +99,7 @@ export const httpManager = {
     sendAiMessage,
     downloadHistoryDocument,
     downloadFileBinary,
-    multipleUploadFiles
+    multipleUploadFiles,
+    chatPdfPost,
+    sendchatpdfMessage
 }

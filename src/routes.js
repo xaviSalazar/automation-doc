@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import AiGenerator from './pages/AiGenerator';
 import SignIn from './pages/SignIn';
 import SignUp from "./pages/SignUp"
+import ChatPdf from './pages/ChatPdf';
 import { autoLogin } from './redux/loginStore/loginAction';
 import { useDispatch, useSelector} from 'react-redux';
 import { useEffect } from 'react';
@@ -67,6 +68,10 @@ export default function Router() {
             path: 'generate',
             element: isAuth ? <AiGenerator />  : <Navigate to="/login" />,
 
+          },
+          {
+            path: 'chatpdf',
+            element: isAuth ? <ChatPdf />  : <Navigate to="/login" />,
           },
           {
             path: 'login',
