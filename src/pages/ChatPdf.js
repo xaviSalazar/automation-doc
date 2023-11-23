@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { sendMsg, cleanReceivedMsg } from '../redux/chatpdfStore/chatpdfAction';
+import { httpManager } from '../managers/httpManagers.js';
 import {
   Container,
   Box,
@@ -35,45 +36,6 @@ export default function ChatPdf() {
   };
 
 
-//   useEffect(() => {
-//       dispatch(loadHistory(userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589", page, 10));
-//   }, [dispatch, userCard]);
-
-//   useEffect(() => {
-//     if (page > 0) {  // Avoid running on initial render
-//       // call append history
-//       dispatch(appendArrayHistory(userCard['id'], "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589", page, 10));
-//     }
-//   }, [dispatch, userCard, page]);
-
-
-//   useEffect(() => {
-//     setMessages(prevMessages => [...filterMsgPart(appendHistory), ...prevMessages]);
-//   }, [appendHistory])
-
-//   // ONLY LOADS FIRST RENDER
-//   useEffect(() => {
-//     setMessages(filterMsgPart(conversationArr));
-//   }, [conversationArr])
-
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     const { scrollTop, clientHeight, scrollHeight } = messagesContainerRef.current;
-  //     const nearingTop = scrollTop === 0;
-  //     if (nearingTop && hasMore) {
-  //       console.log('useEffect 5')
-  //       setPage(prevPage => prevPage + 1);
-  //     }
-  //   };
-  
-  //   const messagesContainer = messagesContainerRef.current;
-  //   messagesContainer.addEventListener('scroll', handleScroll);
-    
-  //   return () => {
-  //     messagesContainer.removeEventListener('scroll', handleScroll);
-  //   };
-  // }, [hasMore]);
-
   useEffect(() =>{
     if(chatAnswer === '') return;
     console.log(chatAnswer)
@@ -82,13 +44,33 @@ export default function ChatPdf() {
   }, [chatAnswer])
   
 
-//   /* UseEffect for blob visualization content after word replacement*/
-//   useEffect(() => {
-//     if (typeof blob === "undefined")
-//       return
-//     docx.renderAsync(blob, document.getElementById("viewer_docx"))
-//       .then((x) => console.log("docx: finished"))
-//   }, [blob])
+  async function processStream(reader, decoder) {
+    const { value, done } = await reader.read();
+    if (done) {
+      // Stream is complete, exit the recursive function
+      return;
+    }
+    const decodedChunk = decoder.decode(value, { stream: true });
+    // Update the messages state by appending the new chunk to the last message
+  setMessages(prevMessages => {
+    if (prevMessages.length === 0 || prevMessages[prevMessages.length - 1].role !== 'assistant') {
+      // If there are no messages or the last message is not from the server, add a new message
+      return [...prevMessages, { content: decodedChunk, role: 'assistant' }];
+    } else {
+      // Otherwise, update the last message with the new chunk
+      const updatedMessages = [...prevMessages];
+      updatedMessages[updatedMessages.length - 1] = {
+        ...updatedMessages[updatedMessages.length - 1],
+        content: updatedMessages[updatedMessages.length - 1].content + decodedChunk,
+      };
+      return updatedMessages;
+    }
+  });
+    //setMessages(prevMessages => [...prevMessages, { content: decodedChunk, role: 'assistant' }]); // Assuming 'server' as the role for demo
+    // setAnswer(answer => answer + decodedChunk); // update state with new chunk
+    // Call the function recursively to read the next chunk
+    await processStream(reader, decoder);
+  }
   
   const handleSendMessage = async () => {
 
@@ -96,24 +78,59 @@ export default function ChatPdf() {
       setInputPosition('bottom');
     }
 
-    try {
-      if (inputValue.trim() !== '') {
-        const copySent = inputValue;
-        setInputValue('');
+    // try {
+    //   if (inputValue.trim() !== '') {
+    //     const copySent = inputValue;
+    //     setInputValue('');
   
-          const obj = {
-            role: 'user',
-            content: copySent,
-            senderId: userCard['id'],
-            uniqueDocumentId: uniqueDocument['attachment_id'],
-            receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589"
+    //       const obj = {
+    //         role: 'user',
+    //         content: copySent,
+    //         senderId: userCard['id'],
+    //         uniqueDocumentId: uniqueDocument['attachment_id'],
+    //         receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589"
+    //       }
+    //       setMessages(prevMessages => [...prevMessages, obj]);
+    //       dispatch(sendMsg(obj, userCard['id']))
+    //   }
+    // } catch (e) {
+    //   console.log(e.message);
+    // }
+
+     // getting response from server based on the user prompt
+     try {
+         if (inputValue.trim() !== '') 
+         {
+          
+                const copySent = inputValue;
+                setInputValue('');
+
+                  const obj = {
+                    role: 'user',
+                    content: copySent,
+                    senderId: userCard['id'],
+                    uniqueDocumentId: uniqueDocument['attachment_id'],
+                    receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589"
+                  }
+
+                const sendData = JSON.stringify(obj)
+                setMessages(prevMessages => [...prevMessages, obj]);
+
+              const response = await httpManager.streamingResponse(sendData)
+          if (!response.ok || !response.body) {
+            throw response.statusText;
           }
-          setMessages(prevMessages => [...prevMessages, obj]);
-          dispatch(sendMsg(obj, userCard['id']))
-      }
-    } catch (e) {
-      console.log(e.message);
-    }
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+
+  // Start processing the stream
+  await processStream(reader, decoder);
+}
+     } catch(error) {
+      console.log(error.message)
+     }
+
+
   };
 
 
@@ -126,27 +143,6 @@ export default function ChatPdf() {
       }, 1000); // Adjust the delay duration as needed
     }
   };
-
-//   const downloadBlob = async (docId) => {
-
-//     try {
-//     const response = await httpManager.downloadHistoryDocument(docId);
-
-//     if(response.status === 200)
-//     {
-//       console.log(response.data)
-//       const {attachment} = response.data
-//       setBlob(new Uint8Array(atob(attachment).split('').map(char => char.charCodeAt(0))))
-//       setDownldBlob(new Blob([ new Uint8Array(atob(attachment).split('').map(char => char.charCodeAt(0))) ]))
-//       setViewDoc(true)
-//     }
-//    } catch (e) {
-//       console.log(e.message)
-//     }
-//   }
-//   const saveFile = () => {
-//     saveAs(downldBlob, `DownloadedFile.docx`);
-//   }
 
   useEffect(() => {
     if (messagesContainerRef.current) {

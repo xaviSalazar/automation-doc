@@ -82,6 +82,17 @@ const chatPdfPost = async(data) => {
     return await axios.post(`${API_BASE_URL}/chatDocument`, data)
 }
 
+const streamingResponse = async(sendData) => {
+    return  await fetch(`${API_BASE_URL}/chatDocument`, {
+        method: "post",
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json",
+        },
+        body: sendData,
+      });
+}
+
 
 export const httpManager = {
     retrieveChat,
@@ -101,5 +112,6 @@ export const httpManager = {
     downloadFileBinary,
     multipleUploadFiles,
     chatPdfPost,
-    sendchatpdfMessage
+    sendchatpdfMessage,
+    streamingResponse
 }
