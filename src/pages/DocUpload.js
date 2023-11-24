@@ -239,7 +239,7 @@ export default function UserPage() {
                             id     = "fileUpload"
                             type   = "file"
                             multiple
-                            accept = ".doc, .docx .pdf"
+                            accept = ".doc, .docx, .pdf, .csv, .xlsx, .xls"
                             hidden
                             onChange={(e) => handleFileEvent(e)}
                             disabled={fileLimit}
