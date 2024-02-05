@@ -2,7 +2,6 @@ import * as React from 'react';
 import PropTypes from 'prop-types';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
-import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
@@ -16,17 +15,23 @@ import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { styled } from '@mui/material/styles';
-import { Container } from '@mui/material'
+import ChatLayout from './libs/ChatLayout'
+import CreateIcon from '@mui/icons-material/Create';
+import { calculateNewValue } from '@testing-library/user-event/dist/utils';
 
 
-const drawerWidth = 280;
-
+const drawerWidth = 190;
 
 function AiGenerator(props) {
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+
+  const [selectedIndex, setSelectedIndex] = React.useState(null);
+
+  const handleListItemClick = (event, index) => {
+    setSelectedIndex(index);
+  };
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -43,13 +48,17 @@ function AiGenerator(props) {
     }
   };
 
+  // HERE LOAD CHAT SUBJECTS FOR THIS USER:
+
   const drawer = (
     <div>
       <Toolbar />
       <Divider />
       <List>
         {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem key={text} disablePadding>
+          <ListItem key={text} disablePadding
+            selected={selectedIndex === index}
+            onClick={(event) => handleListItemClick(event, index)}>
             <ListItemButton>
               <ListItemIcon>
                 {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
@@ -60,18 +69,23 @@ function AiGenerator(props) {
         ))}
       </List>
       <Divider />
-      <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      {/* <List>
+        {['All mail', 'Trash', 'Spam'].map((text, index) => {
+          const adjustedIndex = index + 4; // Adjust index for the second list
+          return (
+            <ListItem key={text} disablePadding
+              selected={selectedIndex === adjustedIndex}
+              onClick={(event) => handleListItemClick(event, adjustedIndex)}>
+              <ListItemButton>
+                <ListItemIcon>
+                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </ListItem>
+          );
+        })}
+      </List> */}
     </div>
   );
 
@@ -81,37 +95,61 @@ function AiGenerator(props) {
   return (    
     <Box
     sx={{
-      display: 'flex',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%', // This should fill the height of Main now
+    flexGrow: 1, // This will make the Box grow to fill the container
+    alignItems: 'stretch', // This ensures the children stretch to fill
     }}
-    >
-       <CssBaseline />
-       {/* <AppBar
-         sx={{
-           width: { sm: `calc(100% - ${drawerWidth}px)` },
-         }}
-       >
-         <Toolbar>
-           <IconButton
-             color="inherit"
-             aria-label="open drawer"
-             edge="start"
-             onClick={handleDrawerToggle}
-             sx={{ mr: 2, display: { sm: 'none' } }}
-           >
-             <MenuIcon />
-           </IconButton>
+  >
+        <AppBar
+        sx={{
+          position: "relative"
+         }}>
+         <Toolbar >
+          <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: 'none' } }}
+            >
+              <MenuIcon />
+            </IconButton>
            <Typography variant="h6" noWrap component="div">
-             Responsive drawer
+             NEW CHAT
           </Typography>
+          <IconButton
+              color="inherit"
+              aria-label="start chat"
+              edge="end"
+              sx={{ mr: 2, display: { sm: 'flex' } }}
+             //  onClick={handleDrawerToggle}
+              // sx={{ mr: 2, display: { sm: 'none' } }}
+            >
+              <CreateIcon />
+            </IconButton>
          </Toolbar>
-       </AppBar> */}
+       </AppBar>
+
+      <Box
+        sx={{
+          display: 'flex',
+          height: '100vh', // Set the height to be 100% of the viewport height
+          flexDirection: 'row', // Set flexDirection to 'row'
+          alignItems: 'stretch', 
+        }}
+      >
+
        <Box
          component="nav"
-         sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+         backgroundColor = 'white'
+         sx={{ flexGrow: 1, height: '80%', width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
          aria-label="mailbox folders"
        >
+
          {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-         {/* <Drawer
+         <Drawer
            container={container}
            variant="temporary"
            open={mobileOpen}
@@ -127,41 +165,38 @@ function AiGenerator(props) {
            }}
          >
            {drawer}
-         </Drawer> */}
+         </Drawer>
+
          <Drawer
            variant="permanent"
            sx={{
-             display: { xs: 'none', sm: 'block' },
-             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, left: 'auto', top: 'auto'},
+            display: { xs: 'none', sm: 'block' },
+             '& .MuiDrawer-paper': { position: 'relative' },
            }}
            open
          >
            {drawer}
          </Drawer>
-       </Box>
-       <Box
-         component="main"
-         sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` } }}
-       >
-         <Toolbar />
-         <Typography paragraph>
-           Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-           tempor incididunt ut labore et dolore magna aliqua. Rhoncus dolor purus non
-           enim praesent elementum facilisis leo vel. Risus at ultrices mi tempus
-           imperdiet. Semper risus in hendrerit gravida rutrum quisque non tellus.
-           Convallis convallis tellus id interdum velit laoreet id donec ultrices.
-           Odio morbi quis commodo odio aenean sed adipiscing. Amet nisl suscipit
-           adipiscing bibendum est ultricies integer quis. Cursus euismod quis viverra
-           nibh cras. Metus vulputate eu scelerisque felis imperdiet proin fermentum
-           leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt lobortis
-           feugiat vivamus at augue. At augue eget arcu dictum varius duis at
-           consectetur lorem. Velit sed ullamcorper morbi tincidunt. Lorem donec massa
-           sapien faucibus et molestie ac.
-         </Typography>
-       </Box>
 
+        </Box>
+
+        <Box
+          component="main"     
+          sx={{ 
+                  display: 'flex',
+                  flexGrow: 1, 
+                  p: 2, 
+                  flexDirection: 'column', // Children will be laid out in a column
+                  height: '80%',
+                  overflow: 'hidden'
+              }}
+        >
+          <ChatLayout />
+        </Box>
+
+        
+      </Box>
     </Box>
-
   );
 }
 
