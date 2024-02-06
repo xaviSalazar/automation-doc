@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { cleanReceivedMsg } from '../../redux/chatpdfStore/chatpdfAction';
 import { httpManager } from '../../managers/httpManagers.js';
+import { loadHistory, appendArrayHistory, sendMsg, cleanReceivedMsg } from '../../redux/conversationStore/conversationAction';
+
 import {
   Box,
   ButtonGroup,
@@ -25,10 +26,13 @@ export default function ChatLayout() {
   const [inputPosition, setInputPosition] = useState('top');
   const [highlight, setHighlight] = useState(false);
   const messagesContainerRef = useRef(null);
+  const [page, setPage] = useState(0);
+  const { selectedChatId, conversationArr, isNewConversation, 
+    isLoadingMessage, hasMore, chatAnswer,
+    appendHistory } = useSelector(state => state.conversationHistory)
 
   // loading state variable after message sent
   const dispatch = useDispatch();
-  const { isLoadingMessage, chatAnswer, uniqueDocument } = useSelector(state => state.chatpdfHistory)
 
   const { userCard } = useSelector(state => state.login)
 
@@ -43,6 +47,48 @@ export default function ChatLayout() {
     dispatch(cleanReceivedMsg())
     setMessages(prevMessages => [...prevMessages, chatAnswer]);
   }, [chatAnswer])
+
+
+  useEffect(() => {
+    if(selectedChatId === '') return;
+    const pagina = 0;
+    setPage(0);
+    dispatch(loadHistory(userCard['id'], selectedChatId, pagina, 10));
+  }, [selectedChatId,dispatch]);
+
+  useEffect(() => {
+    if (page > 0) {  // Avoid running on initial render
+      // call append history
+      dispatch(appendArrayHistory(userCard['id'], selectedChatId, page, 10));
+    }
+  }, [dispatch, userCard, page]);
+
+  useEffect(() => {
+    setMessages(prevMessages => [ ...appendHistory, ...prevMessages]);
+  }, [appendHistory])
+
+  // ONLY LOADS FIRST RENDER
+  useEffect(() => {
+    setMessages(conversationArr);
+  }, [conversationArr, selectedChatId])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const { scrollTop  } = messagesContainerRef.current;
+      const nearingTop = scrollTop === 0;
+      if (nearingTop && hasMore) {
+        console.log('useEffect 5')
+        setPage(prevPage => prevPage + 1);
+      }
+    };
+  
+    const messagesContainer = messagesContainerRef.current;
+    messagesContainer.addEventListener('scroll', handleScroll);
+    
+    return () => {
+      messagesContainer.removeEventListener('scroll', handleScroll);
+    };
+  }, [hasMore]);
   
 
   async function processStream(reader, decoder) {
@@ -80,10 +126,9 @@ export default function ChatLayout() {
     }
 
      try {
-         
+     
         if (inputValue.trim() !== '') 
         {
-          
                 const copySent = inputValue;
                 setInputValue('');
 
@@ -91,14 +136,14 @@ export default function ChatLayout() {
                     role: 'user',
                     content: copySent,
                     senderId: userCard['id'],
-                    uniqueDocumentId: uniqueDocument['attachment_id'],
-                    receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589"
+                    receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589",
+                    conversationId: selectedChatId
                   }
 
                 const sendData = JSON.stringify(obj)
                 setMessages(prevMessages => [...prevMessages, obj]);
 
-              const response = await httpManager.streamingResponse(sendData)
+              const response = await httpManager.streamingResponseConversation(sendData)
           if (!response.ok || !response.body) {
             throw response.statusText;
           }
@@ -131,11 +176,13 @@ export default function ChatLayout() {
 
   return (
     <>
-            <List sx={{    
-                        flexgrow: 1,
-                        overflowY: 'auto',
-                        mb: 2,
-                        }}>
+            <List 
+              ref={messagesContainerRef}
+              sx={{    
+                  flexgrow: 1,
+                  overflowY: 'auto',
+                  mb: 2,
+                  }}>
               {messages.map((message, index) => (
 
                 <ListItem

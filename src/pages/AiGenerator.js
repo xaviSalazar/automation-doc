@@ -17,19 +17,32 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import ChatLayout from './libs/ChatLayout'
 import CreateIcon from '@mui/icons-material/Create';
-import { calculateNewValue } from '@testing-library/user-event/dist/utils';
+import { useDispatch, useSelector } from 'react-redux';
+import { httpManager } from '../managers/httpManagers';
+import { v4 as uuidv4 } from 'uuid';
+
+import { selectChatId } from '../redux/conversationStore/conversationAction';
+
 
 
 const drawerWidth = 190;
 
 function AiGenerator(props) {
+
   const { window } = props;
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [isClosing, setIsClosing] = React.useState(false);
+  const { userCard } = useSelector(state => state.login)
+  const [chatList, setChatList] = React.useState([])
+  const dispatch = useDispatch();
 
   const [selectedIndex, setSelectedIndex] = React.useState(null);
 
+  const { selectedChatId } = useSelector(state => state.conversationHistory)
+
   const handleListItemClick = (event, index) => {
+    console.log(index)
+    dispatch(selectChatId(index))
     setSelectedIndex(index);
   };
 
@@ -48,44 +61,40 @@ function AiGenerator(props) {
     }
   };
 
+  const createNewConversation = () => {
+    const generatedUuid = uuidv4();
+    dispatch(selectChatId(generatedUuid))
+    console.log(generatedUuid)
+  }
+
+ async function fetchChatList(setChatList) {
+    let response = await httpManager.getChatList(userCard['id'])
+    setChatList(response.data)
+  }
+
+  React.useEffect(() => {
+    fetchChatList(setChatList)
+  }, []);
+
   // HERE LOAD CHAT SUBJECTS FOR THIS USER:
+
 
   const drawer = (
     <div>
       <Toolbar />
       <Divider />
-      <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem key={text} disablePadding
-            selected={selectedIndex === index}
-            onClick={(event) => handleListItemClick(event, index)}>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
+
+      <List component="nav" aria-label="main mailbox folders">
+        {chatList.map((doc) => ( 
+          <ListItemButton
+            key={doc.id}
+            selected={selectedIndex === doc.id}
+            onClick={(event) => handleListItemClick(event, doc.id)}
+          >
+            <ListItemText primary={doc.title} />
+          </ListItemButton>
         ))}
       </List>
-      <Divider />
-      {/* <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => {
-          const adjustedIndex = index + 4; // Adjust index for the second list
-          return (
-            <ListItem key={text} disablePadding
-              selected={selectedIndex === adjustedIndex}
-              onClick={(event) => handleListItemClick(event, adjustedIndex)}>
-              <ListItemButton>
-                <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </ListItem>
-          );
-        })}
-      </List> */}
     </div>
   );
 
@@ -124,7 +133,7 @@ function AiGenerator(props) {
               aria-label="start chat"
               edge="end"
               sx={{ mr: 2, display: { sm: 'flex' } }}
-             //  onClick={handleDrawerToggle}
+              onClick={createNewConversation}
               // sx={{ mr: 2, display: { sm: 'none' } }}
             >
               <CreateIcon />
@@ -138,13 +147,14 @@ function AiGenerator(props) {
           height: '100vh', // Set the height to be 100% of the viewport height
           flexDirection: 'row', // Set flexDirection to 'row'
           alignItems: 'stretch', 
+          overflowY: 'hidden',
         }}
       >
 
        <Box
          component="nav"
          backgroundColor = 'white'
-         sx={{ flexGrow: 1, height: '80%', width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+         sx={{ overflowY: 'auto',flexGrow: 1, height: '80%', width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
          aria-label="mailbox folders"
        >
 
@@ -191,10 +201,8 @@ function AiGenerator(props) {
                   overflow: 'hidden'
               }}
         >
-          <ChatLayout />
+            {selectedChatId && <ChatLayout />}
         </Box>
-
-        
       </Box>
     </Box>
   );

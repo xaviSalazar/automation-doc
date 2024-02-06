@@ -66,8 +66,7 @@ export default function Router() {
           },
           {
             path: 'generate',
-           // element: isAuth ? <AiGenerator />  : <Navigate to="/login" />,
-           element:  <AiGenerator />,
+           element: isAuth ? <AiGenerator />  : <Navigate to="/login" />,
 
           },
           {

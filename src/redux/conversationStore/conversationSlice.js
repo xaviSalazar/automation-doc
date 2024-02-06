@@ -5,9 +5,10 @@ const initialState = {
     appendHistory: [],
     isLoadingHistory: true,
     isLoadingMessage: false,
+    selectedChatId: '',
     isNewConversation: false,
     hasMore: false,
-    chatAnswer: ''
+    chatAnswer: '',
 }
 
 const conversationSlice = createSlice({
@@ -50,12 +51,15 @@ const conversationSlice = createSlice({
             state.chatAnswer = action.payload
             state.isNewConversation = false
             state.isLoadingMessage = false
+        },
+        selectedChatId: (state, action) => {
+            state.selectedChatId = action.payload
         }
     }
 });
 
 const { reducer, actions } = conversationSlice
 
-export const { appendHistory, loadMsgSuccessful, loadSuccessHistory, sendMessage, loadingFailed, cleanRcvBuffer } = actions
+export const { selectedChatId, appendHistory, loadMsgSuccessful, loadSuccessHistory, sendMessage, loadingFailed, cleanRcvBuffer } = actions
 
 export default reducer

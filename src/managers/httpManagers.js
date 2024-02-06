@@ -1,7 +1,7 @@
 import axios from "axios"
 
-const API_BASE_URL = "http://localhost:3001";
-// const API_BASE_URL = "https://automationdoc-xavicoel.b4a.run";
+// const API_BASE_URL = "http://localhost:3001";
+const API_BASE_URL = "https://automationdoc-xavicoel.b4a.run";
 
 const retrieveChat = async(chatText) => {
     return await axios.post(`${API_BASE_URL}/fetchDocument`, chatText)
@@ -49,8 +49,8 @@ const deleteDocuments = async (docId) =>{
     return await axios.post(`${API_BASE_URL}/deleteDocument`, docId);
 }
 
-const getChatHistory = async (senderId, receiverId, page, messagesPerPage ) => {
-    return await axios.get(`${API_BASE_URL}/chatHistory?senderId=${senderId}&receiverId=${receiverId}&page=${page}&messagesPerPage=${messagesPerPage}`);
+const getChatHistory = async (senderId, chatId, page, messagesPerPage ) => {
+    return await axios.get(`${API_BASE_URL}/chatHistory?senderId=${senderId}&chatId=${chatId}&page=${page}&messagesPerPage=${messagesPerPage}`);
 }
 
 const sendAiMessage = async(msgObj) => {
@@ -93,6 +93,20 @@ const streamingResponse = async(sendData) => {
       });
 }
 
+const streamingResponseConversation = async(sendData) => {
+    return  await fetch(`${API_BASE_URL}/chatConversation`, {
+        method: "post",
+        headers: {
+          Accept: "application/json, text/plain, */*",
+          "Content-Type": "application/json",
+        },
+        body: sendData,
+      });
+}
+
+const getChatList = async(userId) => {
+    return await axios.get(`${API_BASE_URL}/getChatList?userId=${userId}`) 
+}
 
 export const httpManager = {
     retrieveChat,
@@ -113,5 +127,8 @@ export const httpManager = {
     multipleUploadFiles,
     chatPdfPost,
     sendchatpdfMessage,
-    streamingResponse
+    streamingResponse,
+    streamingResponseConversation,
+    getChatList
+    
 }

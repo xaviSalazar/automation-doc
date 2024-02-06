@@ -1,10 +1,10 @@
-import { loadMsgSuccessful, loadSuccessHistory, sendMessage, cleanRcvBuffer, appendHistory } from "./conversationSlice";
+import { selectedChatId, loadMsgSuccessful, loadSuccessHistory, sendMessage, cleanRcvBuffer, appendHistory } from "./conversationSlice";
 import { httpManager } from "../../managers/httpManagers";
 
-export const loadHistory = (senderId, receiverId, page, messagesPerPage) => async (dispatch) => {
+export const loadHistory = (senderId, chatId, page, messagesPerPage) => async (dispatch) => {
 
     try {
-        const response = await httpManager.getChatHistory(senderId, receiverId, page, messagesPerPage)
+        const response = await httpManager.getChatHistory(senderId, chatId, page, messagesPerPage)
         
         if (response.status === 200) {
             dispatch(loadSuccessHistory(response.data))
@@ -17,6 +17,16 @@ export const loadHistory = (senderId, receiverId, page, messagesPerPage) => asyn
         console.error('Error fetching documents:', error);
       }
 
+}
+
+export const selectChatId = (chatId) => async (dispatch) => {
+    try 
+    {
+        dispatch(selectedChatId(chatId))
+
+    } catch (error) {
+        console.error('chatId error:', error)
+    }
 }
 
 export const appendArrayHistory = (senderId, receiverId, page, messagesPerPage) => async (dispatch) => {
