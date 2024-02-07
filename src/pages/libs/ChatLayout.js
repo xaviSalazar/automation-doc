@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { httpManager } from '../../managers/httpManagers.js';
-import { loadHistory, appendArrayHistory, sendMsg, cleanReceivedMsg } from '../../redux/conversationStore/conversationAction';
+import { loadHistory, appendArrayHistory, cleanReceivedMsg } from '../../redux/conversationStore/conversationAction';
 
 import {
-  Box,
   ButtonGroup,
   CircularProgress,
   Button,
@@ -17,7 +16,6 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
-import { BadgeSharp } from '@mui/icons-material';
 
  const mensajes = []
 
@@ -29,7 +27,7 @@ export default function ChatLayout() {
   const [highlight, setHighlight] = useState(false);
   const messagesContainerRef = useRef(null);
   const [page, setPage] = useState(0);
-  const { selectedChatId, conversationArr, isNewConversation, 
+  const { selectedChatId, conversationArr, 
     isLoadingMessage, hasMore, chatAnswer,
     appendHistory } = useSelector(state => state.conversationHistory)
 
@@ -48,7 +46,7 @@ export default function ChatLayout() {
     console.log(chatAnswer)
     dispatch(cleanReceivedMsg())
     setMessages(prevMessages => [...prevMessages, chatAnswer]);
-  }, [chatAnswer])
+  }, [chatAnswer, dispatch])
 
 
   useEffect(() => {
@@ -63,7 +61,7 @@ export default function ChatLayout() {
       // call append history
       dispatch(appendArrayHistory(userCard['id'], selectedChatId, page, 10));
     }
-  }, [dispatch, userCard, page]);
+  }, [dispatch, userCard, page, selectedChatId]);
 
   useEffect(() => {
     setMessages(prevMessages => [ ...appendHistory, ...prevMessages]);
@@ -115,49 +113,41 @@ export default function ChatLayout() {
       return updatedMessages;
     }
   });
-    //setMessages(prevMessages => [...prevMessages, { content: decodedChunk, role: 'assistant' }]); // Assuming 'server' as the role for demo
-    // setAnswer(answer => answer + decodedChunk); // update state with new chunk
+
     // Call the function recursively to read the next chunk
     await processStream(reader, decoder);
   }
   
   const handleSendMessage = async () => {
+     try { 
+          if (inputValue.trim() !== '') 
+          {
+                    const msgSchema = {
+                      role: 'user',
+                      content: inputValue,
+                      senderId: userCard['id'],
+                      receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589",
+                      conversationId: selectedChatId
+                    }
 
-    if (!inputPosition && inputValue.trim() !== '') {
-      setInputPosition('bottom');
-    }
+                  setMessages(prevMessages => [...prevMessages, msgSchema]);
+                  setInputValue('');
 
-     try {
-     
-        if (inputValue.trim() !== '') 
-        {
-                const copySent = inputValue;
-                setInputValue('');
+                const response = await httpManager.streamingResponseConversation(JSON.stringify(msgSchema))
+            
+                if (!response.ok || !response.body) 
+                {
+                  throw response.statusText;
+                }
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
 
-                  const obj = {
-                    role: 'user',
-                    content: copySent,
-                    senderId: userCard['id'],
-                    receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589",
-                    conversationId: selectedChatId
-                  }
-
-                const sendData = JSON.stringify(obj)
-                setMessages(prevMessages => [...prevMessages, obj]);
-
-              const response = await httpManager.streamingResponseConversation(sendData)
-          if (!response.ok || !response.body) {
-            throw response.statusText;
+              // Start processing the stream
+              await processStream(reader, decoder);
           }
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-
-            // Start processing the stream
-            await processStream(reader, decoder);
+        } catch(error) {
+           console.log(error.message)
         }
-    } catch(error) {
-      console.log(error.message)
-     }
   };
 
   const handleFileEvent =  async (e) => {
