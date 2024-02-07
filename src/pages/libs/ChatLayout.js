@@ -27,6 +27,7 @@ export default function ChatLayout() {
 
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState(mensajes);
+  const [imgFile, setImgFile] = useState('');
   const [inputPosition, setInputPosition] = useState('top');
   const [fileUploaded, setFileUploaded] = useState(false);
   const [highlight, setHighlight] = useState(false);
@@ -123,30 +124,45 @@ export default function ChatLayout() {
     await processStream(reader, decoder);
   }
 
+  const formDataToObject = (formData) => {
+    const object = {};
+    for (let [key, value] of formData.entries()) {
+      object[key] = value;
+    }
+    return object;
+  };
+
   const handleSendMessage = async () => {
     try {
       if (inputValue.trim() !== '') {
-        const msgSchema = {
-          role: 'user',
-          content: inputValue,
-          senderId: userCard['id'],
-          receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589",
-          conversationId: selectedChatId
-        }
 
-        setMessages(prevMessages => [...prevMessages, msgSchema]);
+        const msgSchema = new FormData();
+        msgSchema.append('role', 'user');
+        msgSchema.append('content', inputValue);
+        msgSchema.append('senderId', userCard['id']);
+        msgSchema.append('receiverId', "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589")
+        msgSchema.append('conversationId', selectedChatId)
+        if (imgFile !== '') msgSchema.append('attachment', imgFile);
+
+        const msgSchemaObject = formDataToObject(msgSchema);
+
+        setMessages(prevMessages => [...prevMessages, msgSchemaObject]);
         setInputValue('');
+        setImgFile('');
+        setFileUploaded(false);
 
-        const response = await httpManager.streamingResponseConversation(JSON.stringify(msgSchema))
+        console.log(msgSchemaObject)
 
-        if (!response.ok || !response.body) {
-          throw response.statusText;
-        }
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
+        // const response = await httpManager.streamingResponseConversation(JSON.stringify(msgSchema))
 
-        // Start processing the stream
-        await processStream(reader, decoder);
+        // if (!response.ok || !response.body) {
+        //   throw response.statusText;
+        // }
+        // const reader = response.body.getReader();
+        // const decoder = new TextDecoder();
+
+        // // Start processing the stream
+        // await processStream(reader, decoder);
       }
     } catch (error) {
       console.log(error.message)
@@ -160,6 +176,7 @@ export default function ChatLayout() {
     reader.onloadend = () => {
       const base64Image = reader.result;
       setFileUploaded(true);
+      setImgFile(base64Image)
     }
 
     if (file) {
@@ -169,7 +186,7 @@ export default function ChatLayout() {
 
   const handleDelete = () => {
     setFileUploaded(false);
-    document.getElementById('fileUpload').value = '';
+    setImgFile('')
   };
 
   const handleInputClick = () => {
@@ -181,6 +198,14 @@ export default function ChatLayout() {
       }, 1000); // Adjust the delay duration as needed
     }
   };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault(); // Prevenir el comportamiento predeterminado de Enter en un input multiline
+      handleSendMessage();
+    }
+  };
+  
 
   useEffect(() => {
     if (messagesContainerRef.current) {
@@ -208,6 +233,13 @@ export default function ChatLayout() {
               alignItems: message.role === 'user' ? 'flex-end' : 'flex-start',
             }}
           >
+            {message.attachment && (
+              <img
+                src={message.attachment}
+                alt="Attachment"
+                style={{ maxWidth: '75%', borderRadius: '8px', marginBottom: '4px' }}
+              />
+            )}
             <ListItemText
               primary={message.content}
               sx={{
@@ -218,6 +250,7 @@ export default function ChatLayout() {
                 marginBottom: '4px',
               }}
             />
+            
             {isLoadingMessage && index === messages.length - 1 && (
               <CircularProgress size={40} color="inherit" sx={{ alignSelf: 'flex-start', marginRight: 2 }} />
             )}
@@ -283,6 +316,7 @@ export default function ChatLayout() {
           value={inputValue}
           inputProps={{ 'aria-label': 'chat message input' }}
           multiline
+          onKeyDownCapture={handleKeyPress} 
         />
         )}
         <IconButton
