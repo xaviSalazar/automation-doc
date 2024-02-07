@@ -16,6 +16,8 @@ import {
   ListItemText,
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import { BadgeSharp } from '@mui/icons-material';
 
  const mensajes = []
 
@@ -158,6 +160,19 @@ export default function ChatLayout() {
      }
   };
 
+  const handleFileEvent =  async (e) => {
+    
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onloadend = () =>  { 
+      const base64Image = reader.result;  
+      console.log(base64Image)
+    }
+
+    if (file) 
+    { reader.readAsDataURL(file); } 
+  };
+
   const handleInputClick = () => {
     if (inputPosition === 'top') {
       setInputPosition('bottom');
@@ -243,12 +258,24 @@ export default function ChatLayout() {
               }}
               onClick={handleInputClick}
             >
+              <IconButton variant="contained" component="label">
+              <AttachFileIcon />
+                <input
+                            id     = "fileUpload"
+                            type   = "file"
+                            // multiple
+                            accept = ".jpg, .jpeg, .png, .gif"
+                            hidden
+                            onChange={(e) => handleFileEvent(e)}
+                            //disabled={fileLimit}
+                 />
+            </IconButton>
               {isLoadingMessage ? (
                 <CircularProgress size={24} /> // Show loading icon
               ) : (<InputBase
-                sx={{ ml: 1, flex: 1, width: 700 }}
+                sx={{ ml: 1, flex: 1, width: 700, maxHeight: 100, overflowY:'auto' }}
                 onChange={handleInputChange}
-                placeholder="Escribe que necesitas..."
+                placeholder="Empieza por un Hola chatgpt como estas..."
                 value={inputValue}
                 inputProps={{ 'aria-label': 'chat message input' }}
                 multiline
