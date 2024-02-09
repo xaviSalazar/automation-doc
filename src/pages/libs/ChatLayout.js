@@ -2,6 +2,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { httpManager } from '../../managers/httpManagers.js';
 import { loadHistory, appendArrayHistory, cleanReceivedMsg } from '../../redux/conversationStore/conversationAction';
+import { oneLight as SyntaxHighlighterStyle } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+
 
 import {
   ButtonGroup,
@@ -23,11 +26,45 @@ import DeleteIcon from '@mui/icons-material/Delete'; // Import delete icon
 
 const mensajes = []
 
+const splitMessage = (message) => {
+  const regex = /```(.*?)```/gs;
+  let parts = [];
+  let lastIndex = 0;
+
+  message.replace(regex, (match, code, index) => {
+    if (index > lastIndex) {
+      parts.push({ type: 'text', content: message.slice(lastIndex, index) });
+    }
+    parts.push({ type: 'code', content: code });
+    lastIndex = index + match.length;
+  });
+
+  if (lastIndex < message.length) {
+    parts.push({ type: 'text', content: message.slice(lastIndex) });
+  }
+
+  return parts;
+};
+
+const MessagePart = ({ part }) => {
+  if (part.type === 'code') {
+    return (
+      <SyntaxHighlighter language="javascript" style={SyntaxHighlighterStyle}>
+        {part.content}
+      </SyntaxHighlighter>
+    );
+  } else {
+    return <span>{part.content}</span>;
+  }
+};
+
+
 export default function ChatLayout() {
 
   const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState(mensajes);
   const [imgFile, setImgFile] = useState('');
+  const inputRef = React.useRef(null)
   const [inputPosition, setInputPosition] = useState('top');
   const [fileUploaded, setFileUploaded] = useState(false);
   const [highlight, setHighlight] = useState(false);
@@ -43,7 +80,7 @@ export default function ChatLayout() {
   const { userCard } = useSelector(state => state.login)
 
   const handleInputChange = (event) => {
-    setInputValue(event.target.value);
+    //setInputValue(event.target.value);
   };
 
 
@@ -133,13 +170,14 @@ export default function ChatLayout() {
   };
 
   const handleSendMessage = async () => {
-
     try {
-      if (inputValue.trim() !== '') {
+      const userInput = inputRef.current.value
+      inputRef.current.value = ''
+      if (userInput.trim() !== '') {
 
         const msgSchema = {
           role: 'user',
-          content: inputValue,
+          content: userInput,
           senderId: userCard['id'],
           receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589",
           conversationId: selectedChatId
@@ -154,7 +192,7 @@ export default function ChatLayout() {
         setImgFile('');
         setFileUploaded(false);
         
-        // console.log(msgSchema)
+        console.log(msgSchema)
 
         const stream = await httpManager.streamingResponseConversation(JSON.stringify(msgSchema))
 
@@ -260,7 +298,12 @@ export default function ChatLayout() {
               />
             )}
             <ListItemText
-              primary={message.content}
+              primary={
+                //message.content
+                splitMessage(message.content).map((part, partIndex) => (
+                  <MessagePart key={partIndex} part={part} />
+                ))
+              }
               sx={{
                 backgroundColor: message.role === 'user' ? '#DCF8C6' : '#E3F2FD',
                 padding: '8px',
@@ -329,10 +372,12 @@ export default function ChatLayout() {
         {isLoadingMessage ? (
           <CircularProgress size={24} /> // Show loading icon
         ) : (<InputBase
+          
           sx={{ ml: 1, flex: 1, width: 700, maxHeight: 100, overflowY: 'auto' }}
+          inputRef = {inputRef}
           onChange={handleInputChange}
           placeholder="Empieza por un Hola chatgpt como estas..."
-          value={inputValue}
+          // value={inputValue}
           inputProps={{ 'aria-label': 'chat message input' }}
           multiline
           onKeyDownCapture={handleKeyPress} 
