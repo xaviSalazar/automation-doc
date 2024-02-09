@@ -61,7 +61,6 @@ const MessagePart = ({ part }) => {
 
 export default function ChatLayout() {
 
-  const [inputValue, setInputValue] = useState('');
   const [messages, setMessages] = useState(mensajes);
   const [imgFile, setImgFile] = useState('');
   const inputRef = React.useRef(null)
@@ -78,11 +77,6 @@ export default function ChatLayout() {
   const dispatch = useDispatch();
 
   const { userCard } = useSelector(state => state.login)
-
-  const handleInputChange = (event) => {
-    //setInputValue(event.target.value);
-  };
-
 
   useEffect(() => {
     if (chatAnswer === '') return;
@@ -188,7 +182,6 @@ export default function ChatLayout() {
         }
   
         setMessages(prevMessages => [...prevMessages, msgSchema]);
-        setInputValue('');
         setImgFile('');
         setFileUploaded(false);
         
@@ -375,9 +368,7 @@ export default function ChatLayout() {
           
           sx={{ ml: 1, flex: 1, width: 700, maxHeight: 100, overflowY: 'auto' }}
           inputRef = {inputRef}
-          onChange={handleInputChange}
           placeholder="Empieza por un Hola chatgpt como estas..."
-          // value={inputValue}
           inputProps={{ 'aria-label': 'chat message input' }}
           multiline
           onKeyDownCapture={handleKeyPress} 

@@ -114,6 +114,9 @@ const bucketUploadFiles = async(formData) => {
       });
 }
 
+const deleteOneConversation = async(data) => {
+    return await axios.post(`${API_BASE_URL}/deleteOneConversation`, data)}
+
 export const httpManager = {
     retrieveChat,
     retrieveDocument,
@@ -135,5 +138,6 @@ export const httpManager = {
     streamingResponse,
     streamingResponseConversation,
     getChatList,
-    bucketUploadFiles
+    bucketUploadFiles,
+    deleteOneConversation
 }

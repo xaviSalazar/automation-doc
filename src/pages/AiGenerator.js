@@ -20,6 +20,9 @@ import CreateIcon from '@mui/icons-material/Create';
 import { useDispatch, useSelector } from 'react-redux';
 import { httpManager } from '../managers/httpManagers';
 import { v4 as uuidv4 } from 'uuid';
+import { MenuItem, Popover} from '@mui/material';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Menu from '@mui/material/Menu';
 
 import { selectChatId } from '../redux/conversationStore/conversationAction';
 
@@ -41,7 +44,7 @@ function AiGenerator(props) {
   const { selectedChatId } = useSelector(state => state.conversationHistory)
 
   const handleListItemClick = (event, index) => {
-    console.log(index)
+    // console.log(index)
     dispatch(selectChatId(index))
     setSelectedIndex(index);
   };
@@ -76,26 +79,64 @@ function AiGenerator(props) {
     fetchChatList(setChatList)
   }, []);
 
+
+  const [menuState, setMenuState] = React.useState({ anchorEl: null, selectedId: null });
+
+  const handleClickPopOver = (event, id) => {
+    setMenuState({ anchorEl: event.currentTarget, selectedId: id });
+  };
+  
+  const handleClose = async (event, id) => {
+    // Aquí puedes manejar la lógica para acciones como eliminar o archivar basado en el `id`
+    console.log("Action on item with id:", id);
+    setMenuState({ anchorEl: null, selectedId: null });
+
+    
+    await httpManager.deleteOneConversation({conversationId: id, senderId: userCard['id']})
+  };
+
   // HERE LOAD CHAT SUBJECTS FOR THIS USER:
 
 
   const drawer = (
-    <div>
+    <Box>
       <Toolbar />
       <Divider />
-
       <List component="nav" aria-label="main mailbox folders">
         {chatList.map((doc) => ( 
+
+          <Box key={doc.id}> 
+
           <ListItemButton
             key={doc.id}
             selected={selectedIndex === doc.id}
             onClick={(event) => handleListItemClick(event, doc.id)}
           >
             <ListItemText primary={doc.title} />
-          </ListItemButton>
+
+            <IconButton onClick={(e) => handleClickPopOver(e, doc.id)}>
+              <MoreVertIcon />
+            </IconButton> 
+
+            <Menu
+                id={`menu-${doc.id}`}
+                anchorEl={menuState.anchorEl}
+                open={menuState.anchorEl != null && menuState.selectedId === doc.id}
+                onClose={(e) => handleClose(e, doc.id)}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button',
+                }}
+              >
+                <MenuItem onClick={(e) => handleClose(e, doc.id)}>Delete</MenuItem>
+                <MenuItem onClick={(e) => handleClose(e, doc.id)}>Archive</MenuItem>
+            </Menu>
+            </ListItemButton>
+  
+        </Box>
+              
         ))}
       </List>
-    </div>
+    </Box>
   );
 
   // Remove this const when copying and pasting into your project.
