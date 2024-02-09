@@ -37,9 +37,6 @@ const facebookLogin = async (data) => {
     return await axios.post(`${API_BASE_URL}/facebookLogin`, data)
 }
 
-const documentUpload = async (data) => {
-    return await axios.post(`${API_BASE_URL}/saveDocuments`, data)
-}
 
 const getDocuments = async (page, rowsPerPage, userId) => {
     return await axios.get(`${API_BASE_URL}/documents?page=${page}&rowsPerPage=${rowsPerPage}&userId=${userId}`);
@@ -108,6 +105,15 @@ const getChatList = async(userId) => {
     return await axios.get(`${API_BASE_URL}/getChatList?userId=${userId}`) 
 }
 
+const bucketUploadFiles = async(formData) => {
+     // Send a POST request to your server with Axios
+     return await axios.post(`${API_BASE_URL}/documentInBucket`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Set the Content-Type header to multipart/form-data
+        },
+      });
+}
+
 export const httpManager = {
     retrieveChat,
     retrieveDocument,
@@ -117,7 +123,6 @@ export const httpManager = {
     logoutUser, 
     googleLogin,
     facebookLogin,
-    documentUpload,
     getDocuments,
     deleteDocuments,
     getChatHistory,
@@ -129,6 +134,6 @@ export const httpManager = {
     sendchatpdfMessage,
     streamingResponse,
     streamingResponseConversation,
-    getChatList
-    
+    getChatList,
+    bucketUploadFiles
 }

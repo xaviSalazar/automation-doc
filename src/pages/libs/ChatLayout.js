@@ -133,56 +133,76 @@ export default function ChatLayout() {
   };
 
   const handleSendMessage = async () => {
+
     try {
       if (inputValue.trim() !== '') {
 
-        const msgSchema = new FormData();
-        msgSchema.append('role', 'user');
-        msgSchema.append('content', inputValue);
-        msgSchema.append('senderId', userCard['id']);
-        msgSchema.append('receiverId', "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589")
-        msgSchema.append('conversationId', selectedChatId)
-        if (imgFile !== '') msgSchema.append('attachment', imgFile);
+        const msgSchema = {
+          role: 'user',
+          content: inputValue,
+          senderId: userCard['id'],
+          receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589",
+          conversationId: selectedChatId
+        }
 
-        const msgSchemaObject = formDataToObject(msgSchema);
-
-        setMessages(prevMessages => [...prevMessages, msgSchemaObject]);
+        if (imgFile !== "") {
+          msgSchema.attachment = imgFile;
+        }
+  
+        setMessages(prevMessages => [...prevMessages, msgSchema]);
         setInputValue('');
         setImgFile('');
         setFileUploaded(false);
+        
+        // console.log(msgSchema)
 
-        console.log(msgSchemaObject)
+        const stream = await httpManager.streamingResponseConversation(JSON.stringify(msgSchema))
 
-        // const response = await httpManager.streamingResponseConversation(JSON.stringify(msgSchema))
+        if (!stream.ok || !stream.body) {
+          throw stream.statusText;
+        }
+        const reader = stream .body.getReader();
+        const decoder = new TextDecoder();
 
-        // if (!response.ok || !response.body) {
-        //   throw response.statusText;
-        // }
-        // const reader = response.body.getReader();
-        // const decoder = new TextDecoder();
-
-        // // Start processing the stream
-        // await processStream(reader, decoder);
+        // Start processing the stream
+        await processStream(reader, decoder);
       }
     } catch (error) {
       console.log(error.message)
     }
+    
   };
 
   const handleFileEvent = async (e) => {
-    const file = e.target.files[0];
-    const reader = new FileReader();
 
-    reader.onloadend = () => {
-      const base64Image = reader.result;
-      setFileUploaded(true);
-      setImgFile(base64Image)
-    }
+  try {
+          const files = Array.from(e.target.files);    // array of inserted files
+          const formData = new FormData();             // Create a new FormData object
+          formData.append('user_id', userCard['id']);  // append the user id 
 
-    if (file) {
-      reader.readAsDataURL(file);
-    }
-  };
+          // Create an array with specific properties from each file
+          const fileDetails = files.map(file => ({
+              lastModified: file.lastModified,
+              name: file.name,
+              size: file.size,
+              type: file.type
+          }));
+
+          // Append files to the FormData object
+          files.forEach(file => {
+              formData.append('files', file); // 'files' should match the field name expected by the server
+          });
+
+          await httpManager.bucketUploadFiles(formData); // send to my server
+          setFileUploaded(true);                         // put icon of added photo
+          setImgFile(fileDetails);
+
+  } catch(e) {
+    console.log(e.message)
+  }
+
+};
+
 
   const handleDelete = () => {
     setFileUploaded(false);
@@ -206,7 +226,6 @@ export default function ChatLayout() {
     }
   };
   
-
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -295,7 +314,7 @@ export default function ChatLayout() {
           <input
             id="fileUpload"
             type="file"
-            // multiple
+            multiple
             accept=".jpg, .jpeg, .png, .gif"
             hidden
             onChange={(e) => handleFileEvent(e, setFileUploaded)}
