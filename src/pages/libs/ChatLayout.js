@@ -59,7 +59,7 @@ const MessagePart = ({ part }) => {
 };
 
 
-export default function ChatLayout() {
+export default function ChatLayout({modelo}) {
 
   const [messages, setMessages] = useState(mensajes);
   const [imgFile, setImgFile] = useState('');
@@ -164,6 +164,7 @@ export default function ChatLayout() {
   };
 
   const handleSendMessage = async () => {
+
     try {
       const userInput = inputRef.current.value
       inputRef.current.value = ''
@@ -174,7 +175,8 @@ export default function ChatLayout() {
           content: userInput,
           senderId: userCard['id'],
           receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589",
-          conversationId: selectedChatId
+          conversationId: selectedChatId,
+          model: modelo
         }
 
         if (imgFile !== "") {
@@ -339,12 +341,13 @@ export default function ChatLayout() {
           alignItems: 'center',
           justifyContent: 'space-between', // Add this to evenly distribute items horizontally
           boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.2)',
-          backgroundColor: highlight ? '#ccc' : 'transparent', // Highlight background color
+          backgroundColor: highlight ? '#ccc' : 'white', // Highlight background color
           transition: 'background-color 0.5s ease-in-out', // Add a smooth transition effect
           mt: 'auto',
         }}
         onClick={handleInputClick}
       >
+        { modelo === "gpt-4-vision-preview" &&
         <IconButton variant="contained" component="label">
           {fileUploaded ? <CheckCircleIcon /> : <AttachFileIcon />}
           <input
@@ -357,6 +360,7 @@ export default function ChatLayout() {
           //disabled={fileLimit}
           />
         </IconButton>
+        }
         {fileUploaded && (
           <IconButton onClick={handleDelete} aria-label="delete uploaded file">
             <DeleteIcon />

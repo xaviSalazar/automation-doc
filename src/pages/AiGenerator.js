@@ -5,28 +5,33 @@ import Box from '@mui/material/Box';
 import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
 import IconButton from '@mui/material/IconButton';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import Toolbar from '@mui/material/Toolbar';
-import Typography from '@mui/material/Typography';
 import ChatLayout from './libs/ChatLayout'
-import CreateIcon from '@mui/icons-material/Create';
 import { useDispatch, useSelector } from 'react-redux';
 import { httpManager } from '../managers/httpManagers';
 import { v4 as uuidv4 } from 'uuid';
-import { MenuItem, Popover} from '@mui/material';
+import { MenuItem } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+import AddCircleSharpIcon from '@mui/icons-material/AddCircleSharp';
+
 
 import { selectChatId } from '../redux/conversationStore/conversationAction';
 
 
+const options = [
+  'gpt-3.5-turbo-0125',
+  'gpt-4-0125-preview',
+  'gpt-4-vision-preview',
+];
 
 const drawerWidth = 190;
 
@@ -38,6 +43,23 @@ function AiGenerator(props) {
   const { userCard } = useSelector(state => state.login)
   const [chatList, setChatList] = React.useState([])
   const dispatch = useDispatch();
+
+  const [anchorMenuModel, setAnchorMenuModel] = React.useState(null);
+  const [selectedIndexModel, setSelectedIndexModel] = React.useState(0);
+  const open = Boolean(anchorMenuModel);
+
+  const handleClickListItem = (event) => {
+    setAnchorMenuModel(event.currentTarget);
+  };
+
+  const handleMenuItemClick = (event, index) => {
+    setSelectedIndexModel(index);
+    setAnchorMenuModel(null);
+  };
+
+  const handleCloseMenuModel = () => {
+    setAnchorMenuModel(null);
+  };
 
   const [selectedIndex, setSelectedIndex] = React.useState(null);
 
@@ -76,6 +98,7 @@ function AiGenerator(props) {
   }
 
   React.useEffect(() => {
+    dispatch(selectChatId(''))
     fetchChatList(setChatList)
   }, []);
 
@@ -100,7 +123,24 @@ function AiGenerator(props) {
 
   const drawer = (
     <Box>
-      <Toolbar />
+      {/* <Toolbar /> */}
+      <ListItem
+        secondaryAction={
+          <IconButton edge="end" aria-label="delete" onClick={createNewConversation}>
+            <AddCircleSharpIcon />
+          </IconButton>
+        }
+      >
+        <ListItemAvatar>
+        <Avatar>
+        <AssignmentIcon />
+        </Avatar>
+        </ListItemAvatar> 
+                  <ListItemText
+                    primary="Nueva conversation"
+                    secondary={'Habla con chatgpt ahora'}
+                  />
+      </ListItem>
       <Divider />
       <List component="nav" aria-label="main mailbox folders">
         {chatList.map((doc) => ( 
@@ -154,9 +194,17 @@ function AiGenerator(props) {
   >
         <AppBar
         sx={{
-          position: "relative"
+          position: "relative",
+          bgcolor: "rgba(35, 35, 35, 0.85)", // A darker shade for the AppBar          // height: "10%"
          }}>
-         <Toolbar >
+
+         <Toolbar
+         sx={{
+          display: 'flex', // Set display to flex
+          justifyContent: '', // Space out items
+         }}
+         
+         >
           <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -166,19 +214,53 @@ function AiGenerator(props) {
             >
               <MenuIcon />
             </IconButton>
-           <Typography variant="h6" noWrap component="div">
-             NEW CHAT
-          </Typography>
-          <IconButton
-              color="inherit"
-              aria-label="start chat"
-              edge="end"
-              sx={{ mr: 2, display: { sm: 'flex' } }}
-              onClick={createNewConversation}
-              // sx={{ mr: 2, display: { sm: 'none' } }}
+
+          <List
+            component="nav"
+            aria-label="Device settings"
+            sx={{ display: 'flex',  bgcolor: 'rgba(55, 55, 55, 0.5)'}}
+          >
+            <ListItemButton
+              id="lock-button"
+              aria-haspopup="listbox"
+              aria-controls="lock-menu"
+              aria-label="ELIGE MODELO"
+              aria-expanded={open ? 'true' : undefined}
+              onClick={handleClickListItem}
             >
-              <CreateIcon />
-            </IconButton>
+              <ListItemText
+                primary="ELIGE MODELO"
+                secondary={options[selectedIndexModel]}
+                sx={{
+                  '& .MuiListItemText-secondary': { // Target the secondary text
+                    color: 'white', // Set the color to white
+                  }
+                }}
+              />
+            </ListItemButton>
+          </List>
+
+          <Menu
+            id="lock-menu"
+            anchorEl={anchorMenuModel}
+            open={open}
+            onClose={handleCloseMenuModel}
+            MenuListProps={{
+              'aria-labelledby': 'lock-button',
+              role: 'listbox',
+            }}
+          >
+            {options.map((option, index) => (
+              <MenuItem
+                key={option}
+                selected={index === selectedIndexModel}
+                onClick={(event) => handleMenuItemClick(event, index)}
+              >
+                {option}
+              </MenuItem>
+            ))}
+          </Menu>
+
          </Toolbar>
        </AppBar>
 
@@ -239,10 +321,11 @@ function AiGenerator(props) {
                   p: 2, 
                   flexDirection: 'column', // Children will be laid out in a column
                   height: '80%',
-                  overflow: 'hidden'
+                  overflow: 'hidden',
+                  bgcolor: '#f1f1f1'
               }}
         >
-            {selectedChatId && <ChatLayout />}
+            {selectedChatId && <ChatLayout modelo = {options[selectedIndexModel]} />}
         </Box>
       </Box>
     </Box>
