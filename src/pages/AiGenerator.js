@@ -274,13 +274,6 @@ function AiGenerator(props) {
         }}
       >
 
-       <Box
-         component="nav"
-         backgroundColor = 'white'
-         sx={{ overflowY: 'auto',flexGrow: 1, height: '80%', width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-         aria-label="mailbox folders"
-       >
-
          {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
          <Drawer
            container={container}
@@ -310,9 +303,7 @@ function AiGenerator(props) {
          >
            {drawer}
          </Drawer>
-
-        </Box>
-
+         
         <Box
           component="main"     
           sx={{ 
