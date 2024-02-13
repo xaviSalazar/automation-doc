@@ -114,7 +114,6 @@ export default function ChatLayout({modelo}) {
       const { scrollTop } = messagesContainerRef.current;
       const nearingTop = scrollTop === 0;
       if (nearingTop && hasMore) {
-        console.log('useEffect 5')
         setPage(prevPage => prevPage + 1);
       }
     };
@@ -155,16 +154,7 @@ export default function ChatLayout({modelo}) {
     await processStream(reader, decoder);
   }
 
-  const formDataToObject = (formData) => {
-    const object = {};
-    for (let [key, value] of formData.entries()) {
-      object[key] = value;
-    }
-    return object;
-  };
-
   const handleSendMessage = async () => {
-
     try {
       const userInput = inputRef.current.value
       inputRef.current.value = ''
@@ -180,7 +170,7 @@ export default function ChatLayout({modelo}) {
         }
 
         if (imgFile !== "") {
-          msgSchema.attachment = imgFile;
+          msgSchema.attachment = JSON.stringify(imgFile);
         }
   
         setMessages(prevMessages => [...prevMessages, msgSchema]);
@@ -194,17 +184,14 @@ export default function ChatLayout({modelo}) {
         if (!stream.ok || !stream.body) {
           throw stream.statusText;
         }
-        const reader = stream .body.getReader();
+        const reader = stream.body.getReader();
         const decoder = new TextDecoder();
-
         // Start processing the stream
         await processStream(reader, decoder);
       }
     } catch (error) {
       console.log(error.message)
-    }
-    
-  };
+    }};
 
   const handleFileEvent = async (e) => {
 
@@ -265,6 +252,20 @@ export default function ChatLayout({modelo}) {
     }
   }, [messages]);
 
+  // Function to check if the file is an image
+  const isImage = (type) => type.startsWith('image/');
+
+  const parseAttachment = (attachmentString) => {
+    try {
+      const stringFromServer = JSON.parse(attachmentString);
+      if (typeof stringFromServer === "string") return JSON.parse(stringFromServer)
+      else return stringFromServer;
+    } catch (e) {
+      console.error('Error parsing attachment:', e);
+      return null;
+    }
+  };
+
   return (
     <>
       <List
@@ -275,7 +276,6 @@ export default function ChatLayout({modelo}) {
           mb: 2,
         }}>
         {messages.map((message, index) => (
-
           <ListItem
             key={index}
             disableGutters
@@ -285,13 +285,17 @@ export default function ChatLayout({modelo}) {
               alignItems: message.role === 'user' ? 'flex-end' : 'flex-start',
             }}
           >
-            {message.attachment && (
+          {  message.attachment && Array.isArray(parseAttachment(message.attachment)) && parseAttachment(message.attachment).map((attachment, attIndex) => (
+            isImage(attachment.type) && (
+              
               <img
-                src={message.attachment}
+                key={attIndex}
+                src={`https://d1d5i0xjsb5dtw.cloudfront.net/scribeHarmony/${userCard['id']}/${attachment.name}`} 
                 alt="Attachment"
                 style={{ maxWidth: '75%', borderRadius: '8px', marginBottom: '4px' }}
               />
-            )}
+            )
+          ))}
             <ListItemText
               primary={
                 //message.content
