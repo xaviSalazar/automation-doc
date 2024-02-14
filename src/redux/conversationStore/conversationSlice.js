@@ -6,7 +6,6 @@ const initialState = {
     isLoadingHistory: true,
     isLoadingMessage: false,
     selectedChatId: '',
-    isNewConversation: false,
     hasMore: false,
     chatAnswer: '',
 }
@@ -16,11 +15,6 @@ const conversationSlice = createSlice({
     initialState,
     reducers: {
         loadSuccessHistory: (state, action) => {
-            if (action.payload.conversation.length === 0) {
-                state.isNewConversation = true
-            } else {
-                state.isNewConversation = false
-            }
             // Sort the conversation array by timestamp
             const sortedConversation = action.payload.conversation.sort((a, b) => {
                 return new Date(a.timestamp) - new Date(b.timestamp);
@@ -36,10 +30,10 @@ const conversationSlice = createSlice({
             });
             state.appendHistory = sortedConversation
             state.hasMore = action.payload.hasMore
+            state.isLoadingHistory = false
         },
         loadingFailed: (state) => {
             state.isLoadingHistory = false
-            state.isNewConversation = true
         },
         sendMessage: (state) => {
             state.isLoadingMessage = true
@@ -49,17 +43,27 @@ const conversationSlice = createSlice({
         },
         loadMsgSuccessful: (state, action) => {
             state.chatAnswer = action.payload
-            state.isNewConversation = false
             state.isLoadingMessage = false
         },
         selectedChatId: (state, action) => {
+            state.conversationArr = []
             state.selectedChatId = action.payload
-        }
+        },
+        loadHistoryConversation : (state) => {
+            state.isLoadingHistory = true;
+        },
     }
 });
 
 const { reducer, actions } = conversationSlice
 
-export const { selectedChatId, appendHistory, loadMsgSuccessful, loadSuccessHistory, sendMessage, loadingFailed, cleanRcvBuffer } = actions
+export const { selectedChatId, 
+                appendHistory,
+               loadMsgSuccessful, 
+               loadSuccessHistory, 
+               sendMessage, 
+               loadingFailed,
+                cleanRcvBuffer,
+                loadHistoryConversation } = actions
 
 export default reducer

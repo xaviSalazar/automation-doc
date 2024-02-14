@@ -4,6 +4,7 @@ import { httpManager } from '../../managers/httpManagers.js';
 import { loadHistory, appendArrayHistory, cleanReceivedMsg } from '../../redux/conversationStore/conversationAction';
 import { oneLight as SyntaxHighlighterStyle } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import LinearProgress from '@mui/material/LinearProgress';
 
 
 import {
@@ -69,7 +70,7 @@ export default function ChatLayout({modelo}) {
   const [highlight, setHighlight] = useState(false);
   const messagesContainerRef = useRef(null);
   const [page, setPage] = useState(0);
-  const { selectedChatId, conversationArr,
+  const { isLoadingHistory, selectedChatId, conversationArr,
     isLoadingMessage, hasMore, chatAnswer,
     appendHistory } = useSelector(state => state.conversationHistory)
 
@@ -80,7 +81,6 @@ export default function ChatLayout({modelo}) {
 
   useEffect(() => {
     if (chatAnswer === '') return;
-    console.log(chatAnswer)
     dispatch(cleanReceivedMsg())
     setMessages(prevMessages => [...prevMessages, chatAnswer]);
   }, [chatAnswer, dispatch])
@@ -268,7 +268,9 @@ export default function ChatLayout({modelo}) {
 
   return (
     <>
-      <List
+
+      { isLoadingHistory ? <LinearProgress /> : null} 
+        <List
         ref={messagesContainerRef}
         sx={{
           flexgrow: 1,
