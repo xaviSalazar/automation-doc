@@ -46,7 +46,6 @@ const conversationSlice = createSlice({
             state.isLoadingMessage = false
         },
         selectedChatId: (state, action) => {
-            state.conversationArr = []
             state.selectedChatId = action.payload
         },
         loadHistoryConversation : (state) => {

@@ -23,10 +23,6 @@ import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'; // Import check circle icon
 import DeleteIcon from '@mui/icons-material/Delete'; // Import delete icon
 
-
-
-const mensajes = []
-
 const splitMessage = (message) => {
   const regex = /```(.*?)```/gs;
   let parts = [];
@@ -62,7 +58,7 @@ const MessagePart = ({ part }) => {
 
 export default function ChatLayout({modelo}) {
 
-  const [messages, setMessages] = useState(mensajes);
+  const [messages, setMessages] = useState([]);
   const [imgFile, setImgFile] = useState('');
   const inputRef = React.useRef(null)
   const [inputPosition, setInputPosition] = useState('top');
@@ -282,7 +278,7 @@ export default function ChatLayout({modelo}) {
             key={index}
             disableGutters
             sx={{
-              display: 'flex',
+              display: isLoadingHistory ? 'none' : 'flex',
               flexDirection: 'column',
               alignItems: message.role === 'user' ? 'flex-end' : 'flex-start',
             }}
