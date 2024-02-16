@@ -90,11 +90,11 @@ export default function ChatLayout({modelo}) {
   }, [selectedChatId, dispatch]);
 
   useEffect(() => {
-    if (page > 0) {  // Avoid running on initial render
+    if ((page > 0) && (hasMore === true)) {  // Avoid running on initial render
       // call append history
       dispatch(appendArrayHistory(userCard['id'], selectedChatId, page, 10));
     }
-  }, [dispatch, userCard, page, selectedChatId]);
+  }, [dispatch, userCard['id'], page, selectedChatId]);
 
   useEffect(() => {
     setMessages(prevMessages => [...appendHistory, ...prevMessages]);
@@ -102,14 +102,18 @@ export default function ChatLayout({modelo}) {
 
   // ONLY LOADS FIRST RENDER
   useEffect(() => {
+    setPage(0)
     setMessages(conversationArr);
   }, [conversationArr, selectedChatId])
 
   useEffect(() => {
+
     const handleScroll = () => {
       const { scrollTop } = messagesContainerRef.current;
+      console.log(page)
       const nearingTop = scrollTop === 0;
       if (nearingTop && hasMore) {
+        console.log(page)
         setPage(prevPage => prevPage + 1);
       }
     };
@@ -120,6 +124,7 @@ export default function ChatLayout({modelo}) {
     return () => {
       messagesContainer.removeEventListener('scroll', handleScroll);
     };
+
   }, [hasMore]);
 
 
