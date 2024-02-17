@@ -56,7 +56,7 @@ const MessagePart = ({ part }) => {
 };
 
 
-export default function ChatLayout({modelo}) {
+export default function ChatLayout({ modelo }) {
 
   const [messages, setMessages] = useState([]);
   const [imgFile, setImgFile] = useState('');
@@ -110,7 +110,7 @@ export default function ChatLayout({modelo}) {
 
     const handleScroll = () => {
       const { scrollTop } = messagesContainerRef.current;
-      console.log(page)
+      // console.log(page)
       const nearingTop = scrollTop === 0;
       if (nearingTop && hasMore) {
         console.log(page)
@@ -173,11 +173,11 @@ export default function ChatLayout({modelo}) {
         if (imgFile !== "") {
           msgSchema.attachment = JSON.stringify(imgFile);
         }
-  
+
         setMessages(prevMessages => [...prevMessages, msgSchema]);
         setImgFile('');
         setFileUploaded(false);
-        
+
         console.log(msgSchema)
 
         const stream = await httpManager.streamingResponseConversation(JSON.stringify(msgSchema))
@@ -192,37 +192,72 @@ export default function ChatLayout({modelo}) {
       }
     } catch (error) {
       console.log(error.message)
-    }};
+    }
+  };
+
+  // const handleFileEvent = async (e) => {
+
+  //   try {
+  //     const files = Array.from(e.target.files);    // array of inserted files
+  //     const formData = new FormData();             // Create a new FormData object
+  //     formData.append('user_id', userCard['id']);  // append the user id 
+
+  //     // Create an array with specific properties from each file
+  //     const fileDetails = files.map(file => ({
+  //       lastModified: file.lastModified,
+  //       name: file.name,
+  //       size: file.size,
+  //       type: file.type
+  //     }));
+
+  //     // Append files to the FormData object
+  //     files.forEach(file => {
+  //       formData.append('files', file); // 'files' should match the field name expected by the server
+  //     });
+
+  //     await httpManager.bucketUploadFiles(formData); // send to my server
+  //     setFileUploaded(true);                         // put icon of added photo
+  //     setImgFile(fileDetails);
+
+  //   } catch (e) {
+  //     console.log(e.message)
+  //   }
+
+  // };
 
   const handleFileEvent = async (e) => {
 
-  try {
-          const files = Array.from(e.target.files);    // array of inserted files
-          const formData = new FormData();             // Create a new FormData object
-          formData.append('user_id', userCard['id']);  // append the user id 
+    try {
+      const attachmentArray = [];
+      const files = Array.from(e.target.files);    // array of inserted files
 
-          // Create an array with specific properties from each file
-          const fileDetails = files.map(file => ({
-              lastModified: file.lastModified,
-              name: file.name,
-              size: file.size,
-              type: file.type
-          }));
+      const uploadPromises = files.map(file => {
 
-          // Append files to the FormData object
-          files.forEach(file => {
-              formData.append('files', file); // 'files' should match the field name expected by the server
-          });
+        const obj = {
+          lastModified: file.lastModified,
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          user_id: userCard['id']
+        }
 
-          await httpManager.bucketUploadFiles(formData); // send to my server
-          setFileUploaded(true);                         // put icon of added photo
-          setImgFile(fileDetails);
+        attachmentArray.push(obj); // Add the obj to the array
 
-  } catch(e) {
-    console.log(e.message)
-  }
+        // obtiene la URL presignada
+        return httpManager.requestUrl(obj)
+          //.then(url => console.log(url['data']['url']))
+          .then(url => httpManager.uploadFileToS3(url['data']['url'], file));
+      });
 
-};
+      await Promise.all(uploadPromises);
+      setFileUploaded(true);                    
+      setImgFile(attachmentArray);
+
+    } catch (e) {
+      console.log(e.message)
+    }
+
+  };
 
 
   const handleDelete = () => {
@@ -246,7 +281,7 @@ export default function ChatLayout({modelo}) {
       handleSendMessage();
     }
   };
-  
+
   useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -270,8 +305,8 @@ export default function ChatLayout({modelo}) {
   return (
     <>
 
-      { isLoadingHistory ? <LinearProgress /> : null} 
-        <List
+      {isLoadingHistory ? <LinearProgress /> : null}
+      <List
         ref={messagesContainerRef}
         sx={{
           flexgrow: 1,
@@ -288,17 +323,23 @@ export default function ChatLayout({modelo}) {
               alignItems: message.role === 'user' ? 'flex-end' : 'flex-start',
             }}
           >
-          {  message.attachment && Array.isArray(parseAttachment(message.attachment)) && parseAttachment(message.attachment).map((attachment, attIndex) => (
-            isImage(attachment.type) && (
-              
-              <img
-                key={attIndex}
-                src={`https://d1d5i0xjsb5dtw.cloudfront.net/scribeHarmony/${userCard['id']}/${attachment.name}`} 
-                alt="Attachment"
-                style={{ maxWidth: '75%', borderRadius: '8px', marginBottom: '4px' }}
-              />
-            )
-          ))}
+            {message.attachment && Array.isArray(parseAttachment(message.attachment)) && parseAttachment(message.attachment).map((attachment, attIndex) => (
+              isImage(attachment.type) && (
+
+                <img
+                  key={attIndex}
+                  src={`https://d1d5i0xjsb5dtw.cloudfront.net/scribeHarmony/${userCard['id']}/${attachment.name}`}
+                  alt="Attachment"
+                  style={{ 
+                    maxWidth: '75%', 
+                    width: '200px', // You can set this to the desired width
+                    height: 'auto', // This ensures the aspect ratio is maintained
+                    borderRadius: '8px', 
+                    marginBottom: '4px' 
+                }}
+                />
+              )
+            ))}
             <ListItemText
               primary={
                 //message.content
@@ -314,7 +355,7 @@ export default function ChatLayout({modelo}) {
                 marginBottom: '4px',
               }}
             />
-            
+
             {isLoadingMessage && index === messages.length - 1 && (
               <CircularProgress size={40} color="inherit" sx={{ alignSelf: 'flex-start', marginRight: 2 }} />
             )}
@@ -354,19 +395,19 @@ export default function ChatLayout({modelo}) {
         }}
         onClick={handleInputClick}
       >
-        { modelo === "gpt-4-vision-preview" &&
-        <IconButton variant="contained" component="label">
-          {fileUploaded ? <CheckCircleIcon /> : <AttachFileIcon />}
-          <input
-            id="fileUpload"
-            type="file"
-            multiple
-            accept=".jpg, .jpeg, .png, .gif"
-            hidden
-            onChange={(e) => handleFileEvent(e, setFileUploaded)}
-          //disabled={fileLimit}
-          />
-        </IconButton>
+        {modelo === "gpt-4-vision-preview" &&
+          <IconButton variant="contained" component="label">
+            {fileUploaded ? <CheckCircleIcon /> : <AttachFileIcon />}
+            <input
+              id="fileUpload"
+              type="file"
+              multiple
+              accept=".jpg, .jpeg, .png, .gif"
+              hidden
+              onChange={(e) => handleFileEvent(e, setFileUploaded)}
+            //disabled={fileLimit}
+            />
+          </IconButton>
         }
         {fileUploaded && (
           <IconButton onClick={handleDelete} aria-label="delete uploaded file">
@@ -376,13 +417,13 @@ export default function ChatLayout({modelo}) {
         {isLoadingMessage ? (
           <CircularProgress size={24} /> // Show loading icon
         ) : (<InputBase
-          
+
           sx={{ ml: 1, flex: 1, width: 700, maxHeight: 100, overflowY: 'auto' }}
-          inputRef = {inputRef}
+          inputRef={inputRef}
           placeholder="Empieza por un Hola chatgpt como estas..."
           inputProps={{ 'aria-label': 'chat message input' }}
           multiline
-          onKeyDownCapture={handleKeyPress} 
+          onKeyDownCapture={handleKeyPress}
         />
         )}
         <IconButton

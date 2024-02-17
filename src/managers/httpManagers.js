@@ -114,8 +114,23 @@ const bucketUploadFiles = async(formData) => {
       });
 }
 
+const requestUrl = async(dataJson) => {
+   return await axios.post(`${API_BASE_URL}/getPresignedUrl`, dataJson)
+}
+
+const uploadFileToS3 = async(url, file) => {
+
+    return await axios.put(url, file, {
+        headers: {
+            'Content-Type': file.type // Set the Content-Type to the file's MIME type
+        }
+    });
+
+}
+
 const deleteOneConversation = async(data) => {
-    return await axios.post(`${API_BASE_URL}/deleteOneConversation`, data)}
+    return await axios.post(`${API_BASE_URL}/deleteOneConversation`, data)
+}
 
 export const httpManager = {
     retrieveChat,
@@ -139,5 +154,7 @@ export const httpManager = {
     streamingResponseConversation,
     getChatList,
     bucketUploadFiles,
-    deleteOneConversation
+    deleteOneConversation,
+    requestUrl,
+    uploadFileToS3
 }
