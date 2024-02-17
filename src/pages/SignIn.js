@@ -17,7 +17,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 // redux
 import { useDispatch, useSelector } from 'react-redux';
 import { doLogin } from '../redux/loginStore/loginAction';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import AuthSocial from './libs/login-oauth/AuthSocial';
 
@@ -42,13 +42,15 @@ export default function SignIn() {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const {isAuth, isLoading, error} = useSelector(state => state.login)
 
   React.useEffect(() => {
     if(isAuth === true) {
-      navigate('/home')
+      const from = location.state?.from?.pathname || '/';
+      navigate(from);
     } 
-  }, [isAuth])
+  }, [[isAuth, navigate, location.state]])
 
   const handleSubmit = async (event) => {
 

@@ -1,4 +1,4 @@
-import {useRoutes, Navigate} from 'react-router-dom';
+import {useRoutes, Navigate, useLocation} from 'react-router-dom';
 // layouts 
 import DashboardLayout from './layout/dashboard'
 import DataGridView from './pages/DataGridView';
@@ -13,16 +13,19 @@ import { useDispatch, useSelector} from 'react-redux';
 import { useEffect } from 'react';
 
 
-// Create a function to check if the user is authenticated
-// const isAuthenticated = () => {
-//   const token = localStorage.getItem('customerToken'); // Get the JWT from storage
-//   if(token)
-//     return true; // Return true if a token is present, false otherwise
-// };
+
+function ProtectedRoute({ children }) {
+  const { isAuth } = useSelector(state => state.login);
+  const location = useLocation();
+
+  if (!isAuth) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
 
 export default function Router() {
-
-  const { isAuth } = useSelector(state => state.login)
 
   const dispatch = useDispatch();
 
@@ -48,39 +51,13 @@ export default function Router() {
         element: <DashboardLayout />,
         children: [
           { element: <Navigate to="/home" />, index: true },
-          {
-            path: 'home',
-            element: <Home />,
-          },
-          { 
-            path: 'templates', 
-            element: isAuth ? <DataGridView />  : <Navigate to="/login" /> ,
-          },
-          // { 
-          //   path: 'templates/:name', 
-          //   element: isAuth ? <DataGridView /> : <Navigate to="/login" />,
-          // },
-          { 
-            path:  'edit', 
-            element: isAuth ? <DocUpload />  : <Navigate to="/login" />,
-          },
-          {
-            path: 'generate',
-           element: isAuth ? <AiGenerator />  : <Navigate to="/login" />,
-
-          },
-          {
-            path: 'chatpdf',
-            element: isAuth ? <ChatPdf />  : <Navigate to="/login" />,
-          },
-          {
-            path: 'login',
-            element: <SignIn />,
-          },
-          {
-            path: 'signup',
-            element: <SignUp />,
-          },
+          { path: 'home', element: <ProtectedRoute><Home /></ProtectedRoute> },
+          { path: 'templates', element: <ProtectedRoute><DataGridView /></ProtectedRoute> },
+          { path:  'edit', element: <ProtectedRoute> <DocUpload />  </ProtectedRoute> },
+          { path: 'generate', element: <ProtectedRoute>  <AiGenerator /> </ProtectedRoute> },
+          { path: 'chatpdf', element: <ProtectedRoute>  <ChatPdf />  </ProtectedRoute> },
+          { path: 'login', element: <SignIn />},
+          { path: 'signup', element: <SignUp />},
          ],
       },
     //   {
