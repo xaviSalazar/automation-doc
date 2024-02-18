@@ -22,6 +22,8 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
 import Avatar from '@mui/material/Avatar';
 import AddCircleSharpIcon from '@mui/icons-material/AddCircleSharp';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import Typography from '@mui/material/Typography';
 
 
 import { selectChatId } from '../redux/conversationStore/conversationAction';
@@ -92,7 +94,7 @@ function AiGenerator(props) {
     console.log(generatedUuid)
   }
 
- async function fetchChatList(setChatList) {
+  async function fetchChatList(setChatList) {
     let response = await httpManager.getChatList(userCard['id'])
     setChatList(response.data)
   }
@@ -108,14 +110,17 @@ function AiGenerator(props) {
   const handleClickPopOver = (event, id) => {
     setMenuState({ anchorEl: event.currentTarget, selectedId: id });
   };
-  
+
   const handleClose = async (event, id) => {
     // Aquí puedes manejar la lógica para acciones como eliminar o archivar basado en el `id`
-    console.log("Action on item with id:", id);
     setMenuState({ anchorEl: null, selectedId: null });
+  };
 
-    
-    await httpManager.deleteOneConversation({conversationId: id, senderId: userCard['id']})
+  const handleCloseAndDelete = async (event, id) => {
+    // Aquí puedes manejar la lógica para acciones como eliminar o archivar basado en el `id`
+    // console.log("Action on item with id:", id);
+    setMenuState({ anchorEl: null, selectedId: null });
+    await httpManager.deleteOneConversation({ conversationId: id, senderId: userCard['id'] })
   };
 
   // HERE LOAD CHAT SUBJECTS FOR THIS USER:
@@ -132,33 +137,33 @@ function AiGenerator(props) {
         }
       >
         <ListItemAvatar>
-        <Avatar>
-        <AssignmentIcon />
-        </Avatar>
-        </ListItemAvatar> 
-                  <ListItemText
-                    primary="Nueva conversation"
-                    secondary={'Habla con chatgpt ahora'}
-                  />
+          <Avatar>
+            <AssignmentIcon />
+          </Avatar>
+        </ListItemAvatar>
+        <ListItemText
+          primary="Nueva conversation"
+          secondary={'Habla con chatgpt ahora'}
+        />
       </ListItem>
       <Divider />
       <List component="nav" aria-label="main mailbox folders">
-        {chatList.map((doc) => ( 
+        {chatList.map((doc) => (
 
-          <Box key={doc.id}> 
+          <Box key={doc.id}>
 
-          <ListItemButton
-            key={doc.id}
-            selected={selectedIndex === doc.id}
-            onClick={(event) => handleListItemClick(event, doc.id)}
-          >
-            <ListItemText primary={doc.title} />
+            <ListItemButton
+              key={doc.id}
+              selected={selectedIndex === doc.id}
+              onClick={(event) => handleListItemClick(event, doc.id)}
+            >
+              <ListItemText primary={doc.title} />
 
-            <IconButton onClick={(e) => handleClickPopOver(e, doc.id)}>
-              <MoreVertIcon />
-            </IconButton> 
+              <IconButton onClick={(e) => handleClickPopOver(e, doc.id)}>
+                <MoreVertIcon />
+              </IconButton>
 
-            <Menu
+              <Menu
                 id={`menu-${doc.id}`}
                 anchorEl={menuState.anchorEl}
                 open={menuState.anchorEl != null && menuState.selectedId === doc.id}
@@ -167,13 +172,18 @@ function AiGenerator(props) {
                   'aria-labelledby': 'basic-button',
                 }}
               >
-                <MenuItem onClick={(e) => handleClose(e, doc.id)}>Delete</MenuItem>
-                <MenuItem onClick={(e) => handleClose(e, doc.id)}>Archive</MenuItem>
-            </Menu>
+                <MenuItem
+                  onClick={(e) => handleCloseAndDelete(e, doc.id)}
+                >
+                  <DeleteForeverIcon fontSize="small" />
+                  <Typography variant="inherit">Eliminar</Typography>
+                </MenuItem>
+                {/* <MenuItem onClick={(e) => handleClose(e, doc.id)}>Archive</MenuItem> */}
+              </Menu>
             </ListItemButton>
-  
-        </Box>
-              
+
+          </Box>
+
         ))}
       </List>
     </Box>
@@ -182,43 +192,43 @@ function AiGenerator(props) {
   // Remove this const when copying and pasting into your project.
   const container = window !== undefined ? () => window().document.body : undefined;
 
-  return (    
+  return (
     <Box
-    sx={{
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%', // This should fill the height of Main now
-    flexGrow: 1, // This will make the Box grow to fill the container
-    alignItems: 'stretch', // This ensures the children stretch to fill
-    }}
-  >
-        <AppBar
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%', // This should fill the height of Main now
+        flexGrow: 1, // This will make the Box grow to fill the container
+        alignItems: 'stretch', // This ensures the children stretch to fill
+      }}
+    >
+      <AppBar
         sx={{
           position: "relative",
           bgcolor: "rgba(35, 35, 35, 0.85)", // A darker shade for the AppBar          // height: "10%"
-         }}>
+        }}>
 
-         <Toolbar
-         sx={{
-          display: 'flex', // Set display to flex
-          justifyContent: '', // Space out items
-         }}
-         
-         >
+        <Toolbar
+          sx={{
+            display: 'flex', // Set display to flex
+            justifyContent: '', // Space out items
+          }}
+
+        >
           <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{ mr: 2, display: { sm: 'none' } }}
-            >
-              <MenuIcon />
-            </IconButton>
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ mr: 2, display: { sm: 'none' } }}
+          >
+            <MenuIcon />
+          </IconButton>
 
           <List
             component="nav"
             aria-label="Device settings"
-            sx={{ display: 'flex',  bgcolor: 'rgba(55, 55, 55, 0.5)'}}
+            sx={{ display: 'flex', bgcolor: 'rgba(55, 55, 55, 0.5)' }}
           >
             <ListItemButton
               id="lock-button"
@@ -261,62 +271,62 @@ function AiGenerator(props) {
             ))}
           </Menu>
 
-         </Toolbar>
-       </AppBar>
+        </Toolbar>
+      </AppBar>
 
       <Box
         sx={{
           display: 'flex',
           height: '100vh', // Set the height to be 100% of the viewport height
           flexDirection: 'row', // Set flexDirection to 'row'
-          alignItems: 'stretch', 
+          alignItems: 'stretch',
           overflowY: 'hidden',
         }}
       >
 
-         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-         <Drawer
-           container={container}
-           variant="temporary"
-           open={mobileOpen}
-           onTransitionEnd={handleDrawerTransitionEnd}
-           onClose={handleDrawerClose}
-           ModalProps={{
-             keepMounted: true, // Better open performance on mobile.
-           }}
-           sx={{
+        {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
+        <Drawer
+          container={container}
+          variant="temporary"
+          open={mobileOpen}
+          onTransitionEnd={handleDrawerTransitionEnd}
+          onClose={handleDrawerClose}
+          ModalProps={{
+            keepMounted: true, // Better open performance on mobile.
+          }}
+          sx={{
             ml: { sm: `${drawerWidth}px` },
-             display: { xs: 'block', sm: 'none' },
-             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-           }}
-         >
-           {drawer}
-         </Drawer>
-
-         <Drawer
-           variant="permanent"
-           sx={{
-            display: { xs: 'none', sm: 'block' },
-             '& .MuiDrawer-paper': { position: 'relative' },
-           }}
-           open
-         >
-           {drawer}
-         </Drawer>
-         
-        <Box
-          component="main"     
-          sx={{ 
-                  display: 'flex',
-                  flexGrow: 1, 
-                  p: 2, 
-                  flexDirection: 'column', // Children will be laid out in a column
-                  height: '80%',
-                  overflow: 'hidden',
-                  bgcolor: '#f1f1f1'
-              }}
+            display: { xs: 'block', sm: 'none' },
+            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+          }}
         >
-            {selectedChatId && <ChatLayout modelo = {options[selectedIndexModel]} />}
+          {drawer}
+        </Drawer>
+
+        <Drawer
+          variant="permanent"
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            '& .MuiDrawer-paper': { position: 'relative' },
+          }}
+          open
+        >
+          {drawer}
+        </Drawer>
+
+        <Box
+          component="main"
+          sx={{
+            display: 'flex',
+            flexGrow: 1,
+            p: 2,
+            flexDirection: 'column', // Children will be laid out in a column
+            height: '80%',
+            overflow: 'hidden',
+            bgcolor: '#f1f1f1'
+          }}
+        >
+          {selectedChatId && <ChatLayout modelo={options[selectedIndexModel]} />}
         </Box>
       </Box>
     </Box>
