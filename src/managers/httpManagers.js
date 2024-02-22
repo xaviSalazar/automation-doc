@@ -132,6 +132,14 @@ const deleteOneConversation = async(data) => {
     return await axios.post(`${API_BASE_URL}/deleteOneConversation`, data)
 }
 
+const requestDownloadWord = async(htmlContent) => {
+    return await axios.post(`${API_BASE_URL}/downloadAsWord`, {
+        htmlContent  // Send as a JSON object
+    }, {
+        responseType: 'blob'  // Expect a blob response
+    })
+}
+
 export const httpManager = {
     retrieveChat,
     retrieveDocument,
@@ -156,5 +164,6 @@ export const httpManager = {
     bucketUploadFiles,
     deleteOneConversation,
     requestUrl,
-    uploadFileToS3
+    uploadFileToS3,
+    requestDownloadWord
 }

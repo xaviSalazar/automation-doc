@@ -5,6 +5,7 @@ import { loadHistory, appendArrayHistory, cleanReceivedMsg } from '../../redux/c
 import { oneLight as SyntaxHighlighterStyle } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import LinearProgress from '@mui/material/LinearProgress';
+import DownloadIcon from '@mui/icons-material/Download';
 
 
 import {
@@ -53,8 +54,29 @@ const splitMessage = (message) => {
   return parts;
 };
 
+const sendHtmlToServer = async (htmlContent) => {
+    try {
+        const response = await httpManager.requestDownloadWord(htmlContent)
+        // Receive the response and create a blob URL to download
+        const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = 'ScribeHarmonyDocument.docx';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
 
 const MessagePart = ({ part }) => {
+
+  const logHtmlContent = async () => {
+    sendHtmlToServer(part.content)
+  };
+
   switch(part.type) {
     case 'code':
       return (
@@ -63,7 +85,20 @@ const MessagePart = ({ part }) => {
         </SyntaxHighlighter>
       );
     case 'html':
-      return <div dangerouslySetInnerHTML={{ __html: part.content }} />;
+      return (
+        <div>
+          <div dangerouslySetInnerHTML={{ __html: part.content }} />
+          <Button
+            component="label"
+            variant="contained"
+            tabIndex={-1}
+            endIcon={<DownloadIcon />}
+            onClick={logHtmlContent}
+          >
+            DESCARGA
+        </Button>
+        </div>
+      );
     case 'bold':
       return <b>{part.content}</b>;
     case 'text':
@@ -72,7 +107,6 @@ const MessagePart = ({ part }) => {
       return <span>{part.content}</span>;
   }
 };
-
 
 
 export default function ChatLayout({ modelo, isFirstChat, systemPrompt, setIsFirstChat }) {
