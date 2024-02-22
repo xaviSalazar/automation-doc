@@ -24,6 +24,8 @@ import Avatar from '@mui/material/Avatar';
 import AddCircleSharpIcon from '@mui/icons-material/AddCircleSharp';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import Typography from '@mui/material/Typography';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 
 
 import { selectChatId } from '../redux/conversationStore/conversationAction';
@@ -35,10 +37,10 @@ const options = [
 ];
 
 const PROMPTS = [
-  { key: 'DOCUMENTOS', text: 'Eres un experto redactor de documentos de todo tipo. Y los escribes con las siguientes condiciones. Mandatorio responder con un documento en formateado asi  ```<!DOCTYPE html> pon el contenido aqui </html>```, todos los campos que sean a llenar que esten dentro de llaves en camel case. Por ejemplo: \{detalleDelMotivo\}'},
-  { key: 'NO PROMPT', text: '' },
-  { key: 'EXCEL ESP', text: 'Eres un experto asistente de Excel en espanol para generar formulas y dar pasos en conseguir el objetivo de la pregunta. Y escribes bajo las siguientes condiciones, si se te pregunta formulas exactas envia la explicacion mas corta y sencilla con la formula dentro de ``` '},
-  { key: 'EXCEL ENG', text: 'Eres un experto asistente de Excel en ingles para generar formulas y dar pasos en conseguir el objetivo de la pregunta. Y escribes bajo las siguientes condiciones, si se te pregunta formulas exactas envia la explicacion mas corta y sencilla con la formula dentro de ``` '}
+  { key: 'documentos', text: 'Eres un experto redactor de documentos de todo tipo. Y los escribes con las siguientes condiciones. Mandatorio responder con un documento en formateado asi  ```<!DOCTYPE html> pon el contenido aqui </html>```, todos los campos que sean a llenar que esten dentro de llaves en camel case. Por ejemplo: \{detalleDelMotivo\}'},
+  { key: 'no prompt', text: '' },
+  { key: 'excel ESP', text: 'Eres un experto asistente de Excel en espanol para generar formulas y dar pasos en conseguir el objetivo de la pregunta. Y escribes bajo las siguientes condiciones, si se te pregunta formulas exactas envia la explicacion mas corta y sencilla con la formula dentro de ``` '},
+  { key: 'excel ENG', text: 'Eres un experto asistente de Excel en ingles para generar formulas y dar pasos en conseguir el objetivo de la pregunta. Y escribes bajo las siguientes condiciones, si se te pregunta formulas exactas envia la explicacion mas corta y sencilla con la formula dentro de ``` '}
 ];
 
 const drawerWidth = 190;
@@ -57,7 +59,7 @@ function AiGenerator(props) {
     // New state for the PROMPTS menu
   const [anchorPromptsMenu, setAnchorPromptsMenu] = React.useState(null);
   const [selectedIndexModel, setSelectedIndexModel] = React.useState(0);
-  const [selectedPrompt, setSelectedPrompt] = React.useState('NO PROMPT');
+  const [selectedPrompt, setSelectedPrompt] = React.useState('no prompt');
 
   const open = Boolean(anchorMenuModel);
   const openPromptsMenu = Boolean(anchorPromptsMenu);
@@ -98,7 +100,7 @@ function AiGenerator(props) {
     // console.log(index)
     dispatch(selectChatId(index))
     setIsFirstChat(false)
-    setSelectedPrompt('NO PROMPT')
+    setSelectedPrompt('no prompt')
     setSelectedIndex(index);
   };
 
@@ -132,7 +134,7 @@ function AiGenerator(props) {
   React.useEffect(() => {
     dispatch(selectChatId(''))
     setIsFirstChat(false)
-    setSelectedPrompt('NO PROMPT')
+    setSelectedPrompt('no prompt')
     fetchChatList(setChatList)
   }, []);
 
@@ -235,7 +237,6 @@ function AiGenerator(props) {
       }}
     >
       <AppBar
-
         sx={{
           position: "relative",
           bgcolor: "rgba(35, 35, 35, 0.85)", // A darker shade for the AppBar          // height: "10%"
@@ -244,9 +245,8 @@ function AiGenerator(props) {
         <Toolbar
           sx={{
             display: 'flex', // Set display to flex
-            justifyContent: '', // Space out items
+            justifyContent: 'flex-start', // Space out items
           }}
-
         >
           <IconButton
             color="inherit"
@@ -261,7 +261,7 @@ function AiGenerator(props) {
           <List
             component="nav"
             aria-label="Device settings"
-            sx={{ display: 'flex', bgcolor: 'rgba(55, 55, 55, 0.5)' }}
+            sx={{ display: 'flex', bgcolor: 'rgba(55, 55, 55, 50)' }}
           >
             <ListItemButton
               id="lock-button"
@@ -270,16 +270,33 @@ function AiGenerator(props) {
               aria-label="ELIGE MODELO"
               aria-expanded={open ? 'true' : undefined}
               onClick={handleClickListItem}
+              sx={{
+                display: 'flex', // Make this a flex container
+                justifyContent: 'flex-end', // Space between items
+                width: '100%', // Ensure it spans the full width
+              }}
             >
-              <ListItemText
-                primary="ELIGE MODELO"
-                secondary={options[selectedIndexModel]}
-                sx={{
-                  '& .MuiListItemText-secondary': { // Target the secondary text
-                    color: 'white', // Set the color to white
-                  }
-                }}
-              />
+              
+                <ListItemText
+                  primary="MODELO ACTUAL: "
+                  secondary={options[selectedIndexModel]}
+                  sx={{
+                    '& .MuiListItemText-primary': { // Target the primary text
+                      fontWeight: 'bold', // Make the text bold
+                    },
+                    '& .MuiListItemText-secondary': { // Target the secondary text
+                      display: 'flex',
+                      color: 'white', // Set the color to white
+                      // bgcolor: 'grey',
+                      justifyContent: 'flex-end',
+                    }
+                  }}
+                />
+
+              <ListItemIcon sx={{display: 'flex', justifyContent: 'flex-end', color:'white'}}>
+                  <TuneOutlinedIcon />
+              </ListItemIcon>
+
             </ListItemButton>
           </List>
 
@@ -309,7 +326,7 @@ function AiGenerator(props) {
          <List
           component="nav"
           aria-label="Document settings"
-          sx={{ display: 'flex', bgcolor: 'rgba(55, 55, 55, 0.5)' }}
+          sx={{ display: 'flex', bgcolor: 'rgba(55, 55, 55, 50)' }}
         >
           <ListItemButton
             id="prompts-button"
@@ -318,16 +335,32 @@ function AiGenerator(props) {
             aria-label="ELIGE PROMPT"
             aria-expanded={openPromptsMenu ? 'true' : undefined}
             onClick={handlePromptsMenuClick}
+            sx={{
+              display: 'flex', // Make this a flex container
+              justifyContent: 'flex-end', // Space between items
+              width: '100%', // Ensure it spans the full width
+            }}
           >
             <ListItemText
-              primary="ELIGE PROMPT"
+              primary="PROMPT ACTUAL: "
               secondary={selectedPrompt}
               sx={{
-                '& .MuiListItemText-secondary': {
-                  color: 'white',
+                '& .MuiListItemText-primary': { // Target the primary text
+                  fontWeight: 'bold', // Make the text bold
+                },
+                '& .MuiListItemText-secondary': { // Target the secondary text
+                  display: 'flex',
+                  color: 'white', // Set the color to white
+                  // bgcolor: 'grey',
+                  justifyContent: 'flex-end',
                 }
               }}
             />
+
+            <ListItemIcon sx={{display: 'flex', justifyContent: 'flex-end', color:'white'}}>
+                  <TuneOutlinedIcon />
+            </ListItemIcon>
+
           </ListItemButton>
         </List>
 
