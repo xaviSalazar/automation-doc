@@ -24,15 +24,25 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'; // Import check c
 import DeleteIcon from '@mui/icons-material/Delete'; // Import delete icon
 
 const splitMessage = (message) => {
-  const regex = /```(.*?)```/gs;
+  const regex = /```(.*?)```|(\*\*(.*?)\*\*)/gs;
   let parts = [];
   let lastIndex = 0;
 
-  message.replace(regex, (match, code, index) => {
+  message.replace(regex, (match, code, bold, boldText, index) => {
     if (index > lastIndex) {
       parts.push({ type: 'text', content: message.slice(lastIndex, index) });
     }
-    parts.push({ type: 'code', content: code });
+
+    if (code) {
+      if (code.trim().startsWith('<!DOCTYPE html')) {
+        parts.push({ type: 'html', content: code });
+      } else {
+        parts.push({ type: 'code', content: code });
+      }
+    } else if (bold) {
+      parts.push({ type: 'bold', content: boldText });
+    }
+
     lastIndex = index + match.length;
   });
 
@@ -43,17 +53,26 @@ const splitMessage = (message) => {
   return parts;
 };
 
+
 const MessagePart = ({ part }) => {
-  if (part.type === 'code') {
-    return (
-      <SyntaxHighlighter language="javascript" style={SyntaxHighlighterStyle}>
-        {part.content}
-      </SyntaxHighlighter>
-    );
-  } else {
-    return <span>{part.content}</span>;
+  switch(part.type) {
+    case 'code':
+      return (
+        <SyntaxHighlighter language="javascript" style={SyntaxHighlighterStyle}>
+          {part.content}
+        </SyntaxHighlighter>
+      );
+    case 'html':
+      return <div dangerouslySetInnerHTML={{ __html: part.content }} />;
+    case 'bold':
+      return <b>{part.content}</b>;
+    case 'text':
+      return <span style={{ whiteSpace: 'pre-line' }}>{part.content}</span>;
+    default:
+      return <span>{part.content}</span>;
   }
 };
+
 
 
 export default function ChatLayout({ modelo, isFirstChat, systemPrompt, setIsFirstChat }) {
@@ -165,11 +184,13 @@ export default function ChatLayout({ modelo, isFirstChat, systemPrompt, setIsFir
         const promptMessage = {
           role: 'system',
           content: systemPrompt,
+          senderId: userCard['id'],
         }
 
         const msgSchema = {
           role: 'user',
           content: userInput,
+          senderId: userCard['id'],
         }
 
         if (imgFile !== "") {
