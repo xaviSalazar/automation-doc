@@ -28,11 +28,17 @@ import Typography from '@mui/material/Typography';
 
 import { selectChatId } from '../redux/conversationStore/conversationAction';
 
-
 const options = [
   'gpt-3.5-turbo-0125',
   'gpt-4-0125-preview',
   'gpt-4-vision-preview',
+];
+
+const PROMPTS = [
+  { key: 'DOCUMENTOS', text: 'Eres un experto redactor de documentos de todo tipo. Y los escribes con las siguientes condiciones. Mandatorio responder con un documento en formateado asi  ```<!DOCTYPE html> pon el contenido aqui </html>```, todos los campos que sean a llenar que esten dentro de llaves en camel case. Por ejemplo: \{detalleDelMotivo\}'},
+  { key: 'NO PROMPT', text: '' },
+  { key: 'EXCEL ESP', text: 'Eres un experto asistente de Excel en espanol para generar formulas y dar pasos en conseguir el objetivo de la pregunta. Y escribes bajo las siguientes condiciones, si se te pregunta formulas exactas envia la explicacion mas corta y sencilla con la formula dentro de ``` '},
+  { key: 'EXCEL ENG', text: 'Eres un experto asistente de Excel en ingles para generar formulas y dar pasos en conseguir el objetivo de la pregunta. Y escribes bajo las siguientes condiciones, si se te pregunta formulas exactas envia la explicacion mas corta y sencilla con la formula dentro de ``` '}
 ];
 
 const drawerWidth = 190;
@@ -44,11 +50,27 @@ function AiGenerator(props) {
   const [isClosing, setIsClosing] = React.useState(false);
   const { userCard } = useSelector(state => state.login)
   const [chatList, setChatList] = React.useState([])
+  const [isFirstChat, setIsFirstChat] = React.useState(false);
   const dispatch = useDispatch();
 
   const [anchorMenuModel, setAnchorMenuModel] = React.useState(null);
+    // New state for the PROMPTS menu
+  const [anchorPromptsMenu, setAnchorPromptsMenu] = React.useState(null);
   const [selectedIndexModel, setSelectedIndexModel] = React.useState(0);
+  const [selectedPrompt, setSelectedPrompt] = React.useState('NO PROMPT');
+
   const open = Boolean(anchorMenuModel);
+  const openPromptsMenu = Boolean(anchorPromptsMenu);
+
+    // Function to handle clicking the new menu button
+    const handlePromptsMenuClick = (event) => {
+      setAnchorPromptsMenu(event.currentTarget);
+    };
+  
+    // Function to handle closing the new menu
+    const handleClosePromptsMenu = () => {
+      setAnchorPromptsMenu(null);
+    };
 
   const handleClickListItem = (event) => {
     setAnchorMenuModel(event.currentTarget);
@@ -58,6 +80,11 @@ function AiGenerator(props) {
     setSelectedIndexModel(index);
     setAnchorMenuModel(null);
   };
+
+  const handleMenuPromptClick = (event, key) => {
+    setSelectedPrompt(key)
+    setAnchorPromptsMenu(null);
+  }
 
   const handleCloseMenuModel = () => {
     setAnchorMenuModel(null);
@@ -70,6 +97,8 @@ function AiGenerator(props) {
   const handleListItemClick = (event, index) => {
     // console.log(index)
     dispatch(selectChatId(index))
+    setIsFirstChat(false)
+    setSelectedPrompt('NO PROMPT')
     setSelectedIndex(index);
   };
 
@@ -91,6 +120,7 @@ function AiGenerator(props) {
   const createNewConversation = () => {
     const generatedUuid = uuidv4();
     dispatch(selectChatId(generatedUuid))
+    setIsFirstChat(true)
     console.log(generatedUuid)
   }
 
@@ -101,6 +131,8 @@ function AiGenerator(props) {
 
   React.useEffect(() => {
     dispatch(selectChatId(''))
+    setIsFirstChat(false)
+    setSelectedPrompt('NO PROMPT')
     fetchChatList(setChatList)
   }, []);
 
@@ -203,6 +235,7 @@ function AiGenerator(props) {
       }}
     >
       <AppBar
+
         sx={{
           position: "relative",
           bgcolor: "rgba(35, 35, 35, 0.85)", // A darker shade for the AppBar          // height: "10%"
@@ -271,6 +304,54 @@ function AiGenerator(props) {
             ))}
           </Menu>
 
+
+         {/* New PROMPTS Menu */}
+         <List
+          component="nav"
+          aria-label="Document settings"
+          sx={{ display: 'flex', bgcolor: 'rgba(55, 55, 55, 0.5)' }}
+        >
+          <ListItemButton
+            id="prompts-button"
+            aria-haspopup="listbox"
+            aria-controls="prompts-menu"
+            aria-label="ELIGE PROMPT"
+            aria-expanded={openPromptsMenu ? 'true' : undefined}
+            onClick={handlePromptsMenuClick}
+          >
+            <ListItemText
+              primary="ELIGE PROMPT"
+              secondary={selectedPrompt}
+              sx={{
+                '& .MuiListItemText-secondary': {
+                  color: 'white',
+                }
+              }}
+            />
+          </ListItemButton>
+        </List>
+
+        <Menu
+          id="prompts-menu"
+          anchorEl={anchorPromptsMenu}
+          open={openPromptsMenu}
+          onClose={handleClosePromptsMenu}
+          MenuListProps={{
+            'aria-labelledby': 'prompts-button',
+            role: 'listbox',
+          }}
+        >
+          {PROMPTS.map((prompt, index) => (
+            <MenuItem
+              key={prompt.key}
+              onClick={(event) => handleMenuPromptClick(event, prompt.key)}
+            >
+              {prompt.key}
+            </MenuItem>
+          ))}
+        </Menu>
+
+
         </Toolbar>
       </AppBar>
 
@@ -326,7 +407,12 @@ function AiGenerator(props) {
             bgcolor: '#f1f1f1'
           }}
         >
-          {selectedChatId && <ChatLayout modelo={options[selectedIndexModel]} />}
+          {selectedChatId && <ChatLayout 
+                              modelo={options[selectedIndexModel]} 
+                              isFirstChat={isFirstChat} 
+                              setIsFirstChat={setIsFirstChat}
+                              systemPrompt={PROMPTS.find(prompt => prompt.key === selectedPrompt)?.text || ''}
+                            />}
         </Box>
       </Box>
     </Box>

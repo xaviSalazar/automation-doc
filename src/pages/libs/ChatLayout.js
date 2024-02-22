@@ -56,7 +56,7 @@ const MessagePart = ({ part }) => {
 };
 
 
-export default function ChatLayout({ modelo }) {
+export default function ChatLayout({ modelo, isFirstChat, systemPrompt, setIsFirstChat }) {
 
   const [messages, setMessages] = useState([]);
   const [imgFile, setImgFile] = useState('');
@@ -159,28 +159,43 @@ export default function ChatLayout({ modelo }) {
     try {
       const userInput = inputRef.current.value
       inputRef.current.value = ''
+ 
       if (userInput.trim() !== '') {
+
+        const promptMessage = {
+          role: 'system',
+          content: systemPrompt,
+        }
 
         const msgSchema = {
           role: 'user',
           content: userInput,
-          senderId: userCard['id'],
-          receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589",
-          conversationId: selectedChatId,
-          model: modelo
         }
 
         if (imgFile !== "") {
           msgSchema.attachment = JSON.stringify(imgFile);
         }
 
+        const newMsgSchema = {
+          senderId: userCard['id'],
+          receiverId: "b5fcfbd7-52ba-4786-bea0-d74ed1dbf589",
+          conversationId: selectedChatId,
+          model: modelo,
+          content: [msgSchema]
+        }
+
+        if( isFirstChat && (systemPrompt !== '') ) {
+          newMsgSchema.content.unshift(promptMessage)
+        }
+
+        // console.log(newMsgSchema)
+
         setMessages(prevMessages => [...prevMessages, msgSchema]);
         setImgFile('');
         setFileUploaded(false);
 
-        console.log(msgSchema)
-
-        const stream = await httpManager.streamingResponseConversation(JSON.stringify(msgSchema))
+        const stream = await httpManager.streamingResponseConversation(JSON.stringify(newMsgSchema))
+        setIsFirstChat(false)
 
         if (!stream.ok || !stream.body) {
           throw stream.statusText;
