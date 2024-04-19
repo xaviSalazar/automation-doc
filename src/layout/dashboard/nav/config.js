@@ -44,6 +44,11 @@ const navConfig = [
     title: 'Documento Chat',
     path: '/chatpdf',
     icon: icon('chatwithDoc')
+  },
+  {
+    title: 'IMAGES',
+    path: '/image-gen',
+    icon: icon('chatwithDoc')
   }
   // {
   //   title: 'product',

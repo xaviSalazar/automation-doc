@@ -48,9 +48,11 @@ export default function SignIn() {
   React.useEffect(() => {
     if(isAuth === true) {
       const from = location.state?.from?.pathname || '/';
-      navigate(from);
+      const search = location.state?.from?.search || "";
+      // navigate(from);
+      navigate(`${from}${search}`, { replace: true });
     } 
-  }, [[isAuth, navigate, location.state]])
+  }, [isAuth, navigate, location.state])
 
   const handleSubmit = async (event) => {
 

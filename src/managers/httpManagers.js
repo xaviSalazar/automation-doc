@@ -132,6 +132,14 @@ const deleteOneConversation = async(data) => {
     return await axios.post(`${API_BASE_URL}/deleteOneConversation`, data)
 }
 
+const callOotDiffusion = async(data) => {
+    return await axios.post(`${API_BASE_URL}/getImageDiffusion`, data)
+}
+
+const getImgResults = async(id) => {
+    return await axios.get(`${API_BASE_URL}/retrieveImgResults?Id=${id}`) 
+}
+
 const requestDownloadWord = async(htmlContent) => {
     return await axios.post(`${API_BASE_URL}/downloadAsWord`, {
         htmlContent  // Send as a JSON object
@@ -165,5 +173,7 @@ export const httpManager = {
     deleteOneConversation,
     requestUrl,
     uploadFileToS3,
-    requestDownloadWord
+    requestDownloadWord,
+    callOotDiffusion,
+    getImgResults
 }
