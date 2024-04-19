@@ -101,6 +101,7 @@ function ImgGenerator(props) {
             name: file.name,
             size: file.size,
             type: file.type,
+            user_id: userCard['id']
           };
 
           attachmentArray.push(obj);
