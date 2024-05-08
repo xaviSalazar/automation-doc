@@ -45,11 +45,11 @@ const navConfig = [
     path: '/chatpdf',
     icon: icon('chatwithDoc')
   },
-  {
-    title: 'IMAGES',
-    path: '/image-gen',
-    icon: icon('chatwithDoc')
-  }
+  // {
+  //   title: 'IMAGES',
+  //   path: '/image-gen',
+  //   icon: icon('chatwithDoc')
+  // }
   // {
   //   title: 'product',
   //   path: '/dashboard/products',

@@ -53,7 +53,7 @@ export default function Router() {
         { path: 'edit', element: <ProtectedRoute><DocUpload /></ProtectedRoute> },
         { path: 'generate', element: <ProtectedRoute><AiGenerator /></ProtectedRoute> },
         { path: 'chatpdf', element: <ProtectedRoute><ChatPdf /></ProtectedRoute> },
-        { path: 'image-gen', element: <ProtectedRoute><ImgGenerator /></ProtectedRoute> },
+        // { path: 'image-gen', element: <ProtectedRoute><ImgGenerator /></ProtectedRoute> },
         // Public routes below
         { path: 'login', element: <SignIn />},
         { path: 'signup', element: <SignUp />},

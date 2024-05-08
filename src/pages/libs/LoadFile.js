@@ -12,7 +12,6 @@ const LoadFile = async (e, setColumnLister, setContent) => {
       var doc = new Docxtemplater(new PizZip(content), {delimiters: {start: '12op1j2po1j2poj1po', end: 'op21j4po21jp4oj1op24j'}});
       // gets full text of document but ignores format and breaklines and paragraphs
       var text = doc.getFullText();
-      console.log(text)
       // matches all words inside { }
       const regex = /\{(\w+)\}/g;
       // all matches passed to an array

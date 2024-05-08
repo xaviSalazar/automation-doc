@@ -16,7 +16,7 @@ const checkFiles = (doc, zip) => {
   // matches all words inside { }
   // const regex = /\{(\p{L}+\p{M}*)+\}/gu;
   // const regex = /\{(\p{L}+\p{M}*\d+)\}/gu
-  const regex = /{([a-zA-ZñáéíóúÁÉÍÓÚ0-9]+)}/g
+  const regex = /{([a-zA-ZñáéíóúÁÉÍÓÚ0-9_]+)}/g
 
   const document = zip.files[xmlTypes['document']]
   const header = zip.files[xmlTypes['head']]
@@ -28,6 +28,8 @@ const checkFiles = (doc, zip) => {
     const bodyText = doc.getFullText()
     // still undefined when no existing words with { }
     matchDoc = bodyText.match(regex)?.map(match => match.slice(1, -1));
+    // console.log("document -> ", matchDoc)
+
   }
 
   if (typeof header !== "undefined")
@@ -35,6 +37,8 @@ const checkFiles = (doc, zip) => {
     const headText = doc.getFullText(xmlTypes['head'])
     // still undefined when no existing words with { }
     matchHeading = headText.match(regex)?.map(match => match.slice(1, -1));
+    // console.log("header -> ", matchHeading)
+
   }
 
   if (typeof footer !== "undefined")
@@ -42,11 +46,9 @@ const checkFiles = (doc, zip) => {
     const footText = doc.getFullText(xmlTypes['foot'])
     // still undefined when no existing words with { }
     matchFooter = footText.match(regex)?.map(match => match.slice(1, -1));
+    // console.log("footer -> ", matchFooter)
   }
 
-  console.log("document -> ", matchDoc)
-  // console.log("header -> ", matchHeading)
-  // console.log("footer -> ", matchFooter)
 
   // useful to concatenate only existing Arrays
   // For better stability in filtering, rather than using a blacklist (not null),
