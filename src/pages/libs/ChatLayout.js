@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { httpManager } from '../../managers/httpManagers.js';
-import { loadHistory, appendArrayHistory, cleanReceivedMsg } from '../../redux/conversationStore/conversationAction';
+// import { loadHistory, appendArrayHistory, cleanReceivedMsg } from '../../redux/conversationStore/conversationAction';
 import { oneLight as SyntaxHighlighterStyle } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -23,13 +23,14 @@ import SendIcon from '@mui/icons-material/Send';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'; // Import check circle icon
 import DeleteIcon from '@mui/icons-material/Delete'; // Import delete icon
+import { createWithEqualityFn } from "zustand/traditional"
 
 const splitMessage = (message) => {
   const regex = /```(.*?)```|(\*\*(.*?)\*\*)/gs;
   let parts = [];
   let lastIndex = 0;
 
-  message.replace(regex, (match, code, bold, boldText, index) => {
+  message?.replace(regex, (match, code, bold, boldText, index) => {
     if (index > lastIndex) {
       parts.push({ type: 'text', content: message.slice(lastIndex, index) });
     }
@@ -47,7 +48,7 @@ const splitMessage = (message) => {
     lastIndex = index + match.length;
   });
 
-  if (lastIndex < message.length) {
+  if (lastIndex < message?.length) {
     parts.push({ type: 'text', content: message.slice(lastIndex) });
   }
 
@@ -108,68 +109,119 @@ const MessagePart = ({ part }) => {
   }
 };
 
+// Create a Zustand store
+const useMessageStore = createWithEqualityFn((set, get) => ({
+  messages: [],
+
+  hasMore: false,
+
+  addMessage : (newMessage) => set((state) => ({ messages: [...state.messages, newMessage] })),
+
+  receivedMessage : (newPart) => {
+      if (get().messages.length === 0 || get().messages[get().messages.length - 1].role !== 'assistant') {
+        // If there are no messages or the last message is not from the server, add a new message
+        set((state) => ({messages : [...state.messages, { content: newPart, role: 'assistant' }]}))
+      } else {
+        // Otherwise, update the last message with the new chunk
+        const updatedMessages = [...get().messages];
+        updatedMessages[updatedMessages.length - 1] = {
+          ...updatedMessages[updatedMessages.length - 1],
+          content: updatedMessages[updatedMessages.length - 1].content + newPart,
+        };
+        set(() => ({messages : updatedMessages}))
+      }
+    },
+
+  appendArrayHistory: async(senderId, receiverId, page, messagesPerPage, SetLoadingHistory) => {
+    try {
+      SetLoadingHistory(true)
+     const response = await httpManager.getChatHistory(senderId, receiverId, page, messagesPerPage)
+     if (response.status === 200) {
+         SetLoadingHistory(false)
+         const sortedMessages =response.data.conversation.sort((a, b) => {
+          return new Date(a.timestamp) - new Date(b.timestamp);
+      });
+         set((state) => ({ messages: [...sortedMessages, ...state.messages], hasMore:response.data.hasMore }));
+      } 
+     else {
+         // dispatch(loadingFailed())
+       console.error('Error fetching documents:', response.statusText);
+     }
+   } catch (error) {
+     console.error('Error fetching documents:', error);
+   }
+
+  },
+
+  loadSavedHistory: async (senderId, chatId, page, messagesPerPage, SetLoadingHistory) => {
+    try {
+      SetLoadingHistory(true)
+      const response = await httpManager.getChatHistory(senderId, chatId, page, messagesPerPage)
+      if (response.status === 200) {
+        SetLoadingHistory(false)
+        const sortedMessages =response.data.conversation.sort((a, b) => {
+          return new Date(a.timestamp) - new Date(b.timestamp);
+      });
+        set({ messages: sortedMessages, hasMore:response.data.hasMore });
+       } 
+      else {
+        console.error('Error fetching documents:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching documents:', error);
+    }
+  } 
+
+}));
 
 export default function ChatLayout({ modelo, isFirstChat, systemPrompt, setIsFirstChat }) {
 
-  const [messages, setMessages] = useState([]);
+const messages = useMessageStore((state) => state.messages);
+const hasMore = useMessageStore((state) => state.hasMore);
+const addMessage = useMessageStore((state) => state.addMessage);
+const receivedMessage = useMessageStore((state) => state.receivedMessage);
+const appendArrayHistory = useMessageStore((state) => state.appendArrayHistory);
+const loadSavedHistory = useMessageStore((state) => state.loadSavedHistory);
+
+  // const [messages, setMessages] = useState([]);
   const [imgFile, setImgFile] = useState('');
+  const [isLoadingHistory, SetLoadingHistory] = useState(false)
   const inputRef = React.useRef(null)
   const [inputPosition, setInputPosition] = useState('top');
   const [fileUploaded, setFileUploaded] = useState(false);
   const [highlight, setHighlight] = useState(false);
   const messagesContainerRef = useRef(null);
   const [page, setPage] = useState(0);
-  const { isLoadingHistory, selectedChatId, conversationArr,
-    isLoadingMessage, hasMore, chatAnswer,
-    appendHistory } = useSelector(state => state.conversationHistory)
-
-  // loading state variable after message sent
-  const dispatch = useDispatch();
+  const { selectedChatId,
+    isLoadingMessage, } = useSelector(state => state.conversationHistory)
 
   const { userCard } = useSelector(state => state.login)
 
-  useEffect(() => {
-    if (chatAnswer === '') return;
-    dispatch(cleanReceivedMsg())
-    setMessages(prevMessages => [...prevMessages, chatAnswer]);
-  }, [chatAnswer, dispatch])
-
-
+    // loading history
   useEffect(() => {
     if (selectedChatId === '') return;
     const pagina = 0;
     setPage(0);
-    dispatch(loadHistory(userCard['id'], selectedChatId, pagina, 10));
-  }, [selectedChatId, dispatch]);
+    loadSavedHistory(userCard['id'], selectedChatId, pagina, 10, SetLoadingHistory);
+  }, [selectedChatId]);
 
+  //loading more pages
   useEffect(() => {
     if ((page > 0) && (hasMore === true)) {  // Avoid running on initial render
       // call append history
-      dispatch(appendArrayHistory(userCard['id'], selectedChatId, page, 10));
+      appendArrayHistory(userCard['id'], selectedChatId, page, 10, SetLoadingHistory)
     }
-  }, [dispatch, userCard['id'], page, selectedChatId]);
+  }, [userCard['id'], page, selectedChatId]);
 
+  // update page when scroll touches top
   useEffect(() => {
-    setMessages(prevMessages => [...appendHistory, ...prevMessages]);
-  }, [appendHistory])
-
-  // ONLY LOADS FIRST RENDER
-  useEffect(() => {
-    setPage(0)
-    setMessages(conversationArr);
-  }, [conversationArr, selectedChatId])
-
-  useEffect(() => {
-
     const handleScroll = () => {
       const { scrollTop } = messagesContainerRef.current;
-      // console.log(page)
       const nearingTop = scrollTop === 0;
       if (nearingTop && hasMore) {
-        console.log(page)
         setPage(prevPage => prevPage + 1);
       }
-    };
+  };
 
     const messagesContainer = messagesContainerRef.current;
     messagesContainer.addEventListener('scroll', handleScroll);
@@ -180,7 +232,6 @@ export default function ChatLayout({ modelo, isFirstChat, systemPrompt, setIsFir
 
   }, [hasMore]);
 
-
   async function processStream(reader, decoder) {
     const { value, done } = await reader.read();
     if (done) {
@@ -189,26 +240,12 @@ export default function ChatLayout({ modelo, isFirstChat, systemPrompt, setIsFir
     }
     const decodedChunk = decoder.decode(value, { stream: true });
     // Update the messages state by appending the new chunk to the last message
-    setMessages(prevMessages => {
-      if (prevMessages.length === 0 || prevMessages[prevMessages.length - 1].role !== 'assistant') {
-        // If there are no messages or the last message is not from the server, add a new message
-        return [...prevMessages, { content: decodedChunk, role: 'assistant' }];
-      } else {
-        // Otherwise, update the last message with the new chunk
-        const updatedMessages = [...prevMessages];
-        updatedMessages[updatedMessages.length - 1] = {
-          ...updatedMessages[updatedMessages.length - 1],
-          content: updatedMessages[updatedMessages.length - 1].content + decodedChunk,
-        };
-        return updatedMessages;
-      }
-    });
-
-    // Call the function recursively to read the next chunk
+    receivedMessage(decodedChunk);
     await processStream(reader, decoder);
   }
 
   const handleSendMessage = async () => {
+
     try {
       const userInput = inputRef.current.value
       inputRef.current.value = ''
@@ -242,11 +279,11 @@ export default function ChatLayout({ modelo, isFirstChat, systemPrompt, setIsFir
         if( isFirstChat && (systemPrompt !== '') ) {
           newMsgSchema.content.unshift(promptMessage)
         }
-
-        // console.log(newMsgSchema)
-
-        setMessages(prevMessages => [...prevMessages, msgSchema]);
+        // setMessages(prevMessages => [...prevMessages, msgSchema])
+        addMessage(msgSchema);
         setImgFile('');
+
+        // MODIFICAR ESTA PARTE LO ULTIMO QUE RESTA
         setFileUploaded(false);
 
         const stream = await httpManager.streamingResponseConversation(JSON.stringify(newMsgSchema))
@@ -371,6 +408,10 @@ export default function ChatLayout({ modelo, isFirstChat, systemPrompt, setIsFir
       return null;
     }
   };
+
+  if(!messages) {
+    return
+    }
 
   return (
     <>

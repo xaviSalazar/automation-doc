@@ -36,7 +36,7 @@ const navConfig = [
     icon: icon('autoTemplate'),
   },
   {
-    title: 'Generador AI',
+    title: 'Chatbot AI',
     path: '/generate',
     icon: icon('generateAi'),
   },
